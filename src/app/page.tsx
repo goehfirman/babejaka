@@ -12,6 +12,7 @@ export default function LandingPage() {
   const { profile, logout } = useProfile();
   const router = useRouter();
   const [showNameModal, setShowNameModal] = useState(false);
+  const [showDevModal, setShowDevModal] = useState(false);
 
   const isDefaultUser = profile.name === "Petualang Baca";
   
@@ -195,8 +196,7 @@ export default function LandingPage() {
           <p className="text-xs font-black text-ink-light tracking-[0.2em] opacity-40">© 2026 BABE JAKA - JAKARTA KOTA GLOBAL</p>
           
           <div className="flex gap-10 text-xs font-black tracking-widest text-ink-light">
-             <Link href="#" className="hover:text-primary transition-colors">PRIVASI</Link>
-             <Link href="#" className="hover:text-primary transition-colors">SYARAT</Link>
+             <button onClick={() => setShowDevModal(true)} className="hover:text-primary transition-colors uppercase">TENTANG PENGEMBANG</button>
              <Link href="#" className="hover:text-primary transition-colors">BANTUAN</Link>
           </div>
         </div>
@@ -215,6 +215,41 @@ export default function LandingPage() {
 
       {showNameModal && (
         <NamePromptModal onClose={() => setShowNameModal(false)} />
+      )}
+
+      {/* TENTANG PENGEMBANG BUTTON (BOTTOM RIGHT) */}
+      <button 
+        onClick={() => setShowDevModal(true)}
+        className="fixed bottom-8 right-8 z-[110] bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 px-6 py-4 rounded-2xl font-black text-xs text-primary tracking-widest hover:scale-105 hover:bg-white hover:shadow-2xl transition-all flex items-center gap-3 group"
+      >
+        <span className="relative">
+          TENTANG PENGEMBANG
+          <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+        </span>
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+          <span className="material-symbols-rounded text-lg">person</span>
+        </div>
+      </button>
+
+      {/* DEV MODAL */}
+      {showDevModal && (
+        <div 
+          className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/40 backdrop-blur-xl transition-all animate-in fade-in duration-300"
+          onClick={() => setShowDevModal(false)}
+        >
+          <div 
+            className="relative max-w-2xl w-full animate-in zoom-in duration-300 pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="overflow-hidden rounded-[32px] shadow-lg border border-white/10">
+              <img 
+                src="https://i.ibb.co.com/KcvnDh2X/Teguh-Firmansyah-adalah-pendidik-yang-berdedikasi-dengan-keahlian-dalam-mengelola-kelas-merancang-k.png" 
+                alt="Tentang Pengembang"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );
