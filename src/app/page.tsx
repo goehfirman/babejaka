@@ -65,7 +65,7 @@ export default function LandingPage() {
           </p>
         
           <p className="text-lg md:text-xl text-ink-light font-bold leading-relaxed mb-8 max-w-xl" style={{ animation: 'bounce-in 1s forwards' }}>
-            Gabungkan kearifan lokal Betawi dengan teknologi AI tercanggih. Jelajahi Jakarta Global, pecahkan rahasia cerita, dan jadilah Jagoan Kata bersama Babe Jaka!
+            Siap keliling Jakarta lewat cerita? Bersama Babe Jaka, kamu bisa asah kemampuan membacamu jadi makin jago sambil mengenal kerennya budaya Betawi. Yuk, mulai baca sekarang!
           </p>
 
           <div className="flex flex-wrap justify-center lg:justify-start gap-4" style={{ animation: 'bounce-in 1.2s forwards' }}>
