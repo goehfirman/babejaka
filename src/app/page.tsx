@@ -209,14 +209,14 @@ export default function LandingPage() {
       {/* TENTANG PENGEMBANG BUTTON (BOTTOM RIGHT) */}
       <button 
         onClick={() => setShowDevModal(true)}
-        className="fixed bottom-8 right-8 z-[110] bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 px-6 py-4 rounded-2xl font-black text-xs text-primary tracking-widest hover:scale-105 hover:bg-white hover:shadow-2xl transition-all flex items-center gap-3 group"
+        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[110] bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 p-2 md:px-6 md:py-4 rounded-2xl font-black text-xs text-primary tracking-widest hover:scale-105 hover:bg-white hover:shadow-2xl transition-all flex items-center gap-3 group"
       >
-        <span className="relative">
+        <span className="relative hidden md:block">
           TENTANG PENGEMBANG
           <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
         </span>
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-          <span className="material-symbols-rounded text-lg">person</span>
+        <div className="w-12 h-12 md:w-8 md:h-8 rounded-xl md:rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+          <span className="material-symbols-rounded text-2xl md:text-lg">person</span>
         </div>
       </button>
 
