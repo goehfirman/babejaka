@@ -202,17 +202,6 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* STICKY CTA */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] md:hidden w-[90%]">
-        <button 
-          onClick={handleMulai}
-          className="w-full btn-heritage flex items-center justify-center gap-3 shadow-2xl"
-        >
-          <span>MULAI PETUALANGAN 👋</span>
-          <span className="material-symbols-rounded text-2xl">rocket_launch</span>
-        </button>
-      </div>
-
       {showNameModal && (
         <NamePromptModal onClose={() => setShowNameModal(false)} />
       )}
