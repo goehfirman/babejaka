@@ -1,0 +1,156 @@
+export const BOOKS = [
+  {
+    id: "c_rumah_kebaya",
+    title: "Rahasia Rumah Kebaya",
+    theme: "Budaya Betawi",
+    desc: "Rojali penasaran dengan ukiran kayu unik di atap rumah kakeknya. Ia belajar makna filosofis dan sejarah budaya Betawi dari kakek.",
+    cover: "https://i.ibb.co.com/4wRthwT7/cover.png",
+    illustration: "https://i.ibb.co.com/4wRthwT7/cover.png",
+    level: "Pembaca Semenjana C",
+    grade: "Kelas 4-6 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/8LbHNsr7/2.png" },
+      { text: "", image: "https://i.ibb.co.com/kdGnsDT/3.png" },
+      { text: "", image: "https://i.ibb.co.com/sJgztMDv/4.png" },
+      { text: "", image: "https://i.ibb.co.com/gFBMj36C/5.png" },
+      { text: "", image: "https://i.ibb.co.com/JjzdVN8s/6.png" },
+      { text: "", image: "https://i.ibb.co.com/4Zd7h81J/7.png" },
+      { text: "", image: "https://i.ibb.co.com/SD4Drpxh/8.png" },
+      { text: "", image: "https://i.ibb.co.com/hRcqM2hv/9.png" },
+      { text: "", image: "https://i.ibb.co.com/dwZgLw3v/10.png" },
+      { text: "", image: "https://i.ibb.co.com/pB3N525q/11.png" }
+    ]
+  },
+  {
+    id: "b_ondel_ondel_history",
+    title: "Ondel-Ondel Dulu dan Sekarang",
+    theme: "Budaya Betawi",
+    desc: "Buku ini menceritakan pengalaman Zain bersama Babe. Mereka belajar sejarah ondel-ondel dari zaman dahulu.",
+    cover: "https://i.ibb.co.com/Lh84mcXx/1.png",
+    illustration: "https://i.ibb.co.com/Lh84mcXx/1.png",
+    level: "Pembaca Awal B1",
+    grade: "Kelas 1-2 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/8nq1VQw0/2.png" },
+      { text: "", image: "https://i.ibb.co.com/ymCWfgM2/3.png" },
+      { text: "", image: "https://i.ibb.co.com/hxr85CwZ/4.png" },
+      { text: "", image: "https://i.ibb.co.com/fVC12fq8/5.png" },
+      { text: "", image: "https://i.ibb.co.com/gMdTt905/6.png" },
+      { text: "", image: "https://i.ibb.co.com/nWTnKyx/7.png" },
+      { text: "", image: "https://i.ibb.co.com/BK50C4B7/8.png" },
+      { text: "", image: "https://i.ibb.co.com/b50MwMKX/9.png" },
+      { text: "", image: "https://i.ibb.co.com/gZBSWdCz/10.png" },
+      { text: "", image: "https://i.ibb.co.com/svtr7Zfn/11.png" }
+    ]
+  },
+  {
+    id: "c_palang_pintu",
+    title: "Tradisi Palang Pintu",
+    theme: "Budaya Betawi",
+    desc: "Mamat belajar silat untuk menjadi jagoan tradisi Palang Pintu. Dia harus melawan Bang Juki agar rombongan pengantin bisa masuk.",
+    cover: "https://i.ibb.co.com/0RLvY0nQ/1.jpg",
+    illustration: "https://i.ibb.co.com/0RLvY0nQ/1.jpg",
+    level: "Pembaca Semenjana C",
+    grade: "Kelas 4-6 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/vppdSzV/2.jpg" },
+      { text: "", image: "https://i.ibb.co.com/vxSqDn9T/3.jpg" },
+      { text: "", image: "https://i.ibb.co.com/4gMSdhB2/4.jpg" },
+      { text: "", image: "https://i.ibb.co.com/1fDN8szs/5.jpg" },
+      { text: "", image: "https://i.ibb.co.com/m5XdjJ4f/6.jpg" },
+      { text: "", image: "https://i.ibb.co.com/ccV12yCh/7.jpg" },
+      { text: "", image: "https://i.ibb.co.com/x8KVw6pP/8.jpg" },
+      { text: "", image: "https://i.ibb.co.com/C3PKz1H5/9.jpg" },
+      { text: "", image: "https://i.ibb.co.com/27VLMVQY/10.jpg" },
+      { text: "", image: "https://i.ibb.co.com/Tqd11sZN/11.jpg" }
+    ]
+  },
+  {
+    id: "b_jaklingko",
+    title: "JakLingko Sahabatku",
+    theme: "Transportasi Publik",
+    desc: "Nisa dan Ibu pergi ke rumah Nenek. Mereka naik Mikrotrans Jak Lingko yang sangat nyaman.",
+    cover: "https://i.ibb.co.com/TDmHcMLm/1.jpg",
+    illustration: "https://i.ibb.co.com/TDmHcMLm/1.jpg",
+    level: "Pembaca Awal B2",
+    grade: "Kelas 1-2 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/kLvn7zJ/2.jpg" },
+      { text: "", image: "https://i.ibb.co.com/qF7ktznc/3.jpg" },
+      { text: "", image: "https://i.ibb.co.com/p6x2SRQb/4.jpg" },
+      { text: "", image: "https://i.ibb.co.com/N67qbNjv/5.jpg" },
+      { text: "", image: "https://i.ibb.co.com/hF6vpggX/6.jpg" },
+      { text: "", image: "https://i.ibb.co.com/q8CwMXw/7.jpg" },
+      { text: "", image: "https://i.ibb.co.com/hJ8Dbfgc/8.jpg" },
+      { text: "", image: "https://i.ibb.co.com/F4gF8hhD/9.jpg" },
+      { text: "", image: "https://i.ibb.co.com/D3cGxTM/10.jpg" },
+      { text: "", image: "https://i.ibb.co.com/s9t9CtpX/11.jpg" }
+    ]
+  },
+  {
+    id: "b_dampu_bulan",
+    title: "Permainan Dampu Bulan",
+    theme: "Permainan Tradisional",
+    desc: "Juki dan kawan-kawan asyik bermain Dampu Bulan di halaman rumah. Mereka menyadari bahwa bermain permainan tradisional bersama teman jauh lebih menyenangkan dan sehat daripada bermain gawai.",
+    cover: "https://i.ibb.co.com/j9F3fnTb/1.jpg",
+    illustration: "https://i.ibb.co.com/j9F3fnTb/1.jpg",
+    level: "Pembaca Awal B3",
+    grade: "Kelas 1-2 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/LzNBDC2P/2.jpg" },
+      { text: "", image: "https://i.ibb.co.com/BVwVQX0j/3.jpg" },
+      { text: "", image: "https://i.ibb.co.com/d4vvjXFh/4.jpg" },
+      { text: "", image: "https://i.ibb.co.com/3mJNzszt/5.jpg" },
+      { text: "", image: "https://i.ibb.co.com/QvHDVGMG/6.jpg" },
+      { text: "", image: "https://i.ibb.co.com/d038J4gj/7.jpg" },
+      { text: "", image: "https://i.ibb.co.com/WNK1dv87/8.jpg" },
+      { text: "", image: "https://i.ibb.co.com/FbC5bYcB/9.jpg" },
+      { text: "", image: "https://i.ibb.co.com/wN9qgrcX/10.jpg" },
+      { text: "", image: "https://i.ibb.co.com/rntYsDb/11.jpg" }
+    ]
+  },
+  {
+    id: "b_kerak_telor_juki",
+    title: "Kerak Telor Bang Juki",
+    theme: "Makanan Tradisional",
+    desc: "Siti bersepeda di acara hari bebas kendaraan bermotor Jakarta. Dia bertemu Bang Juki yang menjual kerak telor dengan gerobak pikul yang unik.",
+    cover: "https://i.ibb.co.com/XrmYBTQG/1.jpg",
+    illustration: "https://i.ibb.co.com/XrmYBTQG/1.jpg",
+    level: "Pembaca Awal B3",
+    grade: "Kelas 1-2 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/NQKPk7z/2.jpg" },
+      { text: "", image: "https://i.ibb.co.com/k2d4MjX2/3.jpg" },
+      { text: "", image: "https://i.ibb.co.com/6CHS2Qp/4.jpg" },
+      { text: "", image: "https://i.ibb.co.com/1Yg5YRb5/5.jpg" },
+      { text: "", image: "https://i.ibb.co.com/Xfx4wqFw/6.jpg" },
+      { text: "", image: "https://i.ibb.co.com/6JmLwtht/7.jpg" },
+      { text: "", image: "https://i.ibb.co.com/cKvNNFtJ/8.jpg" },
+      { text: "", image: "https://i.ibb.co.com/mVZsjZf9/9.jpg" },
+      { text: "", image: "https://i.ibb.co.com/zTkzbKKr/10.jpg" },
+      { text: "", image: "https://i.ibb.co.com/0pLhHTrF/11.jpg" }
+    ]
+  },
+  {
+    id: "b_selendang_mayang",
+    title: "Si Manis yang Menyegarkan",
+    theme: "Kuliner Tradisional",
+    desc: "Siti dan Ibu membuat es selendang mayang bersama. Minuman khas Betawi ini rasanya manis dan segar.",
+    cover: "https://i.ibb.co.com/ymNCWGs3/1.jpg",
+    illustration: "https://i.ibb.co.com/ymNCWGs3/1.jpg",
+    level: "Pembaca Awal B1",
+    grade: "Kelas 1-2 SD",
+    pages: [
+      { text: "", image: "https://i.ibb.co.com/yc6HGG34/2.jpg" },
+      { text: "", image: "https://i.ibb.co.com/KjMR5Zz7/3.jpg" },
+      { text: "", image: "https://i.ibb.co.com/67wpw1YX/4.jpg" },
+      { text: "", image: "https://i.ibb.co.com/prdj76hc/5.jpg" },
+      { text: "", image: "https://i.ibb.co.com/xKRZNYch/6.jpg" },
+      { text: "", image: "https://i.ibb.co.com/h1H00B4w/7.jpg" },
+      { text: "", image: "https://i.ibb.co.com/KcCNxBTM/8.jpg" },
+      { text: "", image: "https://i.ibb.co.com/gbQtc0rR/9.jpg" },
+      { text: "", image: "https://i.ibb.co.com/vv1PLy4z/10.jpg" },
+      { text: "", image: "https://i.ibb.co.com/sd3BjKZY/11.jpg" }
+    ]
+  },
+];

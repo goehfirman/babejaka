@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>READIFY - Hub Membaca AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#005e17",
+                        "surface-dim": "#c1d5ff",
+                        "surface": "#f5f6ff",
+                        "error-dim": "#9f0519",
+                        "primary": "#005e9f",
+                        "on-surface-variant": "#485c80",
+                        "on-secondary-fixed": "#4f2c00",
+                        "on-tertiary-fixed-variant": "#00691a",
+                        "on-secondary": "#fff0e5",
+                        "surface-container": "#dfe8ff",
+                        "on-secondary-container": "#6a3c00",
+                        "outline": "#63779d",
+                        "tertiary-fixed-dim": "#83e881",
+                        "secondary-fixed": "#ffc791",
+                        "on-error": "#ffefee",
+                        "on-tertiary": "#d1ffc8",
+                        "inverse-surface": "#000e26",
+                        "on-tertiary-fixed": "#00480f",
+                        "surface-container-highest": "#ceddff",
+                        "error-container": "#fb5151",
+                        "on-background": "#1a2f50",
+                        "secondary-container": "#ffc791",
+                        "on-primary-fixed-variant": "#002e51",
+                        "primary-fixed-dim": "#2498f5",
+                        "outline-variant": "#9aadd6",
+                        "tertiary-dim": "#005d16",
+                        "tertiary-container": "#91f78e",
+                        "primary-dim": "#00528b",
+                        "on-error-container": "#570008",
+                        "background": "#f5f6ff",
+                        "error": "#b31b25",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#006b1b",
+                        "primary-container": "#44a5ff",
+                        "secondary-dim": "#764400",
+                        "tertiary-fixed": "#91f78e",
+                        "surface-container-high": "#d7e3ff",
+                        "secondary": "#874e00",
+                        "on-primary-container": "#002442",
+                        "primary-fixed": "#44a5ff",
+                        "on-primary": "#edf3ff",
+                        "surface-container-low": "#ecf0ff",
+                        "surface-variant": "#ceddff",
+                        "secondary-fixed-dim": "#ffb467",
+                        "surface-tint": "#005e9f",
+                        "on-secondary-fixed-variant": "#774400",
+                        "inverse-on-surface": "#899dc5",
+                        "inverse-primary": "#2498f5",
+                        "on-primary-fixed": "#000000",
+                        "surface-bright": "#f5f6ff",
+                        "on-surface": "#1a2f50"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mic-pulse {
+            box-shadow: 0 0 0 0 rgba(0, 94, 159, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 94, 159, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(0, 94, 159, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 94, 159, 0); }
+        }
+        .sdg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l2.5 5h5l-4 4 1.5 5.5-5-3-5 3 1.5-5.5-4-4h5z' fill='%23485c80' fill-opacity='0.05'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-background antialiased overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm flex justify-between items-center px-6 py-3">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-extrabold tracking-tight text-blue-600">READIFY</span>
+<nav class="hidden md:flex gap-6 ml-8">
+<a class="text-blue-700 font-bold border-b-2 border-blue-600 font-['Plus_Jakarta_Sans'] text-lg" href="#">Perpustakaan</a>
+<a class="text-slate-500 font-medium font-['Plus_Jakarta_Sans'] text-lg hover:bg-slate-100 transition-colors" href="#">Progres Saya</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-slate-100 transition-colors scale-95 active:duration-150">
+<span class="material-symbols-outlined text-slate-500">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-slate-100 transition-colors scale-95 active:duration-150">
+<span class="material-symbols-outlined text-slate-500">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTinN9JZmNJfrQ___yhNDSs4AsLvEwCUe5HSa01ukzFCUIDnpoNy1tiNATaUbFWcBcDrzqdFlEqcp4WZcV3wMHaAHm31NUZC55l6WxElcxXDNK_a6fHylGMWvOb9RlbjH7pI-Mp0zJj_0KX5sw9c859R5wFeVSMzKi1u4pXbGgiF61VKM4N9rZ9l2Xu4kTKxlRO2iwRIempCkkJ3hZ0Lp_oQkjBzpmAFsk8yRJOoYwvGaCOnwvvHMmEwK_1RWa0D8JGYaTKMtB5cc"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-6 bg-slate-50 w-64 mt-16 z-40">
+<div class="px-6 mb-8">
+<h2 class="text-xl font-black text-blue-600 font-headline">Readify Hub</h2>
+<p class="text-xs text-on-surface-variant font-medium">Kanvas Adaptif</p>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="bg-blue-50 text-blue-700 rounded-full mx-2 px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-semibold">Perpustakaan Membaca</span>
+</div>
+<div class="text-slate-600 mx-2 px-4 py-3 flex items-center gap-3 hover:bg-blue-50/50 rounded-full transition-all cursor-pointer">
+<span class="material-symbols-outlined">group</span>
+<span class="font-semibold">Ikhtisar Kelas</span>
+</div>
+<div class="text-slate-600 mx-2 px-4 py-3 flex items-center gap-3 hover:bg-blue-50/50 rounded-full transition-all cursor-pointer">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-semibold">Analitik Siswa</span>
+</div>
+<div class="text-slate-600 mx-2 px-4 py-3 flex items-center gap-3 hover:bg-blue-50/50 rounded-full transition-all cursor-pointer">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-semibold">Progres Saya</span>
+</div>
+<div class="text-slate-600 mx-2 px-4 py-3 flex items-center gap-3 hover:bg-blue-50/50 rounded-full transition-all cursor-pointer">
+<span class="material-symbols-outlined">verified</span>
+<span class="font-semibold">Lencana</span>
+</div>
+</nav>
+<div class="mt-auto px-4 space-y-2">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white rounded-xl py-3 font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                Mulai Membaca
+            </button>
+<div class="flex flex-col gap-1 pt-4 border-t border-outline-variant/10">
+<div class="text-slate-600 px-4 py-2 flex items-center gap-3 hover:bg-blue-50/50 rounded-full cursor-pointer">
+<span class="material-symbols-outlined">help</span>
+<span class="text-sm">Bantuan</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="md:ml-64 mt-16 p-4 md:p-8 min-h-screen sdg-pattern">
+<!-- Interactive Reading Header -->
+<div class="max-w-5xl mx-auto mb-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+<div class="md:col-span-8">
+<span class="px-4 py-1.5 rounded-full bg-tertiary-container text-on-tertiary-container font-bold text-xs mb-4 inline-block tracking-wider">TARGET LITERASI: SDG 4</span>
+<h1 class="text-4xl md:text-5xl font-black font-headline text-on-background leading-tight">
+                    Penjaga <br/><span class="text-primary italic">Lautan Biru</span>
+</h1>
+</div>
+<div class="md:col-span-4 flex justify-end">
+<!-- AI Mascot Glass Card -->
+<div class="bg-white/60 backdrop-blur-xl p-4 rounded-xl shadow-xl shadow-primary/5 flex items-center gap-4 border border-white/20">
+<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-white" data-weight="fill">smart_toy</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary">REDI ROBO</p>
+<p class="text-xs text-on-surface-variant font-medium leading-tight">"Kamu hebat, Leo! Siap untuk kalimat berikutnya?"</p>
+</div>
+</div>
+</div>
+</div>
+<!-- The Book Reading Interface -->
+<div class="max-w-5xl mx-auto">
+<div class="relative bg-surface-container-lowest rounded-lg p-8 md:p-16 min-h-[614px] flex flex-col justify-between overflow-hidden">
+<!-- Background Image Aspect (SDG Related) -->
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+<img alt="underwater photography" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAddBuU3d1PhABhT4azIseKmSfwBZ0MATZDiON3h3MDZdwtwW8ACJWNIMjKiskRtOc4c3r9FkKv2CZ_2Yl_ys4AJ4vjPUQg_KccgHAacv5gZH8n4Ap6SJMrxBXvVosinZkPdL84VYGdISFxVH0dPzauyrZYF5PK3NMrOUF0ZQHJnvvKuHAgsyyLZuthidSru74NiosM0Qba4P8Nw6H9b-0DPvktxdoqQDTVFzTLMq_BfClhzdGofPySjDSX4IoejaW1IVvX2Tcl2nA"/>
+</div>
+<!-- Text Content Area -->
+<div class="relative z-10">
+<div class="flex items-center gap-4 mb-12">
+<div class="mic-pulse w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">mic</span>
+</div>
+<div>
+<span class="text-xs font-black uppercase tracking-widest text-primary-dim">MENDENGARKAN AKTIF</span>
+<div class="flex gap-1">
+<div class="w-1 h-3 bg-primary rounded-full animate-bounce"></div>
+<div class="w-1 h-5 bg-primary rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+<div class="w-1 h-2 bg-primary rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+<div class="w-1 h-4 bg-primary rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+</div>
+</div>
+</div>
+<article class="text-3xl md:text-5xl font-bold font-headline leading-[1.6] md:leading-[1.4] text-slate-400">
+                        Dahulu kala, di dunia bawah <span class="text-on-background">ombak</span>, seekor <span class="text-on-background">penyu</span> kecil bernama <span class="bg-yellow-200 text-on-background px-2 rounded-lg">Tilly</span> berenang melewati <span class="hover:text-primary transition-colors cursor-help border-b-4 border-primary-container">Terumbu Karang Besar</span>. Dia menyadari bahwa warna-warnanya mulai memudar.
+                    </article>
+</div>
+<!-- Footer Progress & Controls -->
+<div class="mt-16 space-y-8">
+<!-- Progress Section -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="font-black text-primary text-sm uppercase tracking-widest">PROGRES MEMBACA</span>
+<span class="font-black text-2xl text-on-background">64%</span>
+</div>
+<div class="w-full h-4 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container rounded-full w-[64%]"></div>
+</div>
+</div>
+<!-- Action Controls -->
+<div class="flex flex-wrap items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<button class="px-8 py-4 bg-surface-container-high hover:bg-surface-container-highest text-on-background rounded-full font-black flex items-center gap-2 transition-all active:scale-95">
+<span class="material-symbols-outlined">pause</span>
+                                JEDA
+                            </button>
+<button class="px-10 py-4 bg-gradient-to-r from-primary to-primary-container text-white rounded-xl font-black text-lg shadow-xl shadow-primary/30 flex items-center gap-2 transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined">play_arrow</span>
+                                LANJUT MEMBACA
+                            </button>
+</div>
+<button class="px-8 py-4 text-error font-black hover:bg-error/5 rounded-full transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                            SELESAI MEMBACA
+                        </button>
+</div>
+</div>
+</div>
+<!-- Bento Stats Grid (Post-Reading Insight) -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="md:col-span-2 bg-surface-container-low p-6 rounded-lg flex items-center gap-6">
+<div class="w-16 h-16 bg-tertiary-container rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl text-on-tertiary-container" data-weight="fill">bolt</span>
+</div>
+<div>
+<h4 class="font-black text-on-background">Peningkatan Kosakata</h4>
+<p class="text-sm text-on-surface-variant">Kamu belajar 4 kosakata baru bertema laut hari ini!</p>
+</div>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm border border-outline-variant/10">
+<h4 class="font-black text-primary text-xs uppercase tracking-widest mb-2">KELANCARAN</h4>
+<div class="text-3xl font-black text-on-background">92<span class="text-lg text-slate-400 font-medium">/100</span></div>
+<div class="mt-4 flex gap-1">
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-slate-200 rounded-full"></div>
+</div>
+</div>
+<div class="bg-secondary-container p-6 rounded-lg text-on-secondary-container">
+<h4 class="font-black text-xs uppercase tracking-widest mb-2">WAKTU BELAJAR</h4>
+<div class="text-3xl font-black">12:45</div>
+<p class="text-xs font-bold mt-1 opacity-70">Tingkat fokus: Tinggi</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white/90 backdrop-blur-lg shadow-[0_-10px_30px_rgba(0,0,0,0.05)] rounded-t-[2rem]">
+<div class="flex flex-col items-center justify-center text-slate-400 p-2">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-bold">Beranda</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-blue-600 text-white rounded-2xl p-2 scale-110 -translate-y-2 transition-transform">
+<span class="material-symbols-outlined" data-weight="fill">auto_stories</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-bold">Pustaka</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 p-2">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-bold">Statistik</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 p-2">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-bold">Profil</span>
+</div>
+</nav>
+<!-- AI Overlay / Notification Toast (Floating Context) -->
+<div class="fixed bottom-24 right-8 z-50 md:bottom-8 group">
+<div class="absolute bottom-full right-0 mb-4 w-64 p-4 bg-on-background text-white rounded-2xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+<p class="text-sm font-medium">"Wah! Kamu sudah membaca 500 kata tentang Kehidupan di Bawah Air hari ini. Kamu benar-benar seorang Penjaga!"</p>
+<div class="absolute bottom-[-8px] right-6 w-4 h-4 bg-on-background rotate-45"></div>
+</div>
+<button class="w-16 h-16 bg-primary rounded-full shadow-2xl flex items-center justify-center text-white hover:rotate-12 transition-transform border-4 border-white">
+<span class="material-symbols-outlined text-3xl" data-weight="fill">emoji_objects</span>
+</button>
+</div>
+</body></html>

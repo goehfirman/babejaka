@@ -1,0 +1,238 @@
+@import url('https://fonts.cdnfonts.com/css/google-sans');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #C62828; /* Heritage Red */
+  --color-secondary: #1A237E; /* Global Blue */
+  --color-success: #2E7D32; /* Tech Green */
+  --color-warning: #FBC02D; /* Modern Yellow */
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #F8FAFC;
+  --color-ink: #1A1A1A;
+  --color-ink-light: #525252;
+  --color-border: #E5E7EB;
+  
+  --font-headline: 'Google Sans', sans-serif;
+  --font-body: 'Google Sans', sans-serif;
+
+  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.05), 0 1px 8px rgba(0, 0, 0, 0.02);
+  --shadow-glow-red: 0 0 20px rgba(198, 40, 40, 0.2);
+  --shadow-glow-blue: 0 0 20px rgba(26, 35, 126, 0.2);
+}
+
+/* ─── Base ─── */
+@layer base {
+  body {
+    @apply bg-[#F8FAFC] text-[#1A1A1A] selection:bg-[#C62828] selection:text-white font-body;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(198, 40, 40, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(26, 35, 126, 0.03) 0px, transparent 50%);
+    zoom: 0.9;
+  }
+}
+
+/* ─── Heritage-Tech Design System ─── */
+
+.card-heritage {
+  @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-[24px] overflow-hidden transition-all duration-500;
+  box-shadow: var(--shadow-premium);
+}
+
+.card-heritage:hover {
+  @apply -translate-y-2 border-primary/20 shadow-xl;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+.btn-heritage {
+  @apply px-10 py-4 bg-primary text-white font-black text-lg tracking-widest rounded-xl transition-all duration-300 relative overflow-hidden;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+}
+
+.btn-heritage::after {
+  content: '';
+  @apply absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300;
+}
+
+.btn-heritage:hover {
+  @apply -translate-y-1 scale-[1.02];
+  box-shadow: 0 8px 24px rgba(198, 40, 40, 0.4);
+}
+
+.btn-heritage:hover::after {
+  @apply opacity-100;
+}
+
+.btn-heritage:active {
+  @apply translate-y-0 scale-[0.98];
+}
+
+.btn-heritage-secondary {
+  @apply px-10 py-4 bg-secondary text-white font-black text-lg tracking-widest rounded-xl transition-all duration-300;
+  box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+}
+
+.btn-heritage-outline {
+  @apply px-10 py-4 bg-white border-2 border-primary/20 text-primary font-black text-lg tracking-widest rounded-xl transition-all duration-300 flex items-center gap-3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.btn-heritage-outline:hover {
+  @apply -translate-y-1 scale-[1.02] border-primary/40 bg-white;
+  box-shadow: 0 8px 24px rgba(198, 40, 40, 0.15);
+}
+
+.btn-heritage-outline:active {
+  @apply translate-y-0 scale-[0.98];
+}
+
+.text-gradient-premium {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-success;
+}
+
+/* ─── Heritage Patterns (Batik-inspired) ─── */
+.bg-batik-subtle {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C62828' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4v-4H4v4H0v2h4v4h2V6h4V4H6zM36 4v-4h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ─── Animations ─── */
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 6s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(198, 40, 40, 0.4)); }
+  50% { filter: drop-shadow(0 0 15px rgba(198, 40, 40, 0.7)); }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes drift {
+  from { background-position: 0 0; }
+  to { background-position: 100% 100%; }
+}
+
+.animate-drift {
+  animation: drift 60s linear infinite;
+}
+@keyframes orbit-diagonal-3d {
+  0% {
+    transform: translate(-120%, 120%) scale(0.4) rotate(0deg);
+    z-index: 5;
+    opacity: 0.4;
+    filter: blur(2px);
+  }
+  25% {
+    transform: translate(0, 0) scale(0.9) rotate(5deg);
+    z-index: 30;
+    opacity: 0.9;
+    filter: blur(0px);
+  }
+  50% {
+    transform: translate(120%, -120%) scale(1.8) rotate(10deg);
+    z-index: 30;
+    opacity: 1;
+    filter: blur(0px);
+  }
+  75% {
+    transform: translate(0, 0) scale(0.9) rotate(5deg);
+    z-index: 5;
+    opacity: 0.7;
+    filter: blur(1px);
+  }
+  100% {
+    transform: translate(-120%, 120%) scale(0.4) rotate(0deg);
+    z-index: 5;
+    opacity: 0.4;
+    filter: blur(2px);
+  }
+}
+
+.animate-orbit-diagonal {
+  animation: orbit-diagonal-3d 8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* ─── Digital Hologram Effects ─── */
+.hologram-border {
+  @apply relative;
+}
+
+.hologram-border::before {
+  content: '';
+  @apply absolute -inset-[1px] bg-gradient-to-r from-primary/50 via-secondary/50 to-primary/50 rounded-[inherit] z-[-1] opacity-50;
+}
+
+/* ─── Custom Slider (Premium Style) ─── */
+input[type="range"].premium-slider {
+  @apply w-full h-2 bg-gray-200 rounded-full appearance-none outline-none;
+}
+
+input[type="range"].premium-slider::-webkit-slider-thumb {
+  @apply appearance-none w-6 h-6 bg-primary rounded-full cursor-pointer border-4 border-white shadow-lg transition-transform;
+}
+
+input[type="range"].premium-slider::-webkit-slider-thumb:hover {
+  @apply scale-125;
+}
+
+/* ─── Perspective for Book ─── */
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+/* ─── Scrollbar Refinement ─── */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float-subtle {
+  animation: float-subtle 5s ease-in-out infinite;
+}
+
+@keyframes float-breathing {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.06); }
+}
+
+.animate-float-breathing {
+  animation: float-breathing 7s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.animate-cursor-blink {
+  animation: cursor-blink 0.8s step-end infinite;
+}
