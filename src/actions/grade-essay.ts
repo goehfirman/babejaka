@@ -17,7 +17,7 @@ export async function gradeEssayAction(
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Menggunakan gemini-2.5-flash sesuai instruksi
+    // Menggunakan gemini-2.5-flash sesuai permintaan user
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json" } });
 
     const prompt = `Anda adalah seorang guru SD yang sangat ramah, hangat, dan selalu menyemangati murid-murid. 

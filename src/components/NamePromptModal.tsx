@@ -5,17 +5,20 @@ import BrandLogo from "./BrandLogo";
 
 interface NamePromptModalProps {
   onClose?: () => void;
+  onSuccess?: (name: string) => void;
   isCompulsory?: boolean;
 }
 
-export default function NamePromptModal({ onClose, isCompulsory = false }: NamePromptModalProps) {
+export default function NamePromptModal({ onClose, onSuccess, isCompulsory = false }: NamePromptModalProps) {
   const { updateProfile } = useProfile();
   const [inputName, setInputName] = useState("");
 
   const saveName = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputName.trim()) {
-      updateProfile({ name: inputName.trim() });
+    const name = inputName.trim();
+    if (name) {
+      updateProfile({ name });
+      if (onSuccess) onSuccess(name);
       if (onClose) onClose();
     }
   };
@@ -46,7 +49,7 @@ export default function NamePromptModal({ onClose, isCompulsory = false }: NameP
           </h2>
           
           <p className="text-xs md:text-sm font-bold text-ink-light mb-10 leading-relaxed text-center opacity-60 px-4">
-            Siapa namamu? Beritahu Babe Jaka agar petualangan membacamu di Jakarta Global jadi lebih istimewa.
+            Tuliskan namamu. Ayo kita berpetualang bersama Babe Jaka!
           </p>
           
           <form onSubmit={saveName} className="space-y-6">

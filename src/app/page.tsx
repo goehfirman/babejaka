@@ -13,11 +13,13 @@ export default function LandingPage() {
   const router = useRouter();
   const [showNameModal, setShowNameModal] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const isDefaultUser = profile.name === "Petualang Baca";
   
   const handleMulai = () => {
     if (isDefaultUser) {
+      setPendingRedirect("/explore/library");
       setShowNameModal(true);
       return;
     }
@@ -26,6 +28,7 @@ export default function LandingPage() {
 
   const handleDiagnosis = () => {
     if (isDefaultUser) {
+      setPendingRedirect("/explore/diagnostic");
       setShowNameModal(true);
       return;
     }
@@ -195,15 +198,21 @@ export default function LandingPage() {
           
           <p className="text-xs font-black text-ink-light tracking-[0.2em] opacity-40">© 2026 BABE JAKA - JAKARTA KOTA GLOBAL</p>
           
-          <div className="flex gap-10 text-xs font-black tracking-widest text-ink-light">
-             <button onClick={() => setShowDevModal(true)} className="hover:text-primary transition-colors uppercase">TENTANG PENGEMBANG</button>
-             <Link href="#" className="hover:text-primary transition-colors">BANTUAN</Link>
-          </div>
         </div>
       </footer>
 
       {showNameModal && (
-        <NamePromptModal onClose={() => setShowNameModal(false)} />
+        <NamePromptModal 
+          onClose={() => {
+            setShowNameModal(false);
+            setPendingRedirect(null);
+          }} 
+          onSuccess={() => {
+            if (pendingRedirect) {
+              router.push(pendingRedirect);
+            }
+          }}
+        />
       )}
 
       {/* TENTANG PENGEMBANG BUTTON (BOTTOM RIGHT) */}

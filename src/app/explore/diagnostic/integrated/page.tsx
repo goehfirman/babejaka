@@ -888,7 +888,7 @@ export default function IntegratedDiagnosticPage() {
                         <p className="text-2xl md:text-[32px] font-bold leading-[1.8] flex flex-wrap gap-x-3 gap-y-4">
                            {currentLevel?.text.split(" ").map((w: string, i: number) => {
                               const match = matchedIndices.includes(i);
-                              return <span key={i} className={`relative transition-all ${match ? 'text-[#34D399] scale-105' : 'text-[#A0AEC0] grayscale'}`}>{w}{match && <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#34D399] rounded-full"></span>}</span>
+                              return <span key={i} className={`relative transition-all ${match ? 'text-[#34D399] scale-105' : 'text-[#333333]'}`}>{w}{match && <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#34D399] rounded-full"></span>}</span>
                            })}
                         </p>
                      </div>
