@@ -199,17 +199,20 @@ const TypewriterText = ({ text, delay = 35 }: { text: string; delay?: number }) 
   return <span>{displayedText}</span>;
 };
 
-// --- Certificate Template (Redesigned for Stability) ---
-const CertificateTemplate = React.forwardRef<HTMLDivElement, { 
+// --- Report Template (Replaces Certificate) ---
+const ReportTemplate = React.forwardRef<HTMLDivElement, { 
   profileName: string; 
   levelData: any; 
   fluencyData: any; 
   compScore: number | null;
-}>(({ profileName, levelData, fluencyData, compScore }, ref) => {
-  const certificateId = useMemo(() => {
+  fluencyRubric: any;
+  barrettMastery: any;
+  smartAdvice: string;
+}>(({ profileName, levelData, fluencyData, compScore, fluencyRubric, barrettMastery, smartAdvice }, ref) => {
+  const reportId = useMemo(() => {
     const random = Math.floor(1000 + Math.random() * 9000);
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    return `BJ-${date}-${random}`;
+    return `RPT-${date}-${random}`;
   }, []);
 
   return (
@@ -217,8 +220,8 @@ const CertificateTemplate = React.forwardRef<HTMLDivElement, {
       position: 'fixed', 
       left: '0', 
       top: '0', 
-      width: '1122px', 
-      height: '793px', 
+      width: '793px', // A4 Portrait Width
+      height: '1122px', // A4 Portrait Height
       zIndex: -1000, 
       opacity: 0, 
       pointerEvents: 'none',
@@ -226,212 +229,107 @@ const CertificateTemplate = React.forwardRef<HTMLDivElement, {
     }}>
       <div 
         ref={ref}
-        id="certificate-content"
+        id="report-content"
         style={{ 
-          width: '1122px', 
-          height: '793px',
+          width: '793px', 
+          height: '1122px',
           boxSizing: 'border-box',
           backgroundColor: '#FFFFFF',
           position: 'relative',
           overflow: 'hidden',
-          fontFamily: 'sans-serif'
+          fontFamily: 'sans-serif',
+          padding: '40px'
         }}
       >
-        {/* Outer Red Frame */}
-        <div style={{
-          position: 'absolute',
-          top: '32px',
-          bottom: '32px',
-          left: '32px',
-          right: '32px',
-          border: '3px solid #B23A2D',
-          borderRadius: '40px',
-          zIndex: 20,
-          pointerEvents: 'none'
-        }}></div>
-
-        {/* Right Side Pattern (Robust SVG Circles) */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          height: '100%',
-          width: '200px',
-          zIndex: 10,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'space-around',
-          paddingTop: '16px',
-          paddingBottom: '16px',
-          overflow: 'hidden',
-          backgroundColor: '#FFFFFF'
-        }}>
-           <svg width="200" height="793" viewBox="0 0 200 793" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {[...Array(9)].map((_, i) => (
-                 <g key={i} transform={`translate(45, ${20 + i * 85})`}>
-                    <circle cx="55" cy="55" r="50" stroke="#B23A2D" strokeWidth="6" />
-                    <circle cx="55" cy="55" r="50" stroke="#B23A2D" strokeWidth="6" transform="translate(-55, 0)" />
-                    <circle cx="55" cy="55" r="50" stroke="#B23A2D" strokeWidth="6" transform="translate(55, 0)" />
-                    <circle cx="55" cy="55" r="50" stroke="#B23A2D" strokeWidth="6" transform="translate(0, -55)" />
-                    <circle cx="55" cy="55" r="50" stroke="#B23A2D" strokeWidth="6" transform="translate(0, 55)" />
-                 </g>
-              ))}
-           </svg>
+        {/* Header Section */}
+        <div style={{ display: 'flex', alignItems: 'center', borderBottom: '4px solid #5AAFD1', paddingBottom: '20px', marginBottom: '30px' }}>
+          <img src="/images/redi_robo.png" alt="BABE JAKA" style={{ width: '80px', height: '80px', objectFit: 'contain', marginRight: '20px' }} />
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#333333', margin: 0, textTransform: 'uppercase' }}>Laporan Hasil Diagnosis Membaca</h1>
+            <p style={{ fontSize: '14px', color: '#666666', margin: 0, marginTop: '4px', fontWeight: 'bold', letterSpacing: '1px' }}>BABE JAKA LITERACY DIAGNOSTIC</p>
+          </div>
         </div>
 
-        <div style={{
-          position: 'relative',
-          zIndex: 30,
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          paddingRight: '220px',
-          paddingLeft: '80px',
-          paddingTop: '64px',
-          paddingBottom: '64px',
-          textAlign: 'center'
-        }}>
-          
-          {/* Header Section */}
-          <div style={{ marginTop: '40px' }}>
-            <h1 style={{
-              fontSize: '100px',
-              fontWeight: 900,
-              color: '#B23A2D',
-              letterSpacing: '10px',
-              lineHeight: 1,
-              marginBottom: '24px',
-              margin: 0
-            }}>
-              SERTIFIKAT
-            </h1>
-            <p style={{
-              fontSize: '26px',
-              fontWeight: 'bold',
-              color: '#333333',
-              marginBottom: '48px'
-            }}>Diberikan Kepada:</p>
-            
-            {/* Name with Underline */}
-            <div style={{
-              position: 'relative',
-              display: 'inline-block',
-              minWidth: '600px',
-              marginBottom: '16px'
-            }}>
-               <h3 style={{
-                 fontSize: '64px',
-                 fontWeight: 900,
-                 color: '#333333',
-                 lineHeight: 1,
-                 paddingLeft: '16px',
-                 paddingRight: '16px',
-                 paddingBottom: '8px',
-                 margin: 0
-               }}>
-                 {profileName}
-               </h3>
-               <div style={{ height: '2px', width: '100%', backgroundColor: '#333333' }}></div>
-            </div>
-
-            <p style={{
-              fontSize: '16px',
-              color: '#333333',
-              maxWidth: '672px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              lineHeight: 1.6,
-              marginTop: '48px',
-              fontWeight: 500
-            }}>
-              Atas keberhasilannya dalam menyelesaikan asesmen membaca BABEJAKA dan mendapat tingkat kompetensi literasi sesuai jenjang:
-            </p>
-
-            {/* Content Display Area (Level & Metrics) */}
-            <div style={{
-              marginTop: '56px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '56px',
-              backgroundColor: 'rgba(248, 250, 252, 0.8)',
-              padding: '32px',
-              borderRadius: '32px',
-              border: '2px dashed rgba(178, 58, 45, 0.2)'
-            }}>
-               {/* Level Badge (SVG) */}
-               <div style={{ position: 'relative', width: '144px', height: '144px', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center' }}>
-                  <svg viewBox="0 0 100 100" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 15px 15px rgba(0,0,0,0.15))' }}>
-                     {levelData.id === 'A' ? (
-                        <path d="M50 0L61 35H98L68 57L79 91L50 70L21 91L32 57L2 35H39L50 0Z" fill={levelData.color} stroke="white" strokeWidth="2" />
-                     ) : levelData.id === 'D' ? (
-                        <path d="M50 5L95 90H5L50 5Z" fill={levelData.color} stroke="white" strokeWidth="2" />
-                     ) : (levelData.id.startsWith('B') || levelData.id === 'C') ? (
-                        <circle cx="50" cy="50" r="45" fill={levelData.color} stroke="white" strokeWidth="2" />
-                     ) : (
-                        <rect x="5" y="5" width="90" height="90" rx="15" fill={levelData.color} stroke="white" strokeWidth="2" />
-                     )}
-                  </svg>
-                  <span style={{ 
-                    position: 'relative', 
-                    zIndex: 10, 
-                    fontSize: '60px', 
-                    fontWeight: 900, 
-                    color: levelData.id === 'E' ? '#333333' : '#FFFFFF',
-                    marginTop: levelData.id === 'D' ? '24px' : '0'
-                  }}>
-                     {levelData.id}
-                  </span>
-               </div>
-
-               <div style={{ textAlign: 'left' }}>
-                  <h4 style={{ fontSize: '36px', fontWeight: 900, color: '#333333', textTransform: 'uppercase', lineHeight: 1.2, margin: 0 }}>{levelData.name}</h4>
-                  <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#666666', letterSpacing: '4px', textTransform: 'uppercase', marginTop: '4px', margin: 0 }}>JENJANG {levelData.id}</p>
-                  
-                  <div style={{ display: 'flex', gap: '32px', marginTop: '24px', paddingTop: '24px', borderTop: '2px solid #E2E8F0' }}>
-                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 900, color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>Akurasi</span>
-                        <span style={{ fontSize: '24px', fontWeight: 900, color: '#B23A2D' }}>{fluencyData.accuracy}%</span>
-                     </div>
-                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 900, color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>Kecepatan</span>
-                        <span style={{ fontSize: '24px', fontWeight: 900, color: '#B23A2D' }}>{fluencyData.wpm} <small style={{ fontSize: '12px' }}>WPM</small></span>
-                     </div>
-                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 900, color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>Pemahaman</span>
-                        <span style={{ fontSize: '24px', fontWeight: 900, color: '#B23A2D' }}>{compScore || '-'}</span>
-                     </div>
-                  </div>
-               </div>
-            </div>
+        {/* Student Info */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px', backgroundColor: '#F0F8FF', padding: '20px', borderRadius: '12px', border: '1px solid #E0F2FE' }}>
+          <div>
+            <p style={{ fontSize: '12px', color: '#A0AEC0', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>Nama Siswa</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#333333', margin: 0 }}>{profileName}</h2>
           </div>
-
-          {/* Signature Section */}
-          <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '48px' }}>
-              <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#333333', marginBottom: '16px' }}>Tertanda</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                 <img src="/images/redi_robo.png" alt="BJ Logo" style={{ width: '96px', height: '96px', objectFit: 'contain' }} />
-                 <div style={{ textAlign: 'left' }}>
-                    <h4 style={{ fontSize: '32px', fontWeight: 900, color: '#333333', lineHeight: 1, textTransform: 'uppercase', letterSpacing: '-1px', margin: 0 }}>BABE JAKA</h4>
-                    <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#666666', letterSpacing: '2px', textTransform: 'uppercase', marginTop: '8px', margin: 0 }}>ID: {certificateId}</p>
-                 </div>
-              </div>
-            </div>
-            
-            <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 'bold', color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '2px', marginRight: '48px', marginBottom: '8px' }}>
-               Diterbitkan secara digital oleh Tim BABE JAKA
-            </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '12px', color: '#A0AEC0', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>Jenjang Membaca</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#5AAFD1', margin: 0 }}>{levelData.id} - {levelData.name}</h2>
           </div>
+        </div>
 
+        {/* Tabel Laporan Komprehensif */}
+        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#333333', marginBottom: '16px', borderLeft: '4px solid #34D399', paddingLeft: '10px' }}>Tabel Laporan Komprehensif</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', fontSize: '14px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#F8FAFC' }}>
+              <th style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'left', color: '#666666' }}>Aspek Penilaian</th>
+              <th style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', color: '#666666' }}>Skor Mentah</th>
+              <th style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', color: '#666666' }}>Peringkat Rubrik (1-4)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', fontWeight: 'bold' }}>Ketepatan (Akurasi)</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>{fluencyData.accuracy}%</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', fontWeight: 'bold', color: '#5AAFD1' }}>{fluencyRubric?.accuracy || '-'}</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', fontWeight: 'bold' }}>Kecepatan (WPM)</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>{fluencyData.wpm}</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', fontWeight: 'bold', color: '#5AAFD1' }}>{fluencyRubric?.rate || '-'}</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', fontWeight: 'bold' }}>Kelancaran (Automaticity)</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>Diukur via Jeda</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', fontWeight: 'bold', color: '#5AAFD1' }}>{fluencyRubric?.automaticity || '-'}</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', fontWeight: 'bold' }}>Intonasi (Prosody)</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center' }}>Diukur via Konsistensi</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', fontWeight: 'bold', color: '#5AAFD1' }}>{fluencyRubric?.prosody || '-'}</td>
+            </tr>
+            <tr style={{ backgroundColor: '#F0F9FF' }}>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', fontWeight: 'bold' }}>Pemahaman Membaca</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', fontWeight: 'bold' }}>{compScore || '-'} / 100</td>
+              <td style={{ padding: '12px', border: '1px solid #E2E8F0', textAlign: 'center', fontWeight: 'bold', color: '#5AAFD1' }}>N/A</td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* Karakteristik Jenjang */}
+        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#333333', marginBottom: '16px', borderLeft: '4px solid #FFB347', paddingLeft: '10px' }}>Karakteristik Jenjang: {levelData.id}</h3>
+        <div style={{ backgroundColor: '#FFFDF0', padding: '20px', borderRadius: '12px', border: '1px solid #FEF08A', marginBottom: '30px', fontSize: '14px', lineHeight: '1.6', color: '#333333' }}>
+          <ul style={{ paddingLeft: '20px', margin: 0 }}>
+            <li style={{ marginBottom: '8px' }}><strong>Target Usia:</strong> {levelData.age}</li>
+            <li style={{ marginBottom: '8px' }}><strong>Kemampuan Utama:</strong> {levelData.ability}</li>
+            <li style={{ marginBottom: '8px' }}><strong>Bahasa & Kosakata:</strong> {levelData.language}</li>
+            <li><strong>Materi Bacaan:</strong> {levelData.content}</li>
+          </ul>
+        </div>
+
+        {/* Saran */}
+        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#333333', marginBottom: '16px', borderLeft: '4px solid #F472B6', paddingLeft: '10px' }}>Saran & Rekomendasi</h3>
+        <div style={{ backgroundColor: '#FDF2F8', padding: '20px', borderRadius: '12px', border: '1px solid #FBCFE8', fontSize: '14px', lineHeight: '1.6', color: '#831843' }}>
+          <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 'bold' }}>"{smartAdvice}"</p>
+        </div>
+
+        {/* Footer Signature */}
+        <div style={{ position: 'absolute', bottom: '40px', right: '40px', textAlign: 'right' }}>
+           <p style={{ fontSize: '12px', color: '#A0AEC0', marginBottom: '8px', fontWeight: 'bold' }}>Dicetak pada: {new Date().toLocaleDateString('id-ID')}</p>
+           <p style={{ fontSize: '16px', fontWeight: 900, color: '#333333', margin: 0 }}>Tim BABE JAKA</p>
+           <p style={{ fontSize: '10px', color: '#666666', marginTop: '4px' }}>ID Laporan: {reportId}</p>
         </div>
       </div>
     </div>
   );
 });
 
-CertificateTemplate.displayName = "CertificateTemplate";
+ReportTemplate.displayName = "ReportTemplate";
 
 // --- Main Page ---
 
@@ -509,15 +407,15 @@ export default function IntegratedDiagnosticPage() {
       });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
-        orientation: 'landscape',
+        orientation: 'portrait',
         unit: 'px',
-        format: [1122, 793]
+        format: [793, 1122]
       });
-      pdf.addImage(imgData, 'PNG', 0, 0, 1122, 793);
-      pdf.save(`Sertifikat_BABEJAKA_${profile.name.replace(/\s+/g, '_')}.pdf`);
+      pdf.addImage(imgData, 'PNG', 0, 0, 793, 1122);
+      pdf.save(`Laporan_BABEJAKA_${profile.name.replace(/\s+/g, '_')}.pdf`);
     } catch (error) {
       console.error("PDF Generation failed", error);
-      alert("Gagal mengunduh sertifikat. Silakan coba lagi.");
+      alert("Gagal mengunduh laporan. Silakan coba lagi.");
     } finally {
       setIsGeneratingPDF(false);
     }
@@ -1319,7 +1217,7 @@ export default function IntegratedDiagnosticPage() {
                                {isGeneratingPDF ? (
                                   <>PROSES... <span className="animate-spin material-symbols-rounded">sync</span></>
                                ) : (
-                                  <>UNDUH SERTIFIKAT <span className="material-symbols-rounded">card_membership</span></>
+                                  <>UNDUH LAPORAN DIAGNOSIS <span className="material-symbols-rounded">download</span></>
                                )}
                             </button>
                          </div>
@@ -1538,12 +1436,15 @@ export default function IntegratedDiagnosticPage() {
       </main>
 
       {step === "result" && (
-         <CertificateTemplate 
+         <ReportTemplate 
            ref={certificateRef}
            profileName={profile.name}
            levelData={finalLevelData}
            fluencyData={finalFluency}
            compScore={compScore}
+           fluencyRubric={fluencyRubric}
+           barrettMastery={barrettMastery}
+           smartAdvice={smartAdvice}
          />
        )}
     </div>
