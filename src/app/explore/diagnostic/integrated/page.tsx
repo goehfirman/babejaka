@@ -209,7 +209,16 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
   barrettMastery: any;
   smartAdvice: string;
 }>(({ profileName, levelData, fluencyData, compScore, fluencyRubric, barrettMastery, smartAdvice }, ref) => {
-  const s = (str: string | undefined | null) => str ? String(str).replace(/ /g, '\u00A0') : '';
+  const s = (str: string | undefined | null) => {
+    if (!str) return '';
+    const words = String(str).split(' ');
+    return words.map((word, index) => (
+      <React.Fragment key={index}>
+        {word}
+        {index < words.length - 1 && <span style={{ display: 'inline-block', width: '0.25em' }}></span>}
+      </React.Fragment>
+    ));
+  };
 
   return (
     <div style={{ position: 'fixed', left: '0', top: '0', width: '793px', height: '1122px', zIndex: -1000, opacity: 0, pointerEvents: 'none', backgroundColor: '#FFFFFF' }}>
