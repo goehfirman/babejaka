@@ -448,10 +448,19 @@ export default function IntegratedDiagnosticPage() {
   const [selectedStory, setSelectedStory] = useState<any | null>(null);
 
   // Fluency State
+  type FluencyEntry = {
+    accuracy: number;
+    wpm: number;
+    levelId: string;
+    pauseCount: number;       // pauses > 1.5s during reading
+    avgGapMs: number;         // average ms between word recognitions
+    speedConsistency: number; // 0-100, higher = more consistent reading pace
+    kpmRange: string;         // target KPM range for this level
+  };
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
-  const [fluencyHistory, setFluencyHistory] = useState<{accuracy: number, wpm: number, levelId: string}[]>([]);
+  const [fluencyHistory, setFluencyHistory] = useState<FluencyEntry[]>([]);
   const [isReading, setIsReading] = useState(false);
-  const [isMicActive, setIsMicActive] = useState(false); // true when mic is actually capturing audio
+  const [isMicActive, setIsMicActive] = useState(false);
   const [matchedIndices, setMatchedIndices] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -460,9 +469,12 @@ export default function IntegratedDiagnosticPage() {
   const currentLevelIdxRef = useRef(0);
   const shouldRestartRef = useRef(false);
   // Transcript persistence across auto-restarts (tablet fix)
-  const savedTranscriptRef = useRef<string>(""); // finals from previous sessions
-  const lastSessionFinalsRef = useRef<string>(""); // finals captured in current session
-  const bestMatchRef = useRef<number[]>([]); // highest match count achieved
+  const savedTranscriptRef = useRef<string>("");
+  const lastSessionFinalsRef = useRef<string>("");
+  const bestMatchRef = useRef<number[]>([]);
+  // Word-timing tracking for Kelancaran & Intonasi measurement
+  const wordTimestampsRef = useRef<number[]>([]);
+  const lastMatchCountRef = useRef<number>(0);
 
   // Comprehension State
   const [showQuestions, setShowQuestions] = useState(false);
@@ -613,7 +625,18 @@ export default function IntegratedDiagnosticPage() {
       const newMatched = matchWordsSequentially(spokenWords, currentLevel.text);
 
       // Only update if we matched MORE words (never regress due to interim fluctuations)
-      if (newMatched.length >= bestMatchRef.current.length) {
+      if (newMatched.length > bestMatchRef.current.length) {
+        // Record timestamp for each NEWLY matched word
+        const now = Date.now();
+        const newWordCount = newMatched.length - lastMatchCountRef.current;
+        for (let k = 0; k < newWordCount; k++) {
+          wordTimestampsRef.current.push(now);
+        }
+        lastMatchCountRef.current = newMatched.length;
+        bestMatchRef.current = newMatched;
+        setMatchedIndices(newMatched);
+      } else if (newMatched.length === bestMatchRef.current.length) {
+        // Same count but possibly different indices — just update display
         bestMatchRef.current = newMatched;
         setMatchedIndices(newMatched);
       }
@@ -707,6 +730,9 @@ export default function IntegratedDiagnosticPage() {
     savedTranscriptRef.current = "";
     lastSessionFinalsRef.current = "";
     bestMatchRef.current = [];
+    // Reset timing tracking
+    wordTimestampsRef.current = [];
+    lastMatchCountRef.current = 0;
     setMatchedIndices([]);
     setStartTime(Date.now());
     if (recognitionRef.current) {
@@ -739,7 +765,46 @@ export default function IntegratedDiagnosticPage() {
     const acc = Math.round((matchCount / totalWords) * 100);
     const wpm = Math.round((matchCount / duration) * 60);
 
-    const newResult = { accuracy: acc, wpm: wpm, levelId: level.id };
+    // --- Compute timing metrics from word timestamps ---
+    const timestamps = wordTimestampsRef.current;
+    let pauseCount = 0;
+    let totalGap = 0;
+    const gaps: number[] = [];
+
+    for (let i = 1; i < timestamps.length; i++) {
+      const gap = timestamps[i] - timestamps[i - 1];
+      gaps.push(gap);
+      totalGap += gap;
+      if (gap > 1500) pauseCount++; // pause = gap > 1.5 seconds
+    }
+
+    const avgGapMs = gaps.length > 0 ? Math.round(totalGap / gaps.length) : 0;
+
+    // Speed consistency: coefficient of variation (lower CV = more consistent)
+    // Convert to 0-100 score where 100 = perfectly consistent
+    let speedConsistency = 50; // default if not enough data
+    if (gaps.length >= 2) {
+      const meanGap = totalGap / gaps.length;
+      const variance = gaps.reduce((sum, g) => sum + Math.pow(g - meanGap, 2), 0) / gaps.length;
+      const stdDev = Math.sqrt(variance);
+      const cv = meanGap > 0 ? stdDev / meanGap : 1; // coefficient of variation
+      // CV of 0 = perfect consistency (100), CV of 1+ = very inconsistent (0)
+      speedConsistency = Math.max(0, Math.min(100, Math.round((1 - Math.min(cv, 1)) * 100)));
+    }
+
+    // Get kpmRange for this level
+    const levelCharKey = level.id === 'A' ? 'A' : level.id === 'B' ? 'B1' : level.id;
+    const kpmRange = LEVEL_CHARACTERISTICS[levelCharKey]?.kpmRange || "0–30 KPM";
+
+    const newResult: FluencyEntry = {
+      accuracy: acc,
+      wpm: wpm,
+      levelId: level.id,
+      pauseCount,
+      avgGapMs,
+      speedConsistency,
+      kpmRange
+    };
     const nextHistory = [...fluencyHistory, newResult];
     setFluencyHistory(nextHistory);
 
@@ -866,64 +931,83 @@ export default function IntegratedDiagnosticPage() {
     };
   }, [fluencyHistory]);
 
-  // Comprehensive Fluency Rubric Score (1-16)
+  // Comprehensive Fluency Rubric Score (1-16) — CUMULATIVE across all levels
   const fluencyRubric = useMemo(() => {
-    if (step !== "result") return null;
-    
-    const acc = finalFluency.accuracy;
-    const wpm = finalFluency.wpm;
+    if (step !== "result" || fluencyHistory.length === 0) return null;
 
-    // Scoring Accuracy (1-4) - Handle zero
-    let accScore = 1;
-    if (acc >= 95) accScore = 4;
-    else if (acc >= 85) accScore = 3;
-    else if (acc >= 70) accScore = 2;
-    else accScore = 1;
-    
-    // Scoring Rate (1-4) based on KPM target - Handle zero
-    const kpmRange = finalLevelData.kpmRange?.match(/\d+/g)?.map(Number) || [0, 30];
-    const targetMin = kpmRange[0];
-    const targetMax = kpmRange[1];
-    
-    let rateScore = 1;
-    if (wpm === 0) {
-      rateScore = 1;
-    } else if (wpm >= targetMax) {
-      rateScore = 4;
-    } else if (wpm >= targetMin) {
-      rateScore = 3;
-    } else if (wpm >= targetMin / 2) {
-      rateScore = 2;
-    } else {
-      rateScore = 1;
-    }
-    
-    // Prosody & Automaticity (Indonesian Standards)
-    // Only give points if there's actual reading activity
-    let autoScore = 1;
-    let prosodyScore = 1;
+    // Helper: score a single level entry
+    const scoreOneLevel = (entry: FluencyEntry) => {
+      const { accuracy: acc, wpm, pauseCount, avgGapMs, speedConsistency, kpmRange } = entry;
 
-    if (wpm > 0 && acc > 0) {
-      autoScore = Math.max(1, Math.min(4, Math.floor((accScore + rateScore) / 2 + (acc > 90 ? 0.5 : 0))));
-      prosodyScore = Math.max(1, Math.min(4, Math.floor((accScore + rateScore) / 2 + (wpm > targetMin ? 0.5 : 0))));
-    }
-    
-    const total = accScore + rateScore + autoScore + prosodyScore;
+      // 1. KETEPATAN (Accuracy) — directly measured from speech recognition
+      let accScore = 1;
+      if (acc >= 95) accScore = 4;
+      else if (acc >= 85) accScore = 3;
+      else if (acc >= 70) accScore = 2;
+
+      // 2. KECEPATAN (Rate) — WPM vs target KPM range for THIS level
+      const kpmNums = kpmRange?.match(/\d+/g)?.map(Number) || [0, 30];
+      const targetMin = kpmNums[0];
+      const targetMax = kpmNums[1] || targetMin + 30;
+
+      let rateScore = 1;
+      if (wpm > 0) {
+        if (wpm >= targetMax) rateScore = 4;
+        else if (wpm >= targetMin) rateScore = 3;
+        else if (wpm >= targetMin / 2) rateScore = 2;
+      }
+
+      // 3. KELANCARAN (Automaticity) — measured from pause patterns
+      //    Fewer pauses + smaller gaps = more fluent reading
+      let autoScore = 1;
+      if (wpm > 0 && acc > 0) {
+        if (pauseCount === 0 && avgGapMs < 600) autoScore = 4;       // Sangat lancar, tanpa jeda
+        else if (pauseCount <= 1 && avgGapMs < 1000) autoScore = 3;  // Lancar, sedikit jeda
+        else if (pauseCount <= 3 && avgGapMs < 1500) autoScore = 2;  // Ada jeda cukup sering
+        // else autoScore = 1 — banyak jeda
+      }
+
+      // 4. INTONASI (Prosody) — estimated from speed consistency
+      //    Consistent but not monotone reading pace indicates good prosody
+      //    Very high consistency (>90) = possibly monotone
+      //    Moderate consistency (50-90) = natural, expressive
+      //    Low consistency (<50) = stuttering/irregular
+      let prosodyScore = 1;
+      if (wpm > 0 && acc > 0) {
+        if (speedConsistency >= 60 && speedConsistency <= 90 && acc >= 85) prosodyScore = 4;
+        else if (speedConsistency >= 45 && acc >= 70) prosodyScore = 3;
+        else if (speedConsistency >= 30 && acc >= 50) prosodyScore = 2;
+        // else prosodyScore = 1
+      }
+
+      return { accScore, rateScore, autoScore, prosodyScore };
+    };
+
+    // Score EACH level independently, then average
+    const allScores = fluencyHistory.map(scoreOneLevel);
+    const count = allScores.length;
+
+    const avgAcc = Math.round(allScores.reduce((s, x) => s + x.accScore, 0) / count);
+    const avgRate = Math.round(allScores.reduce((s, x) => s + x.rateScore, 0) / count);
+    const avgAuto = Math.round(allScores.reduce((s, x) => s + x.autoScore, 0) / count);
+    const avgProsody = Math.round(allScores.reduce((s, x) => s + x.prosodyScore, 0) / count);
+
+    const total = avgAcc + avgRate + avgAuto + avgProsody;
     let label = "Tidak Lancar";
     if (total >= 13) label = "Sangat Lancar";
     else if (total >= 9) label = "Lancar";
     else if (total >= 5) label = "Kurang Lancar";
-    else label = "Tidak Lancar";
 
     return {
-      accuracy: accScore,
-      rate: rateScore,
-      automaticity: autoScore,
-      prosody: prosodyScore,
+      accuracy: avgAcc,
+      rate: avgRate,
+      automaticity: avgAuto,
+      prosody: avgProsody,
       total,
-      label
+      label,
+      perLevel: allScores // expose per-level detail
     };
-  }, [step, finalFluency, finalLevelData]);
+  }, [step, fluencyHistory]);
 
   
   const recommendations = useMemo(() => {
