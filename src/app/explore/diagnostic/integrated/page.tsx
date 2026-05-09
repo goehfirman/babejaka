@@ -213,72 +213,100 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
 
   return (
     <div style={{ position: 'fixed', left: '0', top: '0', width: '793px', height: '1122px', zIndex: -1000, opacity: 0, pointerEvents: 'none', backgroundColor: '#FFFFFF' }}>
-      <div ref={ref} id="report-content" style={{ width: '793px', height: '1122px', boxSizing: 'border-box', backgroundColor: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: 'Arial, sans-serif', color: '#000000', padding: '40px 50px' }}>
+      <div ref={ref} id="report-content" style={{ width: '793px', height: '1122px', boxSizing: 'border-box', backgroundColor: '#F0F8FF', position: 'relative', overflow: 'hidden', fontFamily: '"Nunito", "Trebuchet MS", sans-serif', color: '#333333', padding: '40px' }}>
         <style dangerouslySetInnerHTML={{ __html: `
-          #report-content * { letter-spacing: normal !important; word-spacing: normal !important; line-height: 1.5; }
-          .report-table th, .report-table td { border: 1px solid #000; padding: 10px; }
-          .report-table th { background-color: #f0f0f0; font-weight: bold; }
+          #report-content * { letter-spacing: normal !important; word-spacing: normal !important; line-height: 1.5; box-sizing: border-box; }
+          .report-table th, .report-table td { padding: 16px; border-bottom: 2px solid #E2E8F0; }
+          .report-table th { color: #666666; font-weight: 900; text-transform: uppercase; font-size: 12px; letter-spacing: 1px !important; }
+          .report-table tr:last-child td { border-bottom: none; }
         `}} />
         
-        {/* Judul */}
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{ fontSize: '24px', margin: '0', textTransform: 'uppercase' }}>{s('Laporan Diagnosis Jenjang Membaca')}</h1>
-          <h2 style={{ fontSize: '20px', margin: '5px 0 0 0', textTransform: 'uppercase' }}>{s('Babe Jaka')}</h2>
-        </div>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: '40px', padding: '40px', border: '4px solid #E2E8F0', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '4px solid #F0F8FF', paddingBottom: '24px', marginBottom: '30px' }}>
+            <div>
+               <div style={{ display: 'inline-block', padding: '6px 16px', backgroundColor: '#F0F8FF', borderRadius: '20px', color: '#5AAFD1', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '12px' }}>
+                {s('Profil Diagnostik')}
+              </div>
+              <h1 style={{ fontSize: '28px', margin: '0 0 4px 0', fontWeight: 900, color: '#333333', textTransform: 'uppercase' }}>{s('Laporan Diagnosis')}</h1>
+              <h2 style={{ fontSize: '20px', margin: '0', fontWeight: 900, color: '#5AAFD1', textTransform: 'uppercase' }}>{s('Jenjang Membaca')}</h2>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', fontFamily: "'Changa One', Arial, sans-serif", fontSize: '36px', fontWeight: 900 }}>
+              <span style={{ color: '#FC8181' }}>BABE</span>
+              <span style={{ color: '#63B3ED', marginLeft: '6px' }}>JAKA</span>
+            </div>
+          </div>
 
-        {/* Profil */}
-        <div style={{ marginBottom: '30px' }}>
-          <p style={{ margin: '5px 0', fontSize: '16px' }}><strong>{s('Nama')} :</strong> {s(profileName)}</p>
-          <p style={{ margin: '5px 0', fontSize: '16px' }}><strong>{s('Jenjang Membaca')} :</strong> {s(levelData.id)} - {s(levelData.name)}</p>
-        </div>
+          {/* Profil */}
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
+            <div style={{ flex: 1, backgroundColor: '#F8FAFC', borderRadius: '24px', padding: '20px', border: '2px solid #E2E8F0' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#A0AEC0', fontWeight: 900, textTransform: 'uppercase' }}>{s('Nama Peserta Didik')}</p>
+              <h3 style={{ margin: 0, fontSize: '24px', fontWeight: 900, color: '#333333' }}>{s(profileName)}</h3>
+            </div>
+            <div style={{ flex: 1, backgroundColor: levelData.color || '#5AAFD1', borderRadius: '24px', padding: '20px', border: '2px solid rgba(0,0,0,0.1)' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: 'rgba(255,255,255,0.8)', fontWeight: 900, textTransform: 'uppercase' }}>{s('Hasil Jenjang Membaca')}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '12px', color: '#FFF', fontWeight: 900, fontSize: '16px' }}>{s(levelData.id)}</span>
+                <h3 style={{ margin: 0, fontSize: '24px', fontWeight: 900, color: '#FFFFFF' }}>{s(levelData.name)}</h3>
+              </div>
+            </div>
+          </div>
 
-        {/* Tabel Laporan Komprehensif */}
-        <div style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', margin: '0 0 10px 0' }}>{s('Tabel Laporan Komprehensif')}</h3>
-          <table className="report-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-            <thead>
-              <tr>
-                <th style={{ width: '40%', textAlign: 'left' }}>{s('Aspek')}</th>
-                <th style={{ width: '30%', textAlign: 'center' }}>{s('Capaian')}</th>
-                <th style={{ width: '30%', textAlign: 'center' }}>{s('Peringkat')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{s('Akurasi Kelancaran')}</td>
-                <td style={{ textAlign: 'center' }}>{fluencyData.accuracy}%</td>
-                <td style={{ textAlign: 'center' }}>{fluencyRubric?.accuracy || '-'}</td>
-              </tr>
-              <tr>
-                <td>{s('Kecepatan (WPM)')}</td>
-                <td style={{ textAlign: 'center' }}>{fluencyData.wpm}</td>
-                <td style={{ textAlign: 'center' }}>{fluencyRubric?.rate || '-'}</td>
-              </tr>
-              <tr>
-                <td>{s('Kelancaran')}</td>
-                <td style={{ textAlign: 'center' }}>{s('Diukur via Pola Jeda')}</td>
-                <td style={{ textAlign: 'center' }}>{fluencyRubric?.automaticity || '-'}</td>
-              </tr>
-              <tr>
-                <td>{s('Intonasi')}</td>
-                <td style={{ textAlign: 'center' }}>{s('Diukur via Konsistensi')}</td>
-                <td style={{ textAlign: 'center' }}>{fluencyRubric?.prosody || '-'}</td>
-              </tr>
-              <tr>
-                <td>{s('Skor Pemahaman')}</td>
-                <td style={{ textAlign: 'center' }}>{compScore !== null ? `${compScore}\u00A0/\u00A0100` : '-'}</td>
-                <td style={{ textAlign: 'center' }}>N/A</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          {/* Tabel Laporan Komprehensif */}
+          <div style={{ backgroundColor: '#F8FAFC', borderRadius: '32px', padding: '30px', border: '4px solid #E2E8F0', marginBottom: '40px' }}>
+            <h3 style={{ fontSize: '18px', margin: '0 0 20px 0', color: '#5AAFD1', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#5AAFD1', borderRadius: '50%' }}></span>
+              {s('Laporan Komprehensif')}
+            </h3>
+            <table className="report-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', backgroundColor: '#FFFFFF', borderRadius: '16px', overflow: 'hidden' }}>
+              <thead>
+                <tr>
+                  <th style={{ width: '40%', textAlign: 'left', backgroundColor: '#F1F5F9' }}>{s('Aspek Penilaian')}</th>
+                  <th style={{ width: '30%', textAlign: 'center', backgroundColor: '#F1F5F9' }}>{s('Capaian')}</th>
+                  <th style={{ width: '30%', textAlign: 'center', backgroundColor: '#F1F5F9' }}>{s('Peringkat Rubrik (1-4)')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>{s('Akurasi Kelancaran')}</strong></td>
+                  <td style={{ textAlign: 'center', fontWeight: 900, color: '#34D399', fontSize: '18px' }}>{fluencyData.accuracy}%</td>
+                  <td style={{ textAlign: 'center', fontWeight: 900, color: '#666666' }}>{fluencyRubric?.accuracy || '-'}</td>
+                </tr>
+                <tr>
+                  <td><strong>{s('Kecepatan (WPM)')}</strong></td>
+                  <td style={{ textAlign: 'center', fontWeight: 900, color: '#87CEEB', fontSize: '18px' }}>{fluencyData.wpm}</td>
+                  <td style={{ textAlign: 'center', fontWeight: 900, color: '#666666' }}>{fluencyRubric?.rate || '-'}</td>
+                </tr>
+                <tr>
+                  <td><strong>{s('Kelancaran')}</strong></td>
+                  <td style={{ textAlign: 'center', color: '#A0AEC0', fontWeight: 700 }}>{s('Diukur via Pola Jeda')}</td>
+                  <td style={{ textAlign: 'center', fontWeight: 900, color: '#666666' }}>{fluencyRubric?.automaticity || '-'}</td>
+                </tr>
+                <tr>
+                  <td><strong>{s('Intonasi')}</strong></td>
+                  <td style={{ textAlign: 'center', color: '#A0AEC0', fontWeight: 700 }}>{s('Diukur via Konsistensi')}</td>
+                  <td style={{ textAlign: 'center', fontWeight: 900, color: '#666666' }}>{fluencyRubric?.prosody || '-'}</td>
+                </tr>
+                <tr>
+                  <td style={{ backgroundColor: '#F0F8FF' }}><strong>{s('Skor Pemahaman')}</strong></td>
+                  <td style={{ backgroundColor: '#F0F8FF', textAlign: 'center', fontWeight: 900, color: '#5AAFD1', fontSize: '18px' }}>{compScore !== null ? `${compScore}\u00A0/\u00A0100` : '-'}</td>
+                  <td style={{ backgroundColor: '#F0F8FF', textAlign: 'center', color: '#A0AEC0', fontWeight: 700 }}>N/A</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        {/* Saran */}
-        <div>
-          <h3 style={{ fontSize: '18px', margin: '0 0 10px 0' }}>{s('Saran:')}</h3>
-          <p style={{ margin: '0', fontSize: '14px', lineHeight: '1.6' }}>{s(smartAdvice)}</p>
-        </div>
+          {/* Saran */}
+          <div style={{ backgroundColor: '#F0F8FF', borderRadius: '32px', padding: '30px', border: '4px solid #E0F2FE', flex: 1 }}>
+            <h3 style={{ fontSize: '18px', margin: '0 0 16px 0', color: '#5AAFD1', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#5AAFD1', borderRadius: '50%' }}></span>
+              {s('Saran & Rekomendasi')}
+            </h3>
+            <p style={{ margin: '0', fontSize: '16px', lineHeight: '1.8', color: '#333333', fontWeight: 700, fontStyle: 'italic' }}>"{s(smartAdvice)}"</p>
+          </div>
 
+        </div>
       </div>
     </div>
   );
