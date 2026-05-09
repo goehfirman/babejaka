@@ -403,9 +403,10 @@ export default function IntegratedDiagnosticPage() {
   });
 
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [reportPreviewData, setReportPreviewData] = useState<string | null>(null);
   const certificateRef = useRef<HTMLDivElement>(null);
 
-  const handleDownloadCertificate = async () => {
+  const handleGeneratePreview = async () => {
     if (!certificateRef.current) return;
     setIsGeneratingPDF(true);
     
@@ -420,18 +421,29 @@ export default function IntegratedDiagnosticPage() {
         backgroundColor: "#ffffff",
       });
       const imgData = canvas.toDataURL('image/png');
+      setReportPreviewData(imgData);
+    } catch (error) {
+      console.error("Preview Generation failed", error);
+      alert("Gagal memuat pratinjau laporan. Silakan coba lagi.");
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    if (!reportPreviewData) return;
+    try {
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
         format: [793, 1122]
       });
-      pdf.addImage(imgData, 'PNG', 0, 0, 793, 1122);
+      pdf.addImage(reportPreviewData, 'PNG', 0, 0, 793, 1122);
       pdf.save(`Laporan_BABEJAKA_${profile.name.replace(/\s+/g, '_')}.pdf`);
+      setReportPreviewData(null);
     } catch (error) {
       console.error("PDF Generation failed", error);
       alert("Gagal mengunduh laporan. Silakan coba lagi.");
-    } finally {
-      setIsGeneratingPDF(false);
     }
   };
 
@@ -1224,14 +1236,14 @@ export default function IntegratedDiagnosticPage() {
                          
                          <div className="mt-6 flex flex-wrap gap-4">
                             <button 
-                               onClick={handleDownloadCertificate}
+                               onClick={handleGeneratePreview}
                                disabled={isGeneratingPDF}
                                className={`px-6 py-3 bg-[#5AAFD1] text-white rounded-full font-black flex items-center gap-2 shadow-[0_4px_0_#4691B0] hover:-translate-y-0.5 transition-all active:translate-y-1 ${isGeneratingPDF ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                {isGeneratingPDF ? (
                                   <>PROSES... <span className="animate-spin material-symbols-rounded">sync</span></>
                                ) : (
-                                  <>UNDUH LAPORAN DIAGNOSIS <span className="material-symbols-rounded">download</span></>
+                                  <>LIHAT PRATINJAU LAPORAN <span className="material-symbols-rounded">preview</span></>
                                )}
                             </button>
                          </div>
@@ -1461,6 +1473,31 @@ export default function IntegratedDiagnosticPage() {
            smartAdvice={smartAdvice}
          />
        )}
+
+      {/* Report Preview Modal */}
+      {reportPreviewData && (
+        <div className="fixed inset-0 z-[9999] bg-black/80 flex flex-col items-center justify-center p-4 md:p-8 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#F8FAFC] rounded-3xl w-full max-w-4xl max-h-full flex flex-col overflow-hidden shadow-2xl relative">
+            <div className="p-6 border-b-2 border-[#E2E8F0] flex justify-between items-center bg-white shrink-0">
+              <h2 className="text-xl font-black text-[#333333] flex items-center gap-2">
+                <span className="material-symbols-rounded text-[#5AAFD1]">preview</span> Pratinjau Laporan
+              </h2>
+              <button onClick={() => setReportPreviewData(null)} className="w-10 h-10 rounded-full bg-[#F1F5F9] text-[#666666] hover:bg-[#E2E8F0] flex items-center justify-center transition-colors">
+                <span className="material-symbols-rounded">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-[#E2E8F0] min-h-[300px]">
+              <img src={reportPreviewData} alt="Report Preview" className="w-full max-w-[600px] h-auto object-contain shadow-xl rounded-sm border border-white" />
+            </div>
+            <div className="p-6 border-t-2 border-[#E2E8F0] flex justify-end gap-4 bg-white shrink-0">
+              <button onClick={() => setReportPreviewData(null)} className="px-6 py-3 rounded-full font-bold text-[#666666] hover:bg-[#F1F5F9] transition-colors">Batal</button>
+              <button onClick={handleDownloadPDF} className="px-8 py-3 bg-[#5AAFD1] text-white rounded-full font-black flex items-center gap-2 shadow-[0_4px_0_#4691B0] hover:-translate-y-0.5 transition-all active:translate-y-1">
+                UNDUH PDF <span className="material-symbols-rounded">download</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
