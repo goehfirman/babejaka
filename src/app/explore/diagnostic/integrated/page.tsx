@@ -237,28 +237,42 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
           backgroundColor: '#FFFFFF',
           position: 'relative',
           overflow: 'hidden',
-          fontFamily: 'sans-serif',
-          padding: '40px'
+          fontFamily: '"Google Sans", Arial, Helvetica, sans-serif',
+          padding: '40px',
+          wordSpacing: 'normal',
+          letterSpacing: 'normal'
         }}
       >
+        <style dangerouslySetInnerHTML={{ __html: `
+          #report-content * {
+            letter-spacing: normal !important;
+            word-spacing: normal !important;
+          }
+        `}} />
         {/* Header Section */}
         <div style={{ display: 'flex', alignItems: 'center', borderBottom: '4px solid #5AAFD1', paddingBottom: '20px', marginBottom: '30px' }}>
-          <img src="/images/redi_robo.png" alt="BABE JAKA" style={{ width: '80px', height: '80px', objectFit: 'contain', marginRight: '20px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: '24px' }}>
+            <span style={{ fontSize: '32px', color: '#C62828', marginBottom: '-8px' }} className="material-symbols-rounded">menu_book</span>
+            <div style={{ display: 'flex', alignItems: 'baseline', fontFamily: "'Changa One', Arial, sans-serif", fontSize: '28px', fontWeight: 900, letterSpacing: '1px' }}>
+              <span style={{ color: '#C62828' }}>BABE</span>
+              <span style={{ color: '#1A237E', marginLeft: '6px' }}>JAKA</span>
+            </div>
+          </div>
           <div>
-            <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#333333', margin: 0, textTransform: 'uppercase' }}>Laporan Hasil Diagnosis Membaca</h1>
-            <p style={{ fontSize: '14px', color: '#666666', margin: 0, marginTop: '4px', fontWeight: 'bold', letterSpacing: '1px' }}>BABE JAKA LITERACY DIAGNOSTIC</p>
+            <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#333333', margin: 0, textTransform: 'uppercase', letterSpacing: 'normal' }}>Laporan Hasil Diagnosis Membaca</h1>
+            <p style={{ fontSize: '14px', color: '#666666', margin: 0, marginTop: '4px', fontWeight: 'bold', letterSpacing: 'normal' }}>BABE JAKA LITERACY DIAGNOSTIC</p>
           </div>
         </div>
 
         {/* Student Info */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px', backgroundColor: '#F0F8FF', padding: '20px', borderRadius: '12px', border: '1px solid #E0F2FE' }}>
           <div>
-            <p style={{ fontSize: '12px', color: '#A0AEC0', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>Nama Siswa</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#333333', margin: 0 }}>{profileName}</h2>
+            <p style={{ fontSize: '12px', color: '#A0AEC0', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: 'normal' }}>Nama Siswa</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#333333', margin: 0, letterSpacing: 'normal' }}>{profileName}</h2>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: '12px', color: '#A0AEC0', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>Jenjang Membaca</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#5AAFD1', margin: 0 }}>{levelData.id} - {levelData.name}</h2>
+            <p style={{ fontSize: '12px', color: '#A0AEC0', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: 'normal' }}>Jenjang Membaca</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#5AAFD1', margin: 0, letterSpacing: 'normal' }}>{levelData.id} - {levelData.name}</h2>
           </div>
         </div>
 
@@ -302,13 +316,13 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
         </table>
 
         {/* Karakteristik Jenjang */}
-        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#333333', marginBottom: '16px', borderLeft: '4px solid #FFB347', paddingLeft: '10px' }}>Karakteristik Jenjang: {levelData.id}</h3>
+        <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#333333', marginBottom: '16px', borderLeft: '4px solid #FFB347', paddingLeft: '10px', letterSpacing: 'normal' }}>Karakteristik Jenjang: {levelData.id}</h3>
         <div style={{ backgroundColor: '#FFFDF0', padding: '20px', borderRadius: '12px', border: '1px solid #FEF08A', marginBottom: '30px', fontSize: '14px', lineHeight: '1.6', color: '#333333' }}>
           <ul style={{ paddingLeft: '20px', margin: 0 }}>
-            <li style={{ marginBottom: '8px' }}><strong>Target Usia:</strong> {levelData.age}</li>
-            <li style={{ marginBottom: '8px' }}><strong>Kemampuan Utama:</strong> {levelData.ability}</li>
-            <li style={{ marginBottom: '8px' }}><strong>Bahasa & Kosakata:</strong> {levelData.language}</li>
-            <li><strong>Materi Bacaan:</strong> {levelData.content}</li>
+            <li style={{ marginBottom: '8px' }}><span style={{ fontWeight: 'bold' }}>Target Usia:</span> {levelData.age}</li>
+            <li style={{ marginBottom: '8px' }}><span style={{ fontWeight: 'bold' }}>Kemampuan Utama:</span> {levelData.ability}</li>
+            <li style={{ marginBottom: '8px' }}><span style={{ fontWeight: 'bold' }}>Bahasa & Kosakata:</span> {levelData.language}</li>
+            <li><span style={{ fontWeight: 'bold' }}>Materi Bacaan:</span> {levelData.content}</li>
           </ul>
         </div>
 
