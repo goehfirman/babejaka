@@ -84,12 +84,44 @@ export default function FluencyDiagnosticPage() {
   const isReadingRef = useRef(false);
   const currentTestIndexRef = useRef(0);
   const shouldRestartRef = useRef(false);
+  // Transcript persistence across auto-restarts (tablet fix)
+  const savedTranscriptRef = useRef<string>("");
+  const lastSessionFinalsRef = useRef<string>("");
+  const bestMatchRef = useRef<number[]>([]);
 
   // Keep refs in sync
   useEffect(() => { isReadingRef.current = isReading; }, [isReading]);
   useEffect(() => { currentTestIndexRef.current = currentTestIndex; }, [currentTestIndex]);
 
-  // --- Speech Recognition (Tablet-Robust) ---
+  // --- Word matching helper ---
+  const matchWordsSequentially = (spokenWords: string[], targetText: string): number[] => {
+    const targetWords = targetText.toLowerCase().split(" ");
+    const matched: number[] = [];
+    let cursor = 0;
+
+    // Deduplicate consecutive identical words (tablet echo/reverb fix)
+    const deduped: string[] = [];
+    spokenWords.forEach((w, i) => {
+      if (i === 0 || w !== spokenWords[i - 1]) deduped.push(w);
+    });
+
+    deduped.forEach(w => {
+      const cleanW = w.replace(/[.,!?"""]/g, "").trim();
+      if (!cleanW) return;
+      for (let i = cursor; i < Math.min(cursor + 5, targetWords.length); i++) {
+        const targetClean = targetWords[i].replace(/[.,!?"""]/g, "").trim().toLowerCase();
+        if (targetClean === cleanW && !matched.includes(i)) {
+          matched.push(i);
+          cursor = i + 1;
+          break;
+        }
+      }
+    });
+
+    return matched.sort((a, b) => a - b);
+  };
+
+  // --- Speech Recognition (Tablet-Robust v2) ---
   useEffect(() => {
     // Cleanup previous instance completely
     if (recognitionRef.current) {
@@ -117,44 +149,48 @@ export default function FluencyDiagnosticPage() {
     rec.onaudioend = () => { setIsMicActive(false); };
 
     rec.onresult = (event: any) => {
-       let fullTranscript = "";
+       // Separate final and interim results
+       let sessionFinals = "";
+       let sessionInterim = "";
        for (let i = 0; i < event.results.length; ++i) {
-          fullTranscript += event.results[i][0].transcript + " ";
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            sessionFinals += transcript + " ";
+          } else {
+            sessionInterim += transcript + " ";
+          }
        }
+
+       // Save session finals for persistence across restarts
+       lastSessionFinalsRef.current = sessionFinals;
+
+       // Build FULL transcript: saved from previous sessions + current session
+       const fullTranscript = savedTranscriptRef.current + sessionFinals + sessionInterim;
        
        const idx = currentTestIndexRef.current;
-       const currentText = LEVELS[idx].text.toLowerCase().split(" ");
-       const words = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+       const spokenWords = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+       const newMatched = matchWordsSequentially(spokenWords, LEVELS[idx].text);
        
-       const nextMatched: number[] = [];
-       let textCursor = 0;
-       
-       words.forEach(w => {
-          const cleanW = w.replace(/[.,!?]/g, "").trim();
-          if (!cleanW) return;
-          
-          for (let i = textCursor; i < Math.min(textCursor + 4, currentText.length); i++) {
-             const targetClean = currentText[i].replace(/[.,!?]/g, "").trim().toLowerCase();
-             if (targetClean === cleanW && !nextMatched.includes(i)) {
-                nextMatched.push(i);
-                textCursor = i + 1;
-                break;
-             }
-          }
-       });
-       
-       setMatchedIndices(nextMatched.sort((a, b) => a - b));
+       // Only update if we matched MORE words (never regress)
+       if (newMatched.length >= bestMatchRef.current.length) {
+         bestMatchRef.current = newMatched;
+         setMatchedIndices(newMatched);
+       }
     };
 
     // AUTO-RESTART: tablets/mobile often silently stop recognition
     rec.onend = () => {
       setIsMicActive(false);
       if (isReadingRef.current && shouldRestartRef.current) {
+        // Persist finals from the session that just ended
+        savedTranscriptRef.current += lastSessionFinalsRef.current;
+        lastSessionFinalsRef.current = "";
+
         setTimeout(() => {
           if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
             try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
           }
-        }, 150);
+        }, 80);
       }
     };
 
@@ -167,7 +203,7 @@ export default function FluencyDiagnosticPage() {
           if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
             try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
           }
-        }, 300);
+        }, 200);
       }
     };
 
@@ -213,6 +249,10 @@ export default function FluencyDiagnosticPage() {
     setIsReading(true);
     isReadingRef.current = true;
     shouldRestartRef.current = true;
+    // Reset transcript persistence for fresh reading
+    savedTranscriptRef.current = "";
+    lastSessionFinalsRef.current = "";
+    bestMatchRef.current = [];
     setMatchedIndices([]);
     setStartTime(Date.now());
     if (recognitionRef.current) {

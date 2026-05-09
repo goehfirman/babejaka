@@ -456,9 +456,13 @@ export default function IntegratedDiagnosticPage() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [startTime, setStartTime] = useState<number | null>(null);
   const recognitionRef = useRef<any>(null);
-  const isReadingRef = useRef(false); // stable ref to avoid stale closures
+  const isReadingRef = useRef(false);
   const currentLevelIdxRef = useRef(0);
-  const shouldRestartRef = useRef(false); // controls auto-restart on tablet
+  const shouldRestartRef = useRef(false);
+  // Transcript persistence across auto-restarts (tablet fix)
+  const savedTranscriptRef = useRef<string>(""); // finals from previous sessions
+  const lastSessionFinalsRef = useRef<string>(""); // finals captured in current session
+  const bestMatchRef = useRef<number[]>([]); // highest match count achieved
 
   // Comprehension State
   const [showQuestions, setShowQuestions] = useState(false);
@@ -526,7 +530,36 @@ export default function IntegratedDiagnosticPage() {
   useEffect(() => { isReadingRef.current = isReading; }, [isReading]);
   useEffect(() => { currentLevelIdxRef.current = currentLevelIdx; }, [currentLevelIdx]);
 
-  // --- Speech Recognition Logic (Tablet-Robust) ---
+  // --- Word matching helper (shared logic) ---
+  const matchWordsSequentially = (spokenWords: string[], targetText: string): number[] => {
+    const targetWords = targetText.toLowerCase().split(" ");
+    const matched: number[] = [];
+    let cursor = 0;
+
+    // Deduplicate consecutive identical words (tablet echo/reverb fix)
+    const deduped: string[] = [];
+    spokenWords.forEach((w, i) => {
+      if (i === 0 || w !== spokenWords[i - 1]) deduped.push(w);
+    });
+
+    deduped.forEach(w => {
+      const cleanW = w.replace(/[.,!?"""]/g, "").trim();
+      if (!cleanW) return;
+      // Lookahead window of 5 words (allows skipping difficult words)
+      for (let i = cursor; i < Math.min(cursor + 5, targetWords.length); i++) {
+        const targetClean = targetWords[i].replace(/[.,!?"""]/g, "").trim().toLowerCase();
+        if (targetClean === cleanW && !matched.includes(i)) {
+          matched.push(i);
+          cursor = i + 1;
+          break;
+        }
+      }
+    });
+
+    return matched.sort((a, b) => a - b);
+  };
+
+  // --- Speech Recognition Logic (Tablet-Robust v2) ---
   useEffect(() => {
     // Cleanup previous instance completely
     if (recognitionRef.current) {
@@ -548,61 +581,62 @@ export default function IntegratedDiagnosticPage() {
     rec.continuous = true;
     rec.interimResults = true;
     rec.lang = "id-ID";
-    // Tablet optimization: set max alternatives to reduce processing
     rec.maxAlternatives = 1;
 
-    rec.onaudiostart = () => {
-      setIsMicActive(true);
-    };
-
-    rec.onaudioend = () => {
-      setIsMicActive(false);
-    };
+    rec.onaudiostart = () => { setIsMicActive(true); };
+    rec.onaudioend = () => { setIsMicActive(false); };
 
     rec.onresult = (event: any) => {
-      let fullTranscript = "";
+      // Separate final and interim results from CURRENT recognition session
+      let sessionFinals = "";
+      let sessionInterim = "";
       for (let i = 0; i < event.results.length; ++i) {
-        fullTranscript += event.results[i][0].transcript + " ";
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          sessionFinals += transcript + " ";
+        } else {
+          sessionInterim += transcript + " ";
+        }
       }
-      // Use ref to always get the latest level index
+
+      // Save session finals for persistence across restarts
+      lastSessionFinalsRef.current = sessionFinals;
+
+      // Build FULL transcript: saved from previous sessions + current session
+      const fullTranscript = savedTranscriptRef.current + sessionFinals + sessionInterim;
+
       const idx = currentLevelIdxRef.current;
       const currentLevel = selectedLevels[idx];
       if (!currentLevel) return;
-      const currentText = currentLevel.text.toLowerCase().split(" ");
-      const words = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
-      const nextMatched: number[] = [];
-      let textCursor = 0;
-      words.forEach(w => {
-        const cleanW = w.replace(/[.,!?]/g, "").trim();
-        if (!cleanW) return;
-        for (let i = textCursor; i < Math.min(textCursor + 4, currentText.length); i++) {
-          const targetClean = currentText[i].replace(/[.,!?]/g, "").trim().toLowerCase();
-          if (targetClean === cleanW && !nextMatched.includes(i)) {
-            nextMatched.push(i);
-            textCursor = i + 1;
-            break;
-          }
-        }
-      });
-      setMatchedIndices(nextMatched.sort((a, b) => a - b));
+
+      const spokenWords = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+      const newMatched = matchWordsSequentially(spokenWords, currentLevel.text);
+
+      // Only update if we matched MORE words (never regress due to interim fluctuations)
+      if (newMatched.length >= bestMatchRef.current.length) {
+        bestMatchRef.current = newMatched;
+        setMatchedIndices(newMatched);
+      }
     };
 
     // AUTO-RESTART: On tablets/mobile, Chrome often silently stops recognition
-    // after a few seconds of silence. We auto-restart if the user is still reading.
     rec.onend = () => {
       setIsMicActive(false);
       if (isReadingRef.current && shouldRestartRef.current) {
-        // Small delay to avoid rapid-fire restarts
+        // Persist finals from the session that just ended
+        savedTranscriptRef.current += lastSessionFinalsRef.current;
+        lastSessionFinalsRef.current = "";
+
+        // Quick restart for responsiveness
         setTimeout(() => {
           if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
             try {
               recognitionRef.current.start();
             } catch (e: any) {
-              // "already started" or other — ignore
               console.warn("[SpeechRecognition] auto-restart failed:", e.message);
             }
           }
-        }, 150);
+        }, 80);
       }
     };
 
@@ -610,24 +644,19 @@ export default function IntegratedDiagnosticPage() {
       console.warn("[SpeechRecognition] error:", event.error);
       setIsMicActive(false);
 
-      // Recoverable errors on tablet: "no-speech", "audio-capture", "network"
       const recoverable = ["no-speech", "audio-capture", "network", "aborted"];
       if (recoverable.includes(event.error) && isReadingRef.current && shouldRestartRef.current) {
-        // Retry after a short delay
         setTimeout(() => {
           if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
-            try {
-              recognitionRef.current.start();
-            } catch (_) { /* ignore */ }
+            try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
           }
-        }, 300);
+        }, 200);
       }
     };
 
     recognitionRef.current = rec;
 
     return () => {
-      // Full cleanup on unmount / re-run
       shouldRestartRef.current = false;
       try {
         rec.onresult = null;
@@ -656,7 +685,7 @@ export default function IntegratedDiagnosticPage() {
     setCurrentLevelIdx(0);
     setFluencyHistory([]);
     if (selectedLevels.length > 0) {
-      setTimeLeft(LEVEL_VARIATIONS["A"][0].time); // Use first var's time as default for init
+      setTimeLeft(LEVEL_VARIATIONS["A"][0].time);
     } else {
       setTimeLeft(30);
     }
@@ -674,13 +703,16 @@ export default function IntegratedDiagnosticPage() {
     setIsReading(true);
     isReadingRef.current = true;
     shouldRestartRef.current = true;
+    // Reset transcript persistence for fresh reading session
+    savedTranscriptRef.current = "";
+    lastSessionFinalsRef.current = "";
+    bestMatchRef.current = [];
     setMatchedIndices([]);
     setStartTime(Date.now());
     if (recognitionRef.current) {
       try {
         recognitionRef.current.start();
       } catch (e: any) {
-        // If already started, abort and retry
         try {
           recognitionRef.current.abort();
           setTimeout(() => {
