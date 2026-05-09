@@ -1051,11 +1051,22 @@ export default function IntegratedDiagnosticPage() {
          
 
 
-         {/* 2. Fluency Reading */}
+         {/* 2. Fluency Reading — Read Along-Inspired */}
          {step === "fluency_reading" && selectedLevels.length > 0 && (
             <div className="animate-bounce-in max-w-6xl mx-auto">
                <div className="card-bubbly bg-[#FFFAF0] p-8 md:p-12 min-h-[400px] flex flex-col justify-between relative overflow-hidden">
-                  {/* Integrated Header - Badge & Timer */}
+                  
+                  {/* Progress Bar (Read Along style) */}
+                  {isReading && (
+                    <div className="absolute top-0 left-0 right-0 h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#5AAFD1] to-[#34D399] rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${currentLevel?.text ? Math.round((matchedIndices.length / currentLevel.text.split(" ").length) * 100) : 0}%` }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Integrated Header - Badge, Stars & Timer */}
                   <div className="flex justify-between items-center mb-10">
                       {/* Left: Level Badge */}
                       <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-full border-4 border-[#E2E8F0] shadow-sm">
@@ -1066,6 +1077,17 @@ export default function IntegratedDiagnosticPage() {
                             <h4 className="text-sm text-[#333333]">{currentLevel.title}</h4>
                          </div>
                       </div>
+
+                      {/* Center: Star Counter (Read Along style) */}
+                      {isReading && (
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-[#FFF8E1] to-[#FFFDE7] px-5 py-2 rounded-full border-2 border-[#FFD54F] shadow-sm">
+                          <span className="material-symbols-rounded text-[#FFB300] text-2xl" style={{
+                            animation: matchedIndices.length > 0 ? 'pulse 0.3s ease-in-out' : 'none'
+                          }}>star</span>
+                          <span className="font-black text-xl text-[#F57F17]">{matchedIndices.length}</span>
+                          <span className="text-xs text-[#A0AEC0] font-bold">/ {currentLevel?.text?.split(" ").length || 0}</span>
+                        </div>
+                      )}
 
                       {/* Right: Actions & Timer Group */}
                       <div className="flex items-center gap-4">
@@ -1080,8 +1102,8 @@ export default function IntegratedDiagnosticPage() {
                             <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-1.5 rounded-full border-2 border-[#E2E8F0]">
                                {/* Mic Indicator - reflects actual audio capture state */}
                                <div className="relative w-10 h-10 flex items-center justify-center">
-                                 {isMicActive && <div className="absolute inset-0 rounded-full bg-[#FF4757] opacity-20 animate-ping"></div>}
-                                 <div className={`relative w-8 h-8 rounded-full border-2 shadow-sm flex items-center justify-center z-10 transition-colors ${isMicActive ? 'bg-[#FF4757] border-[#D63031]' : 'bg-[#FFB347] border-[#E69A2E]'}`}>
+                                 {isMicActive && <div className="absolute inset-0 rounded-full bg-[#5AAFD1] opacity-20 animate-ping"></div>}
+                                 <div className={`relative w-8 h-8 rounded-full border-2 shadow-sm flex items-center justify-center z-10 transition-colors ${isMicActive ? 'bg-[#5AAFD1] border-[#4691B0]' : 'bg-[#FFB347] border-[#E69A2E]'}`}>
                                    <span className="material-symbols-rounded text-white text-base">{isMicActive ? 'mic' : 'mic_off'}</span>
                                  </div>
                                </div>
@@ -1104,12 +1126,49 @@ export default function IntegratedDiagnosticPage() {
                   <div className="grid md:grid-cols-12 gap-10 items-center">
                       <div className="md:col-span-4 relative aspect-square rounded-3xl overflow-hidden border-4 border-white shadow-md bg-[#F8FAFC]">
                         {currentLevel?.image && <Image src={currentLevel.image} alt="Illust" fill className="object-cover" unoptimized />}
+                        
+                        {/* Encouragement Overlay (Read Along's Diya-style feedback) */}
+                        {isReading && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4">
+                            <p className="text-white text-center font-bold text-sm animate-pulse">
+                              {matchedIndices.length === 0 && "🎤 Ayo mulai membaca..."}
+                              {matchedIndices.length > 0 && matchedIndices.length < Math.floor((currentLevel?.text?.split(" ").length || 1) * 0.3) && "👏 Bagus, terus membaca!"}
+                              {matchedIndices.length >= Math.floor((currentLevel?.text?.split(" ").length || 1) * 0.3) && matchedIndices.length < Math.floor((currentLevel?.text?.split(" ").length || 1) * 0.7) && "⭐ Hebat! Kamu sudah setengah jalan!"}
+                              {matchedIndices.length >= Math.floor((currentLevel?.text?.split(" ").length || 1) * 0.7) && matchedIndices.length < (currentLevel?.text?.split(" ").length || 1) && "🌟 Luar biasa! Sedikit lagi!"}
+                              {matchedIndices.length >= (currentLevel?.text?.split(" ").length || 1) && "🏆 Sempurna! Semua kata terbaca!"}
+                            </p>
+                          </div>
+                        )}
                       </div>
                      <div className="md:col-span-8">
                         <p className="text-2xl md:text-[32px] font-bold leading-[1.8] flex flex-wrap gap-x-3 gap-y-4">
                            {currentLevel?.text.split(" ").map((w: string, i: number) => {
                               const match = matchedIndices.includes(i);
-                              return <span key={i} className={`relative transition-all ${match ? 'text-[#34D399] scale-105' : 'text-[#333333]'}`}>{w}{match && <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#34D399] rounded-full"></span>}</span>
+                              // Find the "next expected" word (first unmatched)
+                              const nextExpected = currentLevel.text.split(" ").findIndex((_: string, idx: number) => !matchedIndices.includes(idx));
+                              const isNext = i === nextExpected && isReading && !match;
+                              
+                              return (
+                                <span 
+                                  key={i} 
+                                  className={`relative transition-all duration-200 ${
+                                    match 
+                                      ? 'text-[#1E88E5] scale-105' // Blue for correct (Read Along style)
+                                      : isNext 
+                                        ? 'text-[#FFB300] underline decoration-wavy decoration-[#FFD54F]' // Yellow underline for next expected word
+                                        : 'text-[#333333]'
+                                  }`}
+                                  style={match ? { animation: 'bounceIn 0.3s ease-out' } : undefined}
+                                >
+                                  {w}
+                                  {match && (
+                                    <>
+                                      <span className="absolute -bottom-1 left-0 w-full h-1 bg-[#1E88E5] rounded-full"></span>
+                                      <span className="absolute -top-2 -right-1 text-xs" style={{ animation: 'fadeInUp 0.4s ease-out' }}>⭐</span>
+                                    </>
+                                  )}
+                                </span>
+                              );
                            })}
                         </p>
                      </div>
