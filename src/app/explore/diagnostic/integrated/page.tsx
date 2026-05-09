@@ -6,6 +6,9 @@ import { useProfile } from "@/lib/profile-context";
 import { useRouter } from "next/navigation";
 import { gradeEssayAction } from "@/actions/grade-essay";
 import { BOOKS } from "@/lib/books-data";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 // --- Constants ---
 
 // --- Content Collections (Variations) ---
@@ -196,6 +199,93 @@ const TypewriterText = ({ text, delay = 35 }: { text: string; delay?: number }) 
   return <span>{displayedText}</span>;
 };
 
+// --- Report Template ---
+const ReportTemplate = React.forwardRef<HTMLDivElement, { 
+  profileName: string; 
+  levelData: any; 
+  fluencyData: any; 
+  compScore: number | null;
+  fluencyRubric: any;
+  barrettMastery: any;
+  smartAdvice: string;
+}>(({ profileName, levelData, fluencyData, compScore, fluencyRubric, barrettMastery, smartAdvice }, ref) => {
+  const s = (str: string | undefined | null) => str ? String(str).replace(/ /g, '\u00A0') : '';
+
+  return (
+    <div style={{ position: 'fixed', left: '0', top: '0', width: '793px', height: '1122px', zIndex: -1000, opacity: 0, pointerEvents: 'none', backgroundColor: '#FFFFFF' }}>
+      <div ref={ref} id="report-content" style={{ width: '793px', height: '1122px', boxSizing: 'border-box', backgroundColor: '#FFFFFF', position: 'relative', overflow: 'hidden', fontFamily: 'Arial, sans-serif', color: '#000000', padding: '40px 50px' }}>
+        <style dangerouslySetInnerHTML={{ __html: `
+          #report-content * { letter-spacing: normal !important; word-spacing: normal !important; line-height: 1.5; }
+          .report-table th, .report-table td { border: 1px solid #000; padding: 10px; }
+          .report-table th { background-color: #f0f0f0; font-weight: bold; }
+        `}} />
+        
+        {/* Judul */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1 style={{ fontSize: '24px', margin: '0', textTransform: 'uppercase' }}>{s('Laporan Diagnosis Jenjang Membaca')}</h1>
+          <h2 style={{ fontSize: '20px', margin: '5px 0 0 0', textTransform: 'uppercase' }}>{s('Babe Jaka')}</h2>
+        </div>
+
+        {/* Profil */}
+        <div style={{ marginBottom: '30px' }}>
+          <p style={{ margin: '5px 0', fontSize: '16px' }}><strong>{s('Nama')} :</strong> {s(profileName)}</p>
+          <p style={{ margin: '5px 0', fontSize: '16px' }}><strong>{s('Jenjang Membaca')} :</strong> {s(levelData.id)} - {s(levelData.name)}</p>
+        </div>
+
+        {/* Tabel Laporan Komprehensif */}
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ fontSize: '18px', margin: '0 0 10px 0' }}>{s('Tabel Laporan Komprehensif')}</h3>
+          <table className="report-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+            <thead>
+              <tr>
+                <th style={{ width: '40%', textAlign: 'left' }}>{s('Aspek')}</th>
+                <th style={{ width: '30%', textAlign: 'center' }}>{s('Capaian')}</th>
+                <th style={{ width: '30%', textAlign: 'center' }}>{s('Peringkat')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{s('Akurasi Kelancaran')}</td>
+                <td style={{ textAlign: 'center' }}>{fluencyData.accuracy}%</td>
+                <td style={{ textAlign: 'center' }}>{fluencyRubric?.accuracy || '-'}</td>
+              </tr>
+              <tr>
+                <td>{s('Kecepatan (WPM)')}</td>
+                <td style={{ textAlign: 'center' }}>{fluencyData.wpm}</td>
+                <td style={{ textAlign: 'center' }}>{fluencyRubric?.rate || '-'}</td>
+              </tr>
+              <tr>
+                <td>{s('Kelancaran')}</td>
+                <td style={{ textAlign: 'center' }}>{s('Diukur via Pola Jeda')}</td>
+                <td style={{ textAlign: 'center' }}>{fluencyRubric?.automaticity || '-'}</td>
+              </tr>
+              <tr>
+                <td>{s('Intonasi')}</td>
+                <td style={{ textAlign: 'center' }}>{s('Diukur via Konsistensi')}</td>
+                <td style={{ textAlign: 'center' }}>{fluencyRubric?.prosody || '-'}</td>
+              </tr>
+              <tr>
+                <td>{s('Skor Pemahaman')}</td>
+                <td style={{ textAlign: 'center' }}>{compScore !== null ? `${compScore}\u00A0/\u00A0100` : '-'}</td>
+                <td style={{ textAlign: 'center' }}>N/A</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Saran */}
+        <div>
+          <h3 style={{ fontSize: '18px', margin: '0 0 10px 0' }}>{s('Saran:')}</h3>
+          <p style={{ margin: '0', fontSize: '14px', lineHeight: '1.6' }}>{s(smartAdvice)}</p>
+        </div>
+
+      </div>
+    </div>
+  );
+});
+
+ReportTemplate.displayName = "ReportTemplate";
+
 // --- Main Page ---
 
 export default function IntegratedDiagnosticPage() {
@@ -252,6 +342,38 @@ export default function IntegratedDiagnosticPage() {
     inferential: 0, 
     evaluative: 0 
   });
+
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [reportPreviewData, setReportPreviewData] = useState<string | null>(null);
+  const certificateRef = useRef<HTMLDivElement>(null);
+
+  const handleGeneratePreview = async () => {
+    if (!certificateRef.current) return;
+    setIsGeneratingPDF(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const canvas = await html2canvas(certificateRef.current, { scale: 3, useCORS: false, logging: false, backgroundColor: "#ffffff" });
+      setReportPreviewData(canvas.toDataURL('image/png'));
+    } catch (error) {
+      console.error("Preview Generation failed", error);
+      alert("Gagal memuat pratinjau laporan.");
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    if (!reportPreviewData) return;
+    try {
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [793, 1122] });
+      pdf.addImage(reportPreviewData, 'PNG', 0, 0, 793, 1122);
+      pdf.save(`Laporan_Diagnosis_${profile.name.replace(/\s+/g, '_')}.pdf`);
+      setReportPreviewData(null);
+    } catch (error) {
+      console.error("PDF Generation failed", error);
+      alert("Gagal mengunduh laporan.");
+    }
+  };
 
   // --- Randomization Logic ---
   const initializePool = () => {
@@ -1039,6 +1161,20 @@ export default function IntegratedDiagnosticPage() {
                            <h2 className="text-5xl md:text-7xl font-black text-[#333333] uppercase tracking-tighter leading-none shrink-0">{finalLevelData.name}</h2>
                         </div>
                          <p className="text-2xl font-bold text-[#666666] leading-relaxed">Selamat {profile.name}! Kemampuan membacamu selaras dengan karakteristik <span className="text-[#5AAFD1] font-black">Jenjang {finalLevelData.id}</span>.</p>
+                         
+                         <div className="mt-6 flex flex-wrap gap-4">
+                            <button 
+                               onClick={handleGeneratePreview}
+                               disabled={isGeneratingPDF}
+                               className={`px-6 py-3 bg-[#5AAFD1] text-white rounded-full font-black flex items-center gap-2 shadow-[0_4px_0_#4691B0] hover:-translate-y-0.5 transition-all active:translate-y-1 ${isGeneratingPDF ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                               {isGeneratingPDF ? (
+                                  <>PROSES... <span className="animate-spin material-symbols-rounded">sync</span></>
+                               ) : (
+                                  <>UNDUH LAPORAN <span className="material-symbols-rounded">download</span></>
+                               )}
+                            </button>
+                         </div>
                       </div>
                   </div>
 
@@ -1253,6 +1389,43 @@ export default function IntegratedDiagnosticPage() {
          )}
       </main>
 
+      {step === "result" && (
+         <ReportTemplate 
+           ref={certificateRef}
+           profileName={profile.name}
+           levelData={finalLevelData}
+           fluencyData={finalFluency}
+           compScore={compScore}
+           fluencyRubric={fluencyRubric}
+           barrettMastery={barrettMastery}
+           smartAdvice={smartAdvice}
+         />
+       )}
+
+      {/* Report Preview Modal */}
+      {reportPreviewData && (
+        <div className="fixed inset-0 z-[9999] bg-black/80 flex flex-col items-center justify-center p-4 md:p-8 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#F8FAFC] rounded-3xl w-full max-w-4xl max-h-full flex flex-col overflow-hidden shadow-2xl relative">
+            <div className="p-6 border-b-2 border-[#E2E8F0] flex justify-between items-center bg-white shrink-0">
+              <h2 className="text-xl font-black text-[#333333] flex items-center gap-2">
+                <span className="material-symbols-rounded text-[#5AAFD1]">preview</span> Pratinjau Laporan
+              </h2>
+              <button onClick={() => setReportPreviewData(null)} className="w-10 h-10 rounded-full bg-[#F1F5F9] text-[#666666] hover:bg-[#E2E8F0] flex items-center justify-center transition-colors">
+                <span className="material-symbols-rounded">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center bg-[#E2E8F0] min-h-[300px]">
+              <img src={reportPreviewData} alt="Report Preview" className="w-full max-w-[600px] h-auto object-contain shadow-xl rounded-sm border border-white" />
+            </div>
+            <div className="p-6 border-t-2 border-[#E2E8F0] flex justify-end gap-4 bg-white shrink-0">
+              <button onClick={() => setReportPreviewData(null)} className="px-6 py-3 rounded-full font-bold text-[#666666] hover:bg-[#F1F5F9] transition-colors">Batal</button>
+              <button onClick={handleDownloadPDF} className="px-8 py-3 bg-[#5AAFD1] text-white rounded-full font-black flex items-center gap-2 shadow-[0_4px_0_#4691B0] hover:-translate-y-0.5 transition-all active:translate-y-1">
+                UNDUH PDF <span className="material-symbols-rounded">download</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
