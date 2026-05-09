@@ -75,50 +75,115 @@ export default function FluencyDiagnosticPage() {
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
   const [testResults, setTestResults] = useState<{accuracy: number, wpm: number, levelId: string}[]>([]);
   const [isReading, setIsReading] = useState(false);
+  const [isMicActive, setIsMicActive] = useState(false);
   const [matchedIndices, setMatchedIndices] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [readDuration, setReadDuration] = useState(0);
   const recognitionRef = useRef<any>(null);
+  const isReadingRef = useRef(false);
+  const currentTestIndexRef = useRef(0);
+  const shouldRestartRef = useRef(false);
 
+  // Keep refs in sync
+  useEffect(() => { isReadingRef.current = isReading; }, [isReading]);
+  useEffect(() => { currentTestIndexRef.current = currentTestIndex; }, [currentTestIndex]);
+
+  // --- Speech Recognition (Tablet-Robust) ---
   useEffect(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SR) {
-      const rec = new SR();
-      rec.continuous = true;
-      rec.interimResults = true;
-      rec.lang = "id-ID";
-      rec.onresult = (event: any) => {
-         let fullTranscript = "";
-         for (let i = 0; i < event.results.length; ++i) {
-            fullTranscript += event.results[i][0].transcript + " ";
-         }
-         
-         const currentText = LEVELS[currentTestIndex].text.toLowerCase().split(" ");
-         const words = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
-         
-         const nextMatched: number[] = [];
-         let textCursor = 0;
-         
-         words.forEach(w => {
-            const cleanW = w.replace(/[.,!?]/g, "").trim();
-            if (!cleanW) return;
-            
-            // Mencari kecocokan dalam jarak 4 kata ke depan (mengizinkan anak melewati/skip kata yang sulit)
-            for (let i = textCursor; i < Math.min(textCursor + 4, currentText.length); i++) {
-               const targetClean = currentText[i].replace(/[.,!?]/g, "").trim().toLowerCase();
-               if (targetClean === cleanW && !nextMatched.includes(i)) {
-                  nextMatched.push(i);
-                  textCursor = i + 1;
-                  break;
-               }
-            }
-         });
-         
-         setMatchedIndices(nextMatched.sort((a, b) => a - b));
-      };
-      recognitionRef.current = rec;
+    // Cleanup previous instance completely
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onaudiostart = null;
+        recognitionRef.current.onaudioend = null;
+        recognitionRef.current.abort();
+      } catch (_) { /* ignore */ }
+      recognitionRef.current = null;
     }
+
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = "id-ID";
+    rec.maxAlternatives = 1;
+
+    rec.onaudiostart = () => { setIsMicActive(true); };
+    rec.onaudioend = () => { setIsMicActive(false); };
+
+    rec.onresult = (event: any) => {
+       let fullTranscript = "";
+       for (let i = 0; i < event.results.length; ++i) {
+          fullTranscript += event.results[i][0].transcript + " ";
+       }
+       
+       const idx = currentTestIndexRef.current;
+       const currentText = LEVELS[idx].text.toLowerCase().split(" ");
+       const words = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+       
+       const nextMatched: number[] = [];
+       let textCursor = 0;
+       
+       words.forEach(w => {
+          const cleanW = w.replace(/[.,!?]/g, "").trim();
+          if (!cleanW) return;
+          
+          for (let i = textCursor; i < Math.min(textCursor + 4, currentText.length); i++) {
+             const targetClean = currentText[i].replace(/[.,!?]/g, "").trim().toLowerCase();
+             if (targetClean === cleanW && !nextMatched.includes(i)) {
+                nextMatched.push(i);
+                textCursor = i + 1;
+                break;
+             }
+          }
+       });
+       
+       setMatchedIndices(nextMatched.sort((a, b) => a - b));
+    };
+
+    // AUTO-RESTART: tablets/mobile often silently stop recognition
+    rec.onend = () => {
+      setIsMicActive(false);
+      if (isReadingRef.current && shouldRestartRef.current) {
+        setTimeout(() => {
+          if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
+            try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
+          }
+        }, 150);
+      }
+    };
+
+    rec.onerror = (event: any) => {
+      console.warn("[SpeechRecognition] error:", event.error);
+      setIsMicActive(false);
+      const recoverable = ["no-speech", "audio-capture", "network", "aborted"];
+      if (recoverable.includes(event.error) && isReadingRef.current && shouldRestartRef.current) {
+        setTimeout(() => {
+          if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
+            try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
+          }
+        }, 300);
+      }
+    };
+
+    recognitionRef.current = rec;
+
+    return () => {
+      shouldRestartRef.current = false;
+      try {
+        rec.onresult = null;
+        rec.onend = null;
+        rec.onerror = null;
+        rec.onaudiostart = null;
+        rec.onaudioend = null;
+        rec.abort();
+      } catch (_) { /* ignore */ }
+    };
   }, [currentTestIndex]);
 
   useEffect(() => {
@@ -146,19 +211,37 @@ export default function FluencyDiagnosticPage() {
   
   const startReading = () => {
     setIsReading(true);
+    isReadingRef.current = true;
+    shouldRestartRef.current = true;
     setMatchedIndices([]);
     setStartTime(Date.now());
-    if (recognitionRef.current) recognitionRef.current.start();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch (e: any) {
+        try {
+          recognitionRef.current.abort();
+          setTimeout(() => {
+            try { recognitionRef.current?.start(); } catch (_) { /* give up */ }
+          }, 100);
+        } catch (_) { /* ignore */ }
+      }
+    }
   };
 
   const stopReading = () => {
     setIsReading(false);
+    isReadingRef.current = false;
+    shouldRestartRef.current = false;
+    setIsMicActive(false);
     let finalDur = readDuration;
     if (startTime && finalDur === 0) {
       finalDur = Math.round((Date.now() - startTime) / 1000);
       setReadDuration(finalDur);
     }
-    if (recognitionRef.current) recognitionRef.current.stop();
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) { /* ignore */ }
+    }
 
     const currentLevelData = LEVELS[currentTestIndex];
     const totalWords = currentLevelData.text.split(" ").length;

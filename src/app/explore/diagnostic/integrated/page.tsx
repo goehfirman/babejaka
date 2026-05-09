@@ -451,10 +451,14 @@ export default function IntegratedDiagnosticPage() {
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
   const [fluencyHistory, setFluencyHistory] = useState<{accuracy: number, wpm: number, levelId: string}[]>([]);
   const [isReading, setIsReading] = useState(false);
+  const [isMicActive, setIsMicActive] = useState(false); // true when mic is actually capturing audio
   const [matchedIndices, setMatchedIndices] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
   const [startTime, setStartTime] = useState<number | null>(null);
   const recognitionRef = useRef<any>(null);
+  const isReadingRef = useRef(false); // stable ref to avoid stale closures
+  const currentLevelIdxRef = useRef(0);
+  const shouldRestartRef = useRef(false); // controls auto-restart on tablet
 
   // Comprehension State
   const [showQuestions, setShowQuestions] = useState(false);
@@ -518,40 +522,122 @@ export default function IntegratedDiagnosticPage() {
     initializePool();
   }, []);
 
-  // --- Speech Recognition Logic ---
+  // Keep refs in sync with state so callbacks never use stale values
+  useEffect(() => { isReadingRef.current = isReading; }, [isReading]);
+  useEffect(() => { currentLevelIdxRef.current = currentLevelIdx; }, [currentLevelIdx]);
+
+  // --- Speech Recognition Logic (Tablet-Robust) ---
   useEffect(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SR && selectedLevels.length > 0) {
-      const rec = new SR();
-      rec.continuous = true;
-      rec.interimResults = true;
-      rec.lang = "id-ID";
-      rec.onresult = (event: any) => {
-         let fullTranscript = "";
-         for (let i = 0; i < event.results.length; ++i) {
-            fullTranscript += event.results[i][0].transcript + " ";
-         }
-         const currentLevel = selectedLevels[currentLevelIdx];
-         const currentText = currentLevel.text.toLowerCase().split(" ");
-         const words = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
-         const nextMatched: number[] = [];
-         let textCursor = 0;
-         words.forEach(w => {
-            const cleanW = w.replace(/[.,!?]/g, "").trim();
-            if (!cleanW) return;
-            for (let i = textCursor; i < Math.min(textCursor + 4, currentText.length); i++) {
-               const targetClean = currentText[i].replace(/[.,!?]/g, "").trim().toLowerCase();
-               if (targetClean === cleanW && !nextMatched.includes(i)) {
-                  nextMatched.push(i);
-                  textCursor = i + 1;
-                  break;
-               }
-            }
-         });
-         setMatchedIndices(nextMatched.sort((a, b) => a - b));
-      };
-      recognitionRef.current = rec;
+    // Cleanup previous instance completely
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onaudiostart = null;
+        recognitionRef.current.onaudioend = null;
+        recognitionRef.current.abort();
+      } catch (_) { /* ignore */ }
+      recognitionRef.current = null;
     }
+
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR || selectedLevels.length === 0) return;
+
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = "id-ID";
+    // Tablet optimization: set max alternatives to reduce processing
+    rec.maxAlternatives = 1;
+
+    rec.onaudiostart = () => {
+      setIsMicActive(true);
+    };
+
+    rec.onaudioend = () => {
+      setIsMicActive(false);
+    };
+
+    rec.onresult = (event: any) => {
+      let fullTranscript = "";
+      for (let i = 0; i < event.results.length; ++i) {
+        fullTranscript += event.results[i][0].transcript + " ";
+      }
+      // Use ref to always get the latest level index
+      const idx = currentLevelIdxRef.current;
+      const currentLevel = selectedLevels[idx];
+      if (!currentLevel) return;
+      const currentText = currentLevel.text.toLowerCase().split(" ");
+      const words = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+      const nextMatched: number[] = [];
+      let textCursor = 0;
+      words.forEach(w => {
+        const cleanW = w.replace(/[.,!?]/g, "").trim();
+        if (!cleanW) return;
+        for (let i = textCursor; i < Math.min(textCursor + 4, currentText.length); i++) {
+          const targetClean = currentText[i].replace(/[.,!?]/g, "").trim().toLowerCase();
+          if (targetClean === cleanW && !nextMatched.includes(i)) {
+            nextMatched.push(i);
+            textCursor = i + 1;
+            break;
+          }
+        }
+      });
+      setMatchedIndices(nextMatched.sort((a, b) => a - b));
+    };
+
+    // AUTO-RESTART: On tablets/mobile, Chrome often silently stops recognition
+    // after a few seconds of silence. We auto-restart if the user is still reading.
+    rec.onend = () => {
+      setIsMicActive(false);
+      if (isReadingRef.current && shouldRestartRef.current) {
+        // Small delay to avoid rapid-fire restarts
+        setTimeout(() => {
+          if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.start();
+            } catch (e: any) {
+              // "already started" or other — ignore
+              console.warn("[SpeechRecognition] auto-restart failed:", e.message);
+            }
+          }
+        }, 150);
+      }
+    };
+
+    rec.onerror = (event: any) => {
+      console.warn("[SpeechRecognition] error:", event.error);
+      setIsMicActive(false);
+
+      // Recoverable errors on tablet: "no-speech", "audio-capture", "network"
+      const recoverable = ["no-speech", "audio-capture", "network", "aborted"];
+      if (recoverable.includes(event.error) && isReadingRef.current && shouldRestartRef.current) {
+        // Retry after a short delay
+        setTimeout(() => {
+          if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.start();
+            } catch (_) { /* ignore */ }
+          }
+        }, 300);
+      }
+    };
+
+    recognitionRef.current = rec;
+
+    return () => {
+      // Full cleanup on unmount / re-run
+      shouldRestartRef.current = false;
+      try {
+        rec.onresult = null;
+        rec.onend = null;
+        rec.onerror = null;
+        rec.onaudiostart = null;
+        rec.onaudioend = null;
+        rec.abort();
+      } catch (_) { /* ignore */ }
+    };
   }, [currentLevelIdx, selectedLevels]);
 
   useEffect(() => {
@@ -586,15 +672,34 @@ export default function IntegratedDiagnosticPage() {
 
   const startFluencyReading = () => {
     setIsReading(true);
+    isReadingRef.current = true;
+    shouldRestartRef.current = true;
     setMatchedIndices([]);
     setStartTime(Date.now());
-    if (recognitionRef.current) recognitionRef.current.start();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch (e: any) {
+        // If already started, abort and retry
+        try {
+          recognitionRef.current.abort();
+          setTimeout(() => {
+            try { recognitionRef.current?.start(); } catch (_) { /* give up */ }
+          }, 100);
+        } catch (_) { /* ignore */ }
+      }
+    }
   };
 
   const stopFluencyReading = () => {
     setIsReading(false);
+    isReadingRef.current = false;
+    shouldRestartRef.current = false;
+    setIsMicActive(false);
     const duration = startTime ? (Date.now() - startTime) / 1000 : 1;
-    if (recognitionRef.current) recognitionRef.current.stop();
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) { /* ignore */ }
+    }
 
     const level = selectedLevels[currentLevelIdx];
     const totalWords = level.text.split(" ").length;
@@ -857,11 +962,11 @@ export default function IntegratedDiagnosticPage() {
                             </button>
                          ) : (
                             <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-1.5 rounded-full border-2 border-[#E2E8F0]">
-                               {/* Smaller Mic Indicator */}
+                               {/* Mic Indicator - reflects actual audio capture state */}
                                <div className="relative w-10 h-10 flex items-center justify-center">
-                                 <div className="absolute inset-0 rounded-full bg-[#FF4757] opacity-20 animate-ping"></div>
-                                 <div className="relative w-8 h-8 bg-[#FF4757] rounded-full border-2 border-[#D63031] shadow-sm flex items-center justify-center z-10">
-                                   <span className="material-symbols-rounded text-white text-base">mic</span>
+                                 {isMicActive && <div className="absolute inset-0 rounded-full bg-[#FF4757] opacity-20 animate-ping"></div>}
+                                 <div className={`relative w-8 h-8 rounded-full border-2 shadow-sm flex items-center justify-center z-10 transition-colors ${isMicActive ? 'bg-[#FF4757] border-[#D63031]' : 'bg-[#FFB347] border-[#E69A2E]'}`}>
+                                   <span className="material-symbols-rounded text-white text-base">{isMicActive ? 'mic' : 'mic_off'}</span>
                                  </div>
                                </div>
 
