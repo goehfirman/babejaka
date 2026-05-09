@@ -243,8 +243,8 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
       >
         <style dangerouslySetInnerHTML={{ __html: `
           #report-content * {
-            letter-spacing: 0px !important;
-            word-spacing: 0px !important;
+            letter-spacing: normal !important;
+            word-spacing: normal !important;
             line-height: 1.5;
           }
           .report-table th, .report-table td {
