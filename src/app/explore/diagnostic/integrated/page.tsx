@@ -215,6 +215,12 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
     return `RPT-${date}-${random}`;
   }, []);
 
+  // Helper to fix html2canvas bug where spaces are ignored
+  const s = (str: string | undefined | null) => {
+    if (!str) return '';
+    return String(str).replace(/ /g, '\u00A0');
+  };
+
   return (
     <div style={{ 
       position: 'fixed', 
@@ -268,15 +274,15 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
         {/* Header Ribbon */}
         <div style={{ backgroundColor: '#1A365D', color: '#FFFFFF', padding: '40px 50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{ fontSize: '32px', margin: '0 0 8px 0', fontFamily: 'Georgia, serif', fontWeight: 'normal' }}>Laporan Diagnosis Literasi</h1>
-            <p style={{ margin: 0, fontSize: '14px', color: '#A0AEC0' }}>Platform Asesmen Membaca BABE JAKA</p>
+            <h1 style={{ fontSize: '32px', margin: '0 0 8px 0', fontFamily: 'Georgia, serif', fontWeight: 'normal' }}>{s('Laporan Diagnosis Literasi')}</h1>
+            <p style={{ margin: 0, fontSize: '14px', color: '#A0AEC0' }}>{s('Platform Asesmen Membaca BABE JAKA')}</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
              <div style={{ display: 'flex', alignItems: 'baseline', fontFamily: "'Changa One', Arial, sans-serif", fontSize: '28px', fontWeight: 900, marginBottom: '4px' }}>
               <span style={{ color: '#FC8181' }}>BABE</span>
               <span style={{ color: '#63B3ED', marginLeft: '6px' }}>JAKA</span>
             </div>
-            <span style={{ color: '#E2E8F0', fontSize: '12px' }}>ID: {reportId}</span>
+            <span style={{ color: '#E2E8F0', fontSize: '12px' }}>ID:&nbsp;{reportId}</span>
           </div>
         </div>
 
@@ -286,92 +292,92 @@ const ReportTemplate = React.forwardRef<HTMLDivElement, {
           {/* Student Profile & Level */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px', borderBottom: '2px solid #E2E8F0', paddingBottom: '24px' }}>
             <div>
-              <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 4px 0' }}>Nama Peserta Didik</p>
-              <h2 style={{ fontSize: '24px', color: '#2D3748', margin: 0, fontWeight: 'bold' }}>{profileName}</h2>
+              <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 4px 0' }}>{s('Nama Peserta Didik')}</p>
+              <h2 style={{ fontSize: '24px', color: '#2D3748', margin: 0, fontWeight: 'bold' }}>{s(profileName)}</h2>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 4px 0' }}>Hasil Jenjang Membaca</p>
+              <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 4px 0' }}>{s('Hasil Jenjang Membaca')}</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
-                <span style={{ display: 'inline-block', padding: '4px 12px', backgroundColor: levelData.color || '#3182CE', color: '#FFF', borderRadius: '16px', fontWeight: 'bold', fontSize: '16px' }}>{levelData.id}</span>
-                <h2 style={{ fontSize: '24px', color: '#2D3748', margin: 0, fontWeight: 'bold' }}>{levelData.name}</h2>
+                <span style={{ display: 'inline-block', padding: '4px 12px', backgroundColor: levelData.color || '#3182CE', color: '#FFF', borderRadius: '16px', fontWeight: 'bold', fontSize: '16px' }}>{s(levelData.id)}</span>
+                <h2 style={{ fontSize: '24px', color: '#2D3748', margin: 0, fontWeight: 'bold' }}>{s(levelData.name)}</h2>
               </div>
             </div>
           </div>
 
           {/* Section: Hasil Analisis Komprehensif */}
-          <h3 style={{ fontSize: '18px', color: '#2C5282', borderLeft: '4px solid #3182CE', paddingLeft: '12px', marginBottom: '20px', fontFamily: 'Georgia, serif' }}>1. Hasil Analisis Komprehensif</h3>
+          <h3 style={{ fontSize: '18px', color: '#2C5282', borderLeft: '4px solid #3182CE', paddingLeft: '12px', marginBottom: '20px', fontFamily: 'Georgia, serif' }}>{s('1. Hasil Analisis Komprehensif')}</h3>
           <table className="report-table" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '40px' }}>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', width: '40%' }}>Aspek Penilaian</th>
-                <th style={{ textAlign: 'center', width: '30%' }}>Capaian Mentah</th>
-                <th style={{ textAlign: 'center', width: '30%' }}>Peringkat Rubrik (1-4)</th>
+                <th style={{ textAlign: 'left', width: '40%' }}>{s('Aspek Penilaian')}</th>
+                <th style={{ textAlign: 'center', width: '30%' }}>{s('Capaian Mentah')}</th>
+                <th style={{ textAlign: 'center', width: '30%' }}>{s('Peringkat Rubrik (1-4)')}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Ketepatan (Akurasi)</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>Kemampuan membaca kata dengan benar</span></td>
+                <td><strong>{s('Ketepatan (Akurasi)')}</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>{s('Kemampuan membaca kata dengan benar')}</span></td>
                 <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#3182CE' }}>{fluencyData.accuracy}%</td>
                 <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{fluencyRubric?.accuracy || '-'}</td>
               </tr>
               <tr>
-                <td><strong>Kecepatan (Rate)</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>Jumlah kata yang dibaca per menit (WPM)</span></td>
+                <td><strong>{s('Kecepatan (Rate)')}</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>{s('Jumlah kata yang dibaca per menit (WPM)')}</span></td>
                 <td style={{ textAlign: 'center', fontWeight: 'bold', color: '#3182CE' }}>{fluencyData.wpm}</td>
                 <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{fluencyRubric?.rate || '-'}</td>
               </tr>
               <tr>
-                <td><strong>Kelancaran (Automaticity)</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>Jeda dan ritme saat membaca teks</span></td>
-                <td style={{ textAlign: 'center', color: '#4A5568' }}>Diukur via Pola Jeda</td>
+                <td><strong>{s('Kelancaran (Automaticity)')}</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>{s('Jeda dan ritme saat membaca teks')}</span></td>
+                <td style={{ textAlign: 'center', color: '#4A5568' }}>{s('Diukur via Pola Jeda')}</td>
                 <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{fluencyRubric?.automaticity || '-'}</td>
               </tr>
               <tr>
-                <td><strong>Intonasi (Prosody)</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>Ekspresi dan konsistensi kecepatan baca</span></td>
-                <td style={{ textAlign: 'center', color: '#4A5568' }}>Diukur via Konsistensi</td>
+                <td><strong>{s('Intonasi (Prosody)')}</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>{s('Ekspresi dan konsistensi kecepatan baca')}</span></td>
+                <td style={{ textAlign: 'center', color: '#4A5568' }}>{s('Diukur via Konsistensi')}</td>
                 <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{fluencyRubric?.prosody || '-'}</td>
               </tr>
               <tr>
-                <td style={{ backgroundColor: '#F7FAFC' }}><strong>Pemahaman Membaca</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>Kemampuan menjawab soal teks literasi</span></td>
-                <td style={{ backgroundColor: '#F7FAFC', textAlign: 'center', fontWeight: 'bold', color: '#3182CE' }}>{compScore !== null ? `${compScore} / 100` : '-'}</td>
+                <td style={{ backgroundColor: '#F7FAFC' }}><strong>{s('Pemahaman Membaca')}</strong><br/><span style={{fontSize: '11px', color: '#718096'}}>{s('Kemampuan menjawab soal teks literasi')}</span></td>
+                <td style={{ backgroundColor: '#F7FAFC', textAlign: 'center', fontWeight: 'bold', color: '#3182CE' }}>{compScore !== null ? `${compScore}\u00A0/\u00A0100` : '-'}</td>
                 <td style={{ backgroundColor: '#F7FAFC', textAlign: 'center', color: '#A0AEC0' }}>N/A</td>
               </tr>
             </tbody>
           </table>
 
           {/* Section: Profil & Karakteristik Jenjang */}
-          <h3 style={{ fontSize: '18px', color: '#2C5282', borderLeft: '4px solid #3182CE', paddingLeft: '12px', marginBottom: '20px', fontFamily: 'Georgia, serif' }}>2. Karakteristik Jenjang Dikuasai</h3>
+          <h3 style={{ fontSize: '18px', color: '#2C5282', borderLeft: '4px solid #3182CE', paddingLeft: '12px', marginBottom: '20px', fontFamily: 'Georgia, serif' }}>{s('2. Karakteristik Jenjang Dikuasai')}</h3>
           <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', padding: '24px', borderRadius: '8px', marginBottom: '40px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div>
-                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>Target Usia</p>
-                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{levelData.age}</p>
+                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>{s('Target Usia')}</p>
+                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{s(levelData.age)}</p>
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>Kemampuan Utama</p>
-                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{levelData.ability}</p>
+                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>{s('Kemampuan Utama')}</p>
+                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{s(levelData.ability)}</p>
               </div>
               <div style={{ gridColumn: '1 / -1', marginTop: '10px' }}>
-                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>Karakteristik Bahasa & Kosakata</p>
-                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{levelData.language}</p>
+                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>{s('Karakteristik Bahasa & Kosakata')}</p>
+                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{s(levelData.language)}</p>
               </div>
               <div style={{ gridColumn: '1 / -1', marginTop: '10px' }}>
-                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>Materi Bacaan Sesuai</p>
-                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{levelData.content}</p>
+                <p style={{ fontSize: '12px', color: '#718096', textTransform: 'uppercase', fontWeight: 'bold', margin: '0 0 8px 0' }}>{s('Materi Bacaan Sesuai')}</p>
+                <p style={{ margin: 0, fontSize: '14px', color: '#2D3748' }}>{s(levelData.content)}</p>
               </div>
             </div>
           </div>
 
           {/* Section: Saran & Rekomendasi */}
-          <h3 style={{ fontSize: '18px', color: '#2C5282', borderLeft: '4px solid #3182CE', paddingLeft: '12px', marginBottom: '20px', fontFamily: 'Georgia, serif' }}>3. Catatan Pedagogis & Saran</h3>
+          <h3 style={{ fontSize: '18px', color: '#2C5282', borderLeft: '4px solid #3182CE', paddingLeft: '12px', marginBottom: '20px', fontFamily: 'Georgia, serif' }}>{s('3. Catatan Pedagogis & Saran')}</h3>
           <div style={{ backgroundColor: '#EBF8FF', border: '1px solid #BEE3F8', padding: '24px', borderRadius: '8px' }}>
-            <p style={{ margin: 0, fontSize: '15px', color: '#2B6CB0', fontStyle: 'italic', lineHeight: '1.6' }}>"{smartAdvice}"</p>
+            <p style={{ margin: 0, fontSize: '15px', color: '#2B6CB0', fontStyle: 'italic', lineHeight: '1.6' }}>"{s(smartAdvice)}"</p>
           </div>
 
         </div>
 
         {/* Footer */}
         <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', backgroundColor: '#EDF2F7', padding: '20px 50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #E2E8F0' }}>
-          <p style={{ margin: 0, fontSize: '12px', color: '#718096' }}>Dicetak pada: {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-          <p style={{ margin: 0, fontSize: '12px', color: '#718096', fontWeight: 'bold' }}>Dokumen Resmi Diagnosis Literasi BABE JAKA</p>
+          <p style={{ margin: 0, fontSize: '12px', color: '#718096' }}>{s('Dicetak pada:')} {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }).replace(/ /g, '\u00A0')}</p>
+          <p style={{ margin: 0, fontSize: '12px', color: '#718096', fontWeight: 'bold' }}>{s('Dokumen Resmi Diagnosis Literasi BABE JAKA')}</p>
         </div>
 
       </div>
