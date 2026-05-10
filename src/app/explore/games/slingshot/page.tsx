@@ -495,11 +495,12 @@ export default function SlingshotGame() {
 
               return (
                 <motion.div
-                  key={idx}
+                  key={`${currentLevel}-${idx}`}
+                  initial={{ scale: 1, opacity: 1, y: 50 }}
                   animate={
                     isHit 
                       ? (isCorrect ? { scale: [1, 1.5, 0], opacity: [1, 1, 0] } : { x: [0, -10, 10, -10, 10, 0] })
-                      : { y: [0, -5, 0] }
+                      : { y: [0, -5, 0], opacity: 1, scale: 1 }
                   }
                   transition={
                     isHit 
