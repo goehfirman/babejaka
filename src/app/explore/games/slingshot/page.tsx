@@ -246,14 +246,16 @@ export default function SlingshotGame() {
           {/* Sling Rubber (Visual) */}
           <svg className="absolute bottom-32 w-48 h-32 pointer-events-none overflow-visible">
              <motion.line 
-               x1="0" y1="40" 
+               x1="40" y1="50" 
                animate={{ x2: isDragging ? ballPos.x + 96 : 96, y2: isDragging ? ballPos.y + 40 : 40 }}
-               stroke="#4A2511" strokeWidth="6" strokeLinecap="round" 
+               transition={{ type: "spring", stiffness: 400, damping: 20 }}
+               stroke="#3D1E08" strokeWidth="8" strokeLinecap="round" 
              />
              <motion.line 
-               x1="192" y1="40" 
+               x1="152" y1="50" 
                animate={{ x2: isDragging ? ballPos.x + 96 : 96, y2: isDragging ? ballPos.y + 40 : 40 }}
-               stroke="#4A2511" strokeWidth="6" strokeLinecap="round" 
+               transition={{ type: "spring", stiffness: 400, damping: 20 }}
+               stroke="#3D1E08" strokeWidth="8" strokeLinecap="round" 
              />
           </svg>
 
