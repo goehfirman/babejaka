@@ -78,6 +78,9 @@ export default function LandingPage() {
             <button onClick={handleDiagnosis} className="btn-heritage-outline">
               DIAGNOSIS <span className="material-symbols-rounded font-bold text-2xl">troubleshoot</span>
             </button>
+            <Link href="/explore/games/slingshot" className="btn-heritage-outline !text-secondary !border-secondary/20 hover:!bg-secondary/5 flex items-center gap-3">
+              MAIN PERMAINAN <span className="material-symbols-rounded font-bold text-2xl">sports_esports</span>
+            </Link>
           </div>
         </div>
 
