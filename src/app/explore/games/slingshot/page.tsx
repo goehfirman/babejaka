@@ -261,7 +261,7 @@ export default function SlingshotGame() {
 
           {/* Trajectory Guide (Dots) */}
           {isDragging && (
-            <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center">
+            <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-30">
               {[...Array(7)].map((_, i) => {
                 const step = (i + 1) * 0.14;
                 const power = 1.5;
