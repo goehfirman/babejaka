@@ -651,7 +651,7 @@ export default function SlingshotGame() {
               border-2 border-white/20 flex items-center justify-center
               ${isDragging ? 'scale-110 shadow-2xl ring-4 ring-white/20' : ''}
             `}
-            style={{ position: 'absolute', bottom: '120px' }}
+            style={{ position: 'absolute', bottom: '152px' }}
           >
             {/* Ball Shine */}
             <div className="absolute top-2 left-3 w-4 h-2 bg-white/40 rounded-full rotate-[-30deg]"></div>
