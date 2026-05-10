@@ -234,13 +234,13 @@ export default function SlingshotGame() {
         {/* Slingshot Section (Bottom) */}
         <div className="relative w-full h-64 mt-auto flex justify-center items-end pb-12">
           
-          {/* Slingshot Handle (Visual) */}
-          <div className="absolute bottom-0 w-32 h-48 flex justify-center">
-            {/* The Y Shape */}
-            <div className="absolute bottom-0 w-6 h-32 bg-gradient-to-b from-[#A0522D] to-[#5D2E0C] rounded-full border-r-4 border-black/20"></div>
-            <div className="absolute bottom-24 w-24 h-6 bg-gradient-to-r from-[#A0522D] via-[#8B4513] to-[#A0522D] rounded-full"></div>
-            <div className="absolute bottom-24 left-0 w-6 h-16 bg-gradient-to-t from-[#A0522D] to-[#8B4513] rounded-full origin-bottom -rotate-12"></div>
-            <div className="absolute bottom-24 right-0 w-6 h-16 bg-gradient-to-t from-[#A0522D] to-[#8B4513] rounded-full origin-bottom rotate-12"></div>
+          {/* Slingshot Handle (Custom Image) */}
+          <div className="absolute bottom-0 w-48 h-64 flex justify-center pointer-events-none">
+            <img 
+              src="https://i.ibb.co.com/t59W6Hw/KATAPEL.png" 
+              alt="Slingshot Handle" 
+              className="w-full h-full object-contain"
+            />
           </div>
 
           {/* Sling Rubber (Visual) */}
