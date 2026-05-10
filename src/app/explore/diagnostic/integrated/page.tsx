@@ -699,9 +699,13 @@ export default function IntegratedDiagnosticPage() {
       try { recognitionRef.current.stop(); } catch (_) { /* ignore */ }
     }
 
-    const level = selectedLevels[currentLevelIdx];
+    // USE REFS to avoid stale closure — these always have the latest values
+    const idx = currentLevelIdxRef.current;
+    const level = selectedLevels[idx];
+    if (!level) return;
+
     const totalWords = level.text.split(" ").length;
-    const matchCount = matchedIndices.length;
+    const matchCount = bestMatchRef.current.length;
     const acc = Math.round((matchCount / totalWords) * 100);
     const wpm = Math.round((matchCount / duration) * 60);
 
@@ -748,18 +752,22 @@ export default function IntegratedDiagnosticPage() {
     const nextHistory = [...fluencyHistory, newResult];
     setFluencyHistory(nextHistory);
 
-    if (acc >= 80 && currentLevelIdx < selectedLevels.length - 1) {
+    console.log(`[Diagnosis] Level ${level.id}: acc=${acc}%, wpm=${wpm}, matched=${matchCount}/${totalWords}`);
+
+    if (acc >= 80 && idx < selectedLevels.length - 1) {
       // Otomatis lanjut ke level selanjutnya
-      const next = currentLevelIdx + 1;
+      const next = idx + 1;
       setCurrentLevelIdx(next);
       setTimeLeft(selectedLevels[next].time);
       setMatchedIndices([]);
-      setStep("fluency_reading");
-      
-      setIsReading(false);
-      isReadingRef.current = false;
+      bestMatchRef.current = [];
+      savedTranscriptRef.current = "";
+      lastSessionFinalsRef.current = "";
+      wordTimestampsRef.current = [];
+      lastMatchCountRef.current = 0;
       setIsLevelCompleted(false);
       readingDoneTimeRef.current = null;
+      setStep("fluency_reading");
     } else {
       // Jika di bawah kriteria atau level terakhir, langsung munculkan laporan
       setStep("result");
