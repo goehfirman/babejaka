@@ -24,7 +24,7 @@ const playSound = (type: 'pull' | 'win' | 'correct' | 'wrong') => {
     pull: "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3",
     win: "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3",
     correct: "https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3",
-    wrong: "https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"
+    wrong: "https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3" // Distinct 'Tetot' buzzer
   };
   const audio = new Audio(sounds[type]);
   audio.volume = 0.5;
