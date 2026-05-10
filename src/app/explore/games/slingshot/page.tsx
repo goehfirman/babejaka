@@ -627,7 +627,7 @@ export default function SlingshotGame() {
           )}
 
           {/* Projectile (Ball) Origin Container */}
-          <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-40">
+          <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-[60]">
             <motion.div
               key={currentLevel}
               drag={gameState === "playing"}
@@ -636,7 +636,7 @@ export default function SlingshotGame() {
               onDragStart={() => setIsDragging(true)}
               onDrag={(e, info) => setBallPos({ x: info.offset.x, y: info.offset.y })}
               onDragEnd={handleRelease}
-              initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
+              initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
               animate={
                 gameState === "playing" 
                 ? { x: ballPos.x, y: ballPos.y, scale: 1, opacity: 1 } 
