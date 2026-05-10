@@ -15,8 +15,8 @@ import html2canvas from 'html2canvas';
 
 const LEVEL_VARIATIONS: Record<string, any[]> = {
   "A": [
-    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Ini Monas. Monas tinggi sekali. Emas Monas berkilau.", time: 30, image: "/images/stories/jakarta_monas.png" },
-    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Bus melaju. Bus warna biru. Aku naik bus TransJakarta.", time: 30, image: "/images/stories/jakarta_transjakarta.png" }
+    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Buku ini baru. Aku suka baca buku. Buku ini bagus.", time: 30, image: "/images/stories/baca_buku.png" },
+    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Budi main bola. Bola Budi biru. Budi suka bola.", time: 30, image: "/images/stories/main_bola.png" }
   ],
   "B": [
     { id: "B", title: "Pembaca Awal", subtitle: "Level B", text: "Pagi ini aku naik TransJakarta. Busnya bersih dan dingin. Aku pergi ke halte Bundaran HI.", time: 45, image: "/images/stories/jakarta_transjakarta.png" },
@@ -121,10 +121,10 @@ const LEVEL_CHARACTERISTICS: Record<string, any> = {
   "A": {
     id: "A", name: "Pembaca Dini", age: "0–7 tahun", symbol: "Bintang", color: "#FF4757",
     kpmRange: "0–30 KPM",
-    ability: "Mengenal ikon kota seperti Monas dan bus TransJakarta melalui kalimat sangat pendek.",
-    content: "Fokus pada objek ikonik Jakarta (Monas, Bus Biru).",
-    language: "Kosakata sederhana (5–20 kata), maks 5 kata per kalimat.",
-    visual: "Gambar Monas dan Bus sangat dominan."
+    ability: "Membaca kata-kata dasar sederhana tanpa huruf konsonan berangkap yang sulit.",
+    content: "Fokus pada objek harian anak (Buku, Bola).",
+    language: "Kosakata sangat sederhana (1-2 suku kata per kata), struktur kalimat subjek-predikat-objek dasar.",
+    visual: "Gambar anak membaca dan bermain bola sangat dominan."
   },
   "B1": {
     id: "B1", name: "Pembaca Awal", age: "6–8 tahun", symbol: "Lingkaran", color: "#8E44AD",
