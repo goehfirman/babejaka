@@ -156,13 +156,15 @@ export default function TugOfWarGame() {
       await updateDoc(doc(db, "rooms", roomId), updates);
       if (isCorrect) { triggerStars(index); playSound('pull'); }
       
-      // Check Win Lead 30
+      // Check Win: Flag crosses Finish Line
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
       const p2S = updates[`players.p2.score`] || roomData.players.p2?.score || 0;
-      if (Math.abs(p1S - p2S) >= 30) {
+      const currentPos = 50 + (p2S - p1S);
+      
+      if (currentPos <= 15 || currentPos >= 85) {
         await updateDoc(doc(db, "rooms", roomId), {
           "metadata.status": "finished",
-          "metadata.winner": p1S > p2S ? "p1" : "p2"
+          "metadata.winner": currentPos <= 15 ? "p1" : "p2"
         });
         playSound('win');
       }
@@ -172,7 +174,8 @@ export default function TugOfWarGame() {
   };
 
   const checkWin = (p: number, o: number) => {
-    if (Math.abs(p - o) >= 30) {
+    const currentPos = 50 + (o - p);
+    if (currentPos <= 15 || currentPos >= 85) {
       setGameState("gameOver");
       playSound('win');
     }
@@ -252,9 +255,21 @@ export default function TugOfWarGame() {
          <div className="relative w-full max-w-6xl h-96 mb-12 flex items-center justify-center">
             {/* Ground with Perspective */}
             <div className="absolute bottom-20 left-0 right-0 h-4 bg-gray-200/50 rounded-[100%] blur-sm"></div>
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-1 h-48 bg-ink/10"></div>
+            
+            {/* Center Reference Line */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-0.5 h-48 bg-ink/5"></div>
 
-            {/* Rope with 2.5D shadow */}
+            {/* Finish Lines (Garis Finish) */}
+            <div className="absolute inset-0 flex justify-between items-center px-[15%] pointer-events-none">
+               <div className="h-40 w-1.5 bg-red-500/30 rounded-full blur-[1px] relative">
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500/40 tracking-widest uppercase rotate-[-90deg]">FINISH</div>
+               </div>
+               <div className="h-40 w-1.5 bg-red-500/30 rounded-full blur-[1px] relative">
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500/40 tracking-widest uppercase rotate-[90deg]">FINISH</div>
+               </div>
+            </div>
+
+            {/* Rope with Flag */}
             <div className="absolute bottom-[100px] w-full h-12 flex items-center overflow-hidden">
                <motion.div 
                  animate={{ x: -ropeOffset * 8 }}
@@ -262,8 +277,17 @@ export default function TugOfWarGame() {
                  style={{ width: '200%', left: '-50%' }}
                >
                   <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #000, #000 10px, transparent 10px, transparent 20px)' }}></div>
-                  <div className="absolute left-1/2 -translate-x-1/2 w-10 h-16 bg-yellow-400 border-4 border-yellow-500 shadow-lg rounded-sm flex items-center justify-center z-30">
-                     <div className="w-1 h-full bg-yellow-600/20"></div>
+                  
+                  {/* Central Flag (Bendera Pertanda) */}
+                  <div className="absolute left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
+                     <motion.div 
+                       animate={{ rotate: [0, 5, -5, 0] }}
+                       transition={{ repeat: Infinity, duration: 2 }}
+                       className="w-12 h-8 bg-red-600 border-2 border-white shadow-lg rounded-sm relative"
+                     >
+                        <div className="absolute top-0 left-0 w-full h-1/2 bg-white/20"></div>
+                     </motion.div>
+                     <div className="w-1.5 h-16 bg-gray-300 shadow-md"></div>
                   </div>
                </motion.div>
             </div>
