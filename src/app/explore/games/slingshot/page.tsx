@@ -649,23 +649,16 @@ export default function SlingshotGame() {
               }
               className={`
                 pointer-events-auto
-                w-16 h-16 rounded-full cursor-grab active:cursor-grabbing
-                relative overflow-hidden
-                bg-gradient-to-br from-red-400 via-red-600 to-red-900
-                shadow-[0_10px_25px_rgba(0,0,0,0.4),inset_0_-8px_15px_rgba(0,0,0,0.5),inset_0_8px_15px_rgba(255,255,255,0.3)]
-                border-2 border-white/30 flex items-center justify-center
-                ${isDragging ? 'scale-110 shadow-2xl ring-4 ring-white/20' : ''}
+                w-16 h-16 cursor-grab active:cursor-grabbing
+                relative flex items-center justify-center
+                ${isDragging ? 'scale-110' : ''}
               `}
             >
-              {/* Marble Swirl Effect */}
-              <div className="absolute inset-0 opacity-40 bg-[conic-gradient(from_0deg,transparent,rgba(255,255,255,0.4),transparent_60%)] animate-[spin_10s_linear_infinite]"></div>
-              
-              {/* Internal Depth */}
-              <div className="absolute inset-2 rounded-full border-t-2 border-white/20 blur-[1px]"></div>
-              <div className="absolute top-2 left-4 w-6 h-3 bg-white/40 rounded-full blur-[2px] rotate-[-25deg]"></div>
-              
-              {/* Main Shine */}
-              <div className="absolute top-1 left-2 w-10 h-6 bg-gradient-to-b from-white/30 to-transparent rounded-full rotate-[-15deg]"></div>
+              <img 
+                src="https://i.ibb.co.com/Z3ZtMW4/Desain-tanpa-judul.png" 
+                alt="Projectile"
+                className="w-full h-full object-contain drop-shadow-xl"
+              />
             </motion.div>
           </div>
         </div>
