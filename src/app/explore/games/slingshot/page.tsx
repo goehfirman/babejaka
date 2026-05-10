@@ -281,6 +281,35 @@ export default function SlingshotGame() {
             </div>
           )}
 
+          {/* Explosion / Particles (When Hit) */}
+          {gameState === "result" && (
+            <div className="absolute pointer-events-none overflow-visible" style={{ left: `calc(50% + ${ballPos.x}px)`, bottom: `calc(120px - ${ballPos.y}px)` }}>
+              {[...Array(12)].map((_, i) => {
+                const angle = (i / 12) * Math.PI * 2;
+                const dist = 50 + Math.random() * 50;
+                const tx = Math.cos(angle) * dist;
+                const ty = Math.sin(angle) * dist;
+                
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+                    animate={{ x: tx, y: ty, scale: 0, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className={`absolute w-3 h-3 rounded-full ${feedback?.type === "correct" ? "bg-green-400" : "bg-red-400"} shadow-lg`}
+                  />
+                );
+              })}
+              {/* Central Flash */}
+              <motion.div
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{ scale: 2, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute -left-4 -top-4 w-8 h-8 bg-white rounded-full blur-md"
+              />
+            </div>
+          )}
+
           {/* The Projectile (Ball) */}
           <AnimatePresence>
             <motion.div
