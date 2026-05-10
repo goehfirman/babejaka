@@ -390,7 +390,7 @@ export default function IntegratedDiagnosticPage() {
   const certificateRef = useRef<HTMLDivElement>(null);
   const { addPoints } = useProfile();
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
-  const [pendingStars, setPendingStars] = useState<number>(0);
+  const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number }>({ count: 0, timestamp: 0 });
 
   const handleGeneratePreview = async () => {
     if (!certificateRef.current) return;
@@ -531,7 +531,11 @@ export default function IntegratedDiagnosticPage() {
       if (newMatched.length > bestMatchRef.current.length) {
         // Record timestamp for each NEWLY matched word
         const now = Date.now();
-        const newWordCount = newMatched.length - lastMatchCountRef.current;
+        const newWordCount = newMatched.length - bestMatchRef.current.length;
+        
+        // Trigger flying stars for EACH new word matched
+        setPendingStars({ count: newWordCount, timestamp: now });
+
         for (let k = 0; k < newWordCount; k++) {
           wordTimestampsRef.current.push(now);
         }
@@ -783,18 +787,8 @@ export default function IntegratedDiagnosticPage() {
       // DECISION BRIDGE — Level A langsung ke hasil, Level B-E masuk tes pemahaman dulu
       const finalLevel = level.id;
       
-      // FAIR POINT CALCULATION: Calculate total stars from all levels attempted
-      // Points = 10 pts per star.
-      // Stars per level: 95%+ = 3 stars, 80%+ = 2 stars, <80% = 1 star (effort)
-      const totalStars = nextHistory.reduce((sum, entry) => {
-        if (entry.accuracy >= 95) return sum + 3;
-        if (entry.accuracy >= 80) return sum + 2;
-        return sum + 1;
-      }, 0);
-      
-      const sessionPoints = totalStars * 10;
-      setPendingStars(totalStars); // Trigger flying animation
-      setEarnedPoints(sessionPoints);
+      // Points are now awarded in REALTIME as stars fly to the navbar.
+      // No extra points at session end to maintain 1 word = 1 point parity.
 
       if (finalLevel === 'A') {
         setStep("result");
@@ -1594,12 +1588,9 @@ export default function IntegratedDiagnosticPage() {
          <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
        )}
 
-       {pendingStars > 0 && (
-         <StarFly count={pendingStars} onComplete={() => {
-           addPoints(pendingStars * 10);
-           setPendingStars(0);
-         }} />
-       )}
+       <StarFly burst={pendingStars} onStarHit={() => {
+         addPoints(1); // 1 bintang = 1 poin
+       }} />
     </div>
   );
 }
