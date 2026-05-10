@@ -32,33 +32,38 @@ export default function TarikTambangLobby({ onCreate, onJoin, onSingle }: LobbyP
           <button className="mt-8 py-4 bg-primary/10 text-primary font-black rounded-2xl group-hover:bg-primary group-hover:text-white transition-all">MULAI LATIHAN</button>
         </motion.div>
 
-        {/* Multiplayer: Join Room */}
+        {/* Multiplayer: Join/Create via Code */}
         <motion.div 
           whileHover={{ y: -10 }}
           className="bg-white/90 backdrop-blur-md p-8 rounded-[40px] shadow-premium border-2 border-white text-center flex flex-col justify-between"
         >
           <div>
-            <div className="w-20 h-20 bg-ink/5 rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-inner text-ink/40">
-              <LogIn size={40} />
+            <div className="w-20 h-20 bg-secondary/10 rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-inner text-secondary group-hover:bg-secondary group-hover:text-white transition-all">
+              <Users size={40} />
             </div>
-            <h2 className="text-2xl font-black text-ink mb-4">GABUNG TANDING</h2>
-            <div className="space-y-3 mt-6">
+            <h2 className="text-2xl font-black text-ink mb-4 uppercase">Ajak Teman</h2>
+            <p className="text-ink-light font-bold text-xs mb-6">Masukkan 4 angka rahasia untuk bertanding dengan temanmu!</p>
+            
+            <div className="space-y-4 mt-6">
               <input 
                 type="text" 
-                maxLength={6}
+                maxLength={4}
                 value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                placeholder="KODE (MISAL: BJ-772)" 
-                className="w-full px-6 py-4 bg-gray-50 rounded-2xl border-2 border-gray-100 font-black text-center tracking-[0.2em] focus:border-secondary outline-none transition-all"
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  setJoinCode(val);
+                }}
+                placeholder="____" 
+                className="w-full px-6 py-6 bg-gray-50 rounded-3xl border-4 border-gray-100 font-black text-center text-4xl tracking-[0.5em] focus:border-secondary outline-none transition-all placeholder:text-gray-200"
               />
               <button 
                 onClick={() => onJoin(joinCode)}
-                disabled={joinCode.length < 3}
-                className={`w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-2 ${
-                  joinCode.length >= 3 ? 'bg-ink text-white shadow-lg active:scale-95' : 'bg-gray-100 text-gray-300'
+                disabled={joinCode.length !== 4}
+                className={`w-full py-6 rounded-3xl font-black text-xl transition-all flex items-center justify-center gap-2 ${
+                  joinCode.length === 4 ? 'bg-secondary text-white shadow-glow-blue active:scale-95' : 'bg-gray-100 text-gray-300'
                 }`}
               >
-                GABUNG SEKARANG
+                MULAI TANDING
               </button>
             </div>
           </div>

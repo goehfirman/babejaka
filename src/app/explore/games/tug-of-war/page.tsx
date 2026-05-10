@@ -88,6 +88,12 @@ export default function TugOfWarGame() {
         const data = snap.data();
         setRoomData(data);
         if (data.metadata.status === "playing") setGameMode("multi-playing");
+        
+        // SYNC QUESTION LEVEL
+        if (data.gameplay?.currentLevel !== undefined) {
+          setCurrentLevel(data.gameplay.currentLevel);
+        }
+
         if (data.metadata.status === "finished") {
           setGameState("gameOver");
           if (data.metadata.winner === playerRole) playWinCelebration();
@@ -98,34 +104,48 @@ export default function TugOfWarGame() {
   }, [roomId, playerRole]);
 
   // --- Actions ---
-  const createRoom = async () => {
-    const code = `BJ-${Math.floor(100 + Math.random() * 900)}`;
-    const newRoom = {
-      metadata: { status: "waiting", createdAt: serverTimestamp(), winner: null },
-      players: {
-        p1: { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null },
-        p2: null
-      },
-      gameplay: { ropePosition: 50, winThreshold: 30 }
-    };
-    await setDoc(doc(db, "rooms", code), newRoom);
-    setRoomId(code);
-    setPlayerRole("p1");
-    setGameMode("multi-lobby");
-  };
-
   const joinRoom = async (code: string) => {
-    const docRef = doc(db, "rooms", code.toUpperCase());
+    const docRef = doc(db, "rooms", code);
     const snap = await getDoc(docRef);
-    if (snap.exists()) {
+    
+    if (!snap.exists()) {
+      // CREATE AS P1
+      const newRoom = {
+        metadata: { status: "waiting", createdAt: serverTimestamp(), winner: null },
+        players: {
+          p1: { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null },
+          p2: null
+        },
+        gameplay: { ropePosition: 50, currentLevel: 0 }
+      };
+      await setDoc(docRef, newRoom);
+      setRoomId(code);
+      setPlayerRole("p1");
+      setGameMode("multi-lobby");
+    } else {
+      // JOIN AS P2
       const data = snap.data();
       if (!data.players.p2) {
+        if (data.players.p1.name === profile.name) {
+          // Rejoining as P1
+          setRoomId(code);
+          setPlayerRole("p1");
+          setGameMode("multi-lobby");
+          return;
+        }
         await updateDoc(docRef, { "players.p2": { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null } });
-        setRoomId(code.toUpperCase());
+        setRoomId(code);
         setPlayerRole("p2");
         setGameMode("multi-lobby");
-      } else alert("Penuh!");
-    } else alert("Salah Kode!");
+      } else {
+        // Re-check if it's p1 or p2 rejoining
+        if (data.players.p1.name === profile.name) {
+          setRoomId(code); setPlayerRole("p1"); setGameMode("multi-lobby");
+        } else if (data.players.p2.name === profile.name) {
+          setRoomId(code); setPlayerRole("p2"); setGameMode("multi-lobby");
+        } else alert("Ruangan Penuh!");
+      }
+    }
   };
 
   const handleAnswer = async (index: number) => {
@@ -163,9 +183,12 @@ export default function TugOfWarGame() {
       const otherRole = playerRole === "p1" ? "p2" : "p1";
       
       const currentScore = (roomData.players as any)[playerRole].score || 0;
+      const nextLevel = (roomData.gameplay.currentLevel + 1) % QUESTIONS.length;
+      
       const updates: any = {
         [`players.${playerRole}.score`]: currentScore + power,
-        [`players.${playerRole}.lastAnswerStatus`]: isCorrect ? "correct" : "wrong"
+        [`players.${playerRole}.lastAnswerStatus`]: isCorrect ? "correct" : "wrong",
+        "gameplay.currentLevel": nextLevel // Sync next level for both
       };
  
       if (!isCorrect) {
@@ -187,7 +210,10 @@ export default function TugOfWarGame() {
         });
       }
  
-      setTimeout(() => { setFeedback(null); setCurrentLevel(p => (p + 1) % QUESTIONS.length); setStartTime(Date.now()); }, 1500);
+      setTimeout(() => { 
+        setFeedback(null); 
+        setStartTime(Date.now()); 
+      }, 1500);
     }
   };
  
@@ -211,7 +237,7 @@ export default function TugOfWarGame() {
     }
   };
 
-  if (gameMode === "select") return <TarikTambangLobby onCreate={createRoom} onJoin={joinRoom} onSingle={() => setGameMode("single")} />;
+  if (gameMode === "select") return <TarikTambangLobby onJoin={joinRoom} onSingle={() => setGameMode("single")} onCreate={() => {}} />;
 
   if (gameMode === "multi-lobby") return (
     <div className="min-h-screen bg-batik-subtle flex items-center justify-center p-6">
