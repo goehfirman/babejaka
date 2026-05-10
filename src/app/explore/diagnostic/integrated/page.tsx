@@ -1133,25 +1133,16 @@ export default function IntegratedDiagnosticPage() {
 
                   {/* Integrated Header - Badge, Stars & Timer */}
                   <div className="flex justify-between items-center mb-10">
-                      {/* Left: Level Badge & Fullscreen */}
-                       <div className="flex items-center gap-3">
-                          <button 
-                            onClick={toggleFullscreen}
-                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#A0AEC0] hover:text-[#5AAFD1] border-2 border-[#E2E8F0] shadow-sm transition-all active:scale-95"
-                            title="Layar Penuh"
-                          >
-                            <span className="material-symbols-rounded text-2xl">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
-                          </button>
+                      {/* Left: Level Badge */}
+                      <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-full border-4 border-[#E2E8F0] shadow-sm">
+                         <div className="w-10 h-10 bg-[#5AAFD1] rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white shadow-sm">{currentLevel?.id}</div>
 
-                          <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-full border-4 border-[#E2E8F0] shadow-sm">
-                             <div className="w-10 h-10 bg-[#5AAFD1] rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white shadow-sm">{currentLevel?.id}</div>
+                         <div className="text-left font-black uppercase">
+                            <p className="text-[9px] text-[#A0AEC0] tracking-widest leading-none mb-0.5">Kelancaran</p>
+                            <h4 className="text-sm text-[#333333]">{currentLevel.title}</h4>
+                         </div>
+                      </div>
 
-                             <div className="text-left font-black uppercase">
-                                <p className="text-[9px] text-[#A0AEC0] tracking-widest leading-none mb-0.5">Kelancaran</p>
-                                <h4 className="text-sm text-[#333333]">{currentLevel.title}</h4>
-                             </div>
-                          </div>
-                       </div>
 
                       {/* Center: Star Counter (Read Along style) */}
                       {isReading && (
@@ -1166,6 +1157,13 @@ export default function IntegratedDiagnosticPage() {
 
                       {/* Right: Actions & Timer Group */}
                       <div className="flex items-center gap-4">
+                         <button 
+                           onClick={toggleFullscreen}
+                           className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#A0AEC0] hover:text-[#5AAFD1] border-2 border-[#E2E8F0] shadow-sm transition-all active:scale-95"
+                           title="Layar Penuh"
+                         >
+                           <span className="material-symbols-rounded text-2xl">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+                         </button>
                          {!isReading ? (
                             <button 
                               onClick={startFluencyReading} 

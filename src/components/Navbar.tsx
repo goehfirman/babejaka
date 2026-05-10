@@ -35,6 +35,14 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-md shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* Logo */}
+            <Link href="/" className="hover:scale-105 transition-transform flex items-center shrink-0 group outline-none focus:ring-0">
+              <BrandLogo size="sm" showIcon={true} />
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-4 lg:gap-6">
+
             <button 
               onClick={() => {
                 if (!document.fullscreenElement) {
@@ -48,14 +56,6 @@ export default function Navbar() {
             >
               <span className="material-symbols-rounded text-2xl">fullscreen</span>
             </button>
-
-            {/* Logo */}
-            <Link href="/" className="hover:scale-105 transition-transform flex items-center shrink-0 group outline-none focus:ring-0">
-              <BrandLogo size="sm" showIcon={true} />
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-4 lg:gap-6">
 
             {/* Hamburger Button (Mobile Only) */}
             <button 
