@@ -408,11 +408,21 @@ export default function SlingshotGame() {
       if (hitIndex === question.jawabanBenar) {
         setScore(s => s + 5);
         
-        // Trigger Star Burst
+        // Trigger Star Burst from the hit bubble's screen position
         const now = Date.now();
+        const bubbleEl = document.getElementById(`bubble-${hitIndex}`);
+        let startX = window.innerWidth / 2;
+        let startY = window.innerHeight / 2;
+
+        if (bubbleEl) {
+          const rect = bubbleEl.getBoundingClientRect();
+          startX = rect.left + rect.width / 2;
+          startY = rect.top + rect.height / 2;
+        }
+
         const positions = Array.from({ length: 5 }).map(() => ({
-          x: window.innerWidth / 2 + (Math.random() * 200 - 100),
-          y: window.innerHeight / 2 + (Math.random() * 200 - 100)
+          x: startX + (Math.random() * 60 - 30),
+          y: startY + (Math.random() * 60 - 30)
         }));
         setPendingStars({ count: 5, timestamp: now, positions });
 
