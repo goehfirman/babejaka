@@ -571,7 +571,7 @@ export default function SlingshotGame() {
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
                 const dy = -ballPos.y * 2.5 * step;
-                const scale = 1.1 - (step * 0.2); 
+                const scale = 1.2 - (step * 0.8); // Dramatic perspective scaling
                 
                 return (
                   <motion.div
