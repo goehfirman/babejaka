@@ -60,9 +60,9 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
                 type="text" 
                 value={inputName}
                 onChange={(e) => setInputName(e.target.value)}
-                placeholder="NAMAMU DI SINI"
+                placeholder="Namamu di sini"
                 autoFocus
-                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-black text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center tracking-widest focus:scale-[1.01]"
+                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-bold text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center focus:scale-[1.01]"
               />
             </div>
 
@@ -71,30 +71,30 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
                 type="text" 
                 value={inputSchool}
                 onChange={(e) => setInputSchool(e.target.value)}
-                placeholder="NAMA SEKOLAHMU"
-                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-black text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center tracking-widest focus:scale-[1.01]"
+                placeholder="Nama sekolahmu"
+                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-bold text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center focus:scale-[1.01]"
               />
             </div>
             
             <button 
               type="submit" 
               disabled={!inputName.trim() || !inputSchool.trim()}
-              className={`w-full py-5 rounded-2xl font-black text-lg tracking-[0.2em] transition-all uppercase flex items-center justify-center gap-3 ${
+              className={`w-full py-5 rounded-2xl font-black text-lg tracking-wider transition-all flex items-center justify-center gap-3 ${
                 inputName.trim() && inputSchool.trim()
                 ? 'btn-heritage shadow-glow-red' 
                 : 'bg-gray-100 text-gray-300 cursor-not-allowed'
               }`}
             >
-              MULAI
+              Mulai Petualangan
             </button>
           </form>
 
           {!isCompulsory && (
             <button 
               onClick={onClose}
-              className="mt-8 w-full text-center text-ink-light font-black text-[10px] uppercase tracking-[0.4em] hover:text-primary transition-all opacity-40 hover:opacity-100"
+              className="mt-8 w-full text-center text-ink-light font-bold text-sm hover:text-primary transition-all opacity-40 hover:opacity-100"
             >
-              Lewati untuk Sekarang
+              Lewati untuk sekarang
             </button>
           )}
         </div>
