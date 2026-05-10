@@ -42,6 +42,13 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 lg:gap-6">
+            <Link 
+              href="/explore/leaderboard" 
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-black text-xs uppercase tracking-widest ${pathname === '/explore/leaderboard' ? 'bg-secondary/10 text-secondary' : 'text-ink-light hover:text-secondary hover:bg-secondary/5'}`}
+            >
+              <span className="material-symbols-rounded text-lg">emoji_events</span>
+              <span className="hidden lg:inline">Peringkat</span>
+            </Link>
 
             <button 
               onClick={() => {
