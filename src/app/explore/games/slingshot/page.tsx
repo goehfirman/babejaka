@@ -61,7 +61,7 @@ export default function SlingshotGame() {
     
     // Reverse direction for slingshot feel
     const targetX = -offset.x * power;
-    const targetY = -offset.y * power - 250; // Shortened distance to match bubbles
+    const targetY = -offset.y * power - 150; // Synchronized with dots
 
     setGameState("flying");
     setIsDragging(false);
@@ -84,10 +84,10 @@ export default function SlingshotGame() {
     // Bubble positions (relative to screen center)
     // Horizontal row: left to right
     const bubbles = [
-      { x: -180, y: -250 },
-      { x: -60, y: -250 },
-      { x: 60, y: -250 },
-      { x: 180, y: -250 }
+      { x: -180, y: -150 },
+      { x: -60, y: -150 },
+      { x: 60, y: -150 },
+      { x: 180, y: -150 }
     ];
 
     let hitIndex = -1;
@@ -266,7 +266,7 @@ export default function SlingshotGame() {
                 const step = (i + 1) * 0.14;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
-                const dy = -ballPos.y * power * step - (125 * step);
+                const dy = -ballPos.y * power * step - (150 * step);
                 const scale = 1.1 - (step * 0.2); // Less scaling down
                 
                 return (
