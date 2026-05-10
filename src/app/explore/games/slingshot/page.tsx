@@ -624,39 +624,41 @@ export default function SlingshotGame() {
             </div>
           )}
 
-          {/* The Projectile (Ball) */}
-          <motion.div
-            key={currentLevel}
-            drag={gameState === "playing"}
-            dragConstraints={{ top: 0, bottom: 150, left: -100, right: 100 }}
-            dragElastic={0.1}
-            onDragStart={() => setIsDragging(true)}
-            onDrag={(e, info) => setBallPos({ x: info.offset.x, y: info.offset.y })}
-            onDragEnd={handleRelease}
-            initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
-            animate={
-              gameState === "playing" 
-              ? { x: ballPos.x, y: ballPos.y, scale: 1, opacity: 1 } 
-              : (gameState === "flying" ? { x: ballPos.x, y: ballPos.y, scale: 0.35, opacity: 0.8 } : { opacity: 0 })
-            }
-            transition={
-              gameState === "flying" 
-              ? { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
-              : (isDragging ? { type: "tween", duration: 0 } : { type: "spring", damping: 15, stiffness: 300 })
-            }
-            className={`
-              z-50 w-16 h-16 rounded-full cursor-grab active:cursor-grabbing
-              shadow-[0_10px_20px_rgba(0,0,0,0.3),inset_0_-5px_10px_rgba(0,0,0,0.2)]
-              bg-gradient-to-br from-primary via-primary-dark to-black
-              border-2 border-white/20 flex items-center justify-center
-              ${isDragging ? 'scale-110 shadow-2xl ring-4 ring-white/20' : ''}
-            `}
-            style={{ position: 'absolute', bottom: '152px' }}
-          >
-            {/* Ball Shine */}
-            <div className="absolute top-2 left-3 w-4 h-2 bg-white/40 rounded-full rotate-[-30deg]"></div>
-            <span className="material-symbols-rounded text-white text-3xl opacity-40">sports_baseball</span>
-          </motion.div>
+          {/* Projectile (Ball) Origin Container */}
+          <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-40">
+            <motion.div
+              key={currentLevel}
+              drag={gameState === "playing"}
+              dragConstraints={{ top: 0, bottom: 150, left: -100, right: 100 }}
+              dragElastic={0.1}
+              onDragStart={() => setIsDragging(true)}
+              onDrag={(e, info) => setBallPos({ x: info.offset.x, y: info.offset.y })}
+              onDragEnd={handleRelease}
+              initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
+              animate={
+                gameState === "playing" 
+                ? { x: ballPos.x, y: ballPos.y, scale: 1, opacity: 1 } 
+                : (gameState === "flying" ? { x: ballPos.x, y: ballPos.y, scale: 0.35, opacity: 0.8 } : { opacity: 0 })
+              }
+              transition={
+                gameState === "flying" 
+                ? { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
+                : (isDragging ? { type: "tween", duration: 0 } : { type: "spring", damping: 15, stiffness: 300 })
+              }
+              className={`
+                pointer-events-auto
+                w-16 h-16 rounded-full cursor-grab active:cursor-grabbing
+                shadow-[0_10px_20px_rgba(0,0,0,0.3),inset_0_-5px_10px_rgba(0,0,0,0.2)]
+                bg-gradient-to-br from-primary via-primary-dark to-black
+                border-2 border-white/20 flex items-center justify-center
+                ${isDragging ? 'scale-110 shadow-2xl ring-4 ring-white/20' : ''}
+              `}
+            >
+              {/* Ball Shine */}
+              <div className="absolute top-2 left-3 w-4 h-2 bg-white/40 rounded-full rotate-[-30deg]"></div>
+              <span className="material-symbols-rounded text-white text-3xl opacity-40">sports_baseball</span>
+            </motion.div>
+          </div>
         </div>
       </div>
 
