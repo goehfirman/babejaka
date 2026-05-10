@@ -49,34 +49,47 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const savedActive = localStorage.getItem(ACTIVE_USER_KEY);
-    if (savedActive) {
-      try {
-        const localProfile = JSON.parse(savedActive);
-        setProfile(localProfile);
-        
-        // Start Realtime Sync with Firestore
-        const docId = getDocId(localProfile.name, localProfile.schoolName);
-        const unsub = onSnapshot(doc(db, "users", docId), (docSnap) => {
-          if (docSnap.exists()) {
-            const cloudData = docSnap.data() as UserProfile;
-            // Ensure arrays exist even if cloud data is old
-            const sanitized: UserProfile = {
-              ...cloudData,
-              completedBooks: cloudData.completedBooks || [],
-              badges: cloudData.badges || [],
-            };
-            setProfile(sanitized);
-            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sanitized));
-          }
-        });
-        
-        return () => unsub();
-      } catch (e) {
-        console.error("Failed to load active profile", e);
+    const initProfile = async () => {
+      const savedActive = localStorage.getItem(ACTIVE_USER_KEY);
+      let unsub: (() => void) | undefined;
+
+      if (savedActive) {
+        try {
+          const localProfile = JSON.parse(savedActive);
+          setProfile(localProfile);
+          
+          // Start Realtime Sync with Firestore
+          const docId = getDocId(localProfile.name, localProfile.schoolName);
+          unsub = onSnapshot(
+            doc(db, "users", docId), 
+            (docSnap) => {
+              if (docSnap.exists()) {
+                const cloudData = docSnap.data() as UserProfile;
+                const sanitized: UserProfile = {
+                  ...cloudData,
+                  completedBooks: cloudData.completedBooks || [],
+                  badges: cloudData.badges || [],
+                };
+                setProfile(sanitized);
+                localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sanitized));
+              }
+            },
+            (error) => {
+              console.error("Firestore Sync Error (Check Security Rules):", error);
+            }
+          );
+        } catch (e) {
+          console.error("Failed to load active profile from local storage", e);
+        }
       }
-    }
-    setLoaded(true);
+      setLoaded(true);
+      return unsub;
+    };
+
+    const cleanup = initProfile();
+    return () => {
+      cleanup.then(unsub => unsub?.());
+    };
   }, []);
 
   const saveToStorage = async (p: UserProfile) => {
