@@ -8,6 +8,7 @@ import { gradeEssayAction } from "@/actions/grade-essay";
 import { BOOKS } from "@/lib/books-data";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { PointToast } from "@/components/PointToast";
 
 // --- Constants ---
 
@@ -386,6 +387,8 @@ export default function IntegratedDiagnosticPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [reportPreviewData, setReportPreviewData] = useState<string | null>(null);
   const certificateRef = useRef<HTMLDivElement>(null);
+  const { addPoints } = useProfile();
+  const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
 
   const handleGeneratePreview = async () => {
     if (!certificateRef.current) return;
@@ -777,6 +780,11 @@ export default function IntegratedDiagnosticPage() {
     } else {
       // DECISION BRIDGE — Level A langsung ke hasil, Level B-E masuk tes pemahaman dulu
       const finalLevel = level.id;
+      
+      // Award points for finishing diagnostic fluency phase
+      addPoints(100);
+      setEarnedPoints(100);
+
       if (finalLevel === 'A') {
         setStep("result");
       } else {
@@ -1571,6 +1579,9 @@ export default function IntegratedDiagnosticPage() {
           </div>
         </div>
       )}
+       {earnedPoints && (
+         <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
+       )}
     </div>
   );
 }

@@ -20,6 +20,7 @@ const STORAGE_KEY = "babe_jaka_user_profile";
 interface ProfileContextValue {
   profile: UserProfile;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  addPoints: (amount: number) => void;
   logout: () => void;
   getAvatarUrl: () => string;
 }
@@ -50,6 +51,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const addPoints = (amount: number) => {
+    setProfile(prev => {
+      const next = { ...prev, points: (prev.points || 0) + amount };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem(STORAGE_KEY);
     setProfile(DEFAULT_PROFILE);
@@ -62,7 +71,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile, logout, getAvatarUrl }}>
+    <ProfileContext.Provider value={{ profile, updateProfile, addPoints, logout, getAvatarUrl }}>
       {children}
     </ProfileContext.Provider>
   );
@@ -75,6 +84,7 @@ export function useProfile() {
     return {
       profile: DEFAULT_PROFILE,
       updateProfile: () => {},
+      addPoints: () => {},
       logout: () => {},
       getAvatarUrl: () => `https://api.dicebear.com/9.x/fun-emoji/svg?seed=42`,
     };

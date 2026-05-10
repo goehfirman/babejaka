@@ -59,7 +59,13 @@ export default function Navbar() {
               </button>
             ) : (
               <div className="flex items-center gap-2 md:gap-3 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 ml-1">
-                <div className="hidden sm:block">
+                {/* Point Counter */}
+                <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-sm mr-1">
+                  <span className="text-lg">⭐</span>
+                  <span className="text-[13px] font-black text-[#FFB347]">{profile.points || 0}</span>
+                </div>
+                
+                <div className="hidden sm:block border-l border-gray-200 pl-3">
                   <p className="text-[9px] font-black text-ink-light tracking-widest leading-none mb-0.5 opacity-60 uppercase">HALO</p>
                   <h4 className="text-[11px] font-black text-secondary truncate tracking-tight max-w-[80px] md:max-w-[100px]">{profile.name}</h4>
                 </div>
@@ -100,6 +106,7 @@ export default function Navbar() {
         onLogout={handleLogout}
         onLogin={() => setShowNameModal(true)}
         isDefaultUser={isDefaultUser}
+        points={profile.points}
       />
     </>
   );

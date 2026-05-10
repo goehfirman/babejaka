@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { useBooks } from "@/hooks/useBooks";
 import dynamic from "next/dynamic";
 import BrandLogo from "@/components/BrandLogo";
+import { useProfile } from "@/lib/profile-context";
+import { PointToast } from "@/components/PointToast";
 
 // Dynamically import react-pageflip to avoid SSR 'window is not defined' errors
 const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false });
@@ -67,6 +69,10 @@ export default function ReadingRoom() {
 
   const [isNavVisible, setIsNavVisible] = useState(true);
   const navTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const { addPoints } = useProfile();
+  const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
+  const hasEarnedRef = useRef(false);
 
   useEffect(() => {
      const resetNavVisibility = (e: MouseEvent) => {
@@ -185,7 +191,15 @@ export default function ReadingRoom() {
   };
 
   const onPage = (e: any) => {
-     setCurrentPage(e.data);
+     const newPage = e.data;
+     setCurrentPage(newPage);
+     
+     // Detect reaching the end of the book (back cover)
+     if (newPage >= bookElements.length - 1 && !hasEarnedRef.current) {
+        addPoints(50);
+        setEarnedPoints(50);
+        hasEarnedRef.current = true;
+     }
   };
 
   // Convert linear sequence to Left/Right spread pairs
@@ -372,6 +386,9 @@ export default function ReadingRoom() {
            </div>
         </div>
 
+       {earnedPoints && (
+         <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
+       )}
       </main>
     </div>
   );

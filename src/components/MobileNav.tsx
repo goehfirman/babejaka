@@ -11,9 +11,10 @@ interface MobileNavProps {
   onLogout?: () => void;
   onLogin?: () => void;
   isDefaultUser?: boolean;
+  points?: number;
 }
 
-export default function MobileNav({ isOpen, onClose, profileName, avatarUrl, onLogout, onLogin, isDefaultUser }: MobileNavProps) {
+export default function MobileNav({ isOpen, onClose, profileName, avatarUrl, onLogout, onLogin, isDefaultUser, points }: MobileNavProps) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -44,7 +45,15 @@ export default function MobileNav({ isOpen, onClose, profileName, avatarUrl, onL
               </div>
               <div>
                 <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest leading-none mb-1">Hallo,</p>
-                <p className="text-xs font-black text-[#5AAFD1] truncate max-w-[120px]">{profileName || "Petualang"}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-black text-[#5AAFD1] truncate max-w-[120px]">{profileName || "Petualang"}</p>
+                  {!isDefaultUser && (
+                    <div className="flex items-center gap-1 bg-[#FFFBEB] px-2 py-0.5 rounded-full border border-[#FEF3C7]">
+                      <span className="text-[10px]">⭐</span>
+                      <span className="text-[10px] font-black text-[#D97706]">{points || 0}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#F8FAFC] flex items-center justify-center text-[#666666] hover:bg-[#F0F8FF] transition-colors">
