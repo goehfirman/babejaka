@@ -253,41 +253,39 @@ export default function TugOfWarGame() {
 
       <div className="flex-1 flex flex-col items-center justify-center">
          <div className="relative w-full max-w-6xl h-96 mb-12 flex items-center justify-center">
-            {/* Ground with Perspective */}
-            <div className="absolute bottom-20 left-0 right-0 h-4 bg-gray-200/50 rounded-[100%] blur-sm"></div>
+            {/* Ground / Background Zone */}
+            <div className="absolute inset-0 bg-[#F0F7FF] rounded-[2rem] border-2 border-blue-100 shadow-inner"></div>
             
-            {/* Center Reference Line */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-0.5 h-48 bg-ink/5"></div>
-
-            {/* Finish Lines (Garis Finish) */}
-            <div className="absolute inset-0 flex justify-between items-center px-[15%] pointer-events-none">
-               <div className="h-40 w-1.5 bg-red-500/30 rounded-full blur-[1px] relative">
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500/40 tracking-widest uppercase rotate-[-90deg]">FINISH</div>
+            {/* Striped Finish Zones (as per image) */}
+            <div className="absolute inset-0 flex justify-between items-center px-[10%] pointer-events-none">
+               {/* Finish P1 Zone */}
+               <div className="h-full w-24 bg-repeat bg-center opacity-20 border-x border-gray-300" 
+                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P1</div>
                </div>
-               <div className="h-40 w-1.5 bg-red-500/30 rounded-full blur-[1px] relative">
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-red-500/40 tracking-widest uppercase rotate-[90deg]">FINISH</div>
+               
+               {/* Finish P2 Zone */}
+               <div className="h-full w-24 bg-repeat bg-center opacity-20 border-x border-gray-300" 
+                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P2</div>
                </div>
             </div>
 
-            {/* Rope with Flag */}
+            {/* Center Reference Line (dotted) */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-0.5 h-full border-l-2 border-dashed border-blue-200 opacity-50"></div>
+
+            {/* Rope with Flag/Marker */}
             <div className="absolute bottom-[100px] w-full h-12 flex items-center overflow-hidden">
                <motion.div 
                  animate={{ x: -ropeOffset * 8 }}
-                 className="relative h-6 bg-[#8B4513] shadow-[0_10px_20px_rgba(0,0,0,0.3)] rounded-full flex items-center justify-center"
+                 className="relative h-6 bg-[#A0522D] shadow-md rounded-sm flex items-center justify-center"
                  style={{ width: '200%', left: '-50%' }}
                >
-                  <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #000, #000 10px, transparent 10px, transparent 20px)' }}></div>
+                  <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #000 25%, transparent 25%, transparent 50%, #000 50%, #000 75%, transparent 75%, transparent)', backgroundSize: '10px 10px' }}></div>
                   
-                  {/* Central Flag (Bendera Pertanda) */}
-                  <div className="absolute left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
-                     <motion.div 
-                       animate={{ rotate: [0, 5, -5, 0] }}
-                       transition={{ repeat: Infinity, duration: 2 }}
-                       className="w-12 h-8 bg-red-600 border-2 border-white shadow-lg rounded-sm relative"
-                     >
-                        <div className="absolute top-0 left-0 w-full h-1/2 bg-white/20"></div>
-                     </motion.div>
-                     <div className="w-1.5 h-16 bg-gray-300 shadow-md"></div>
+                  {/* Circular Red Marker (as per image) */}
+                  <div className="absolute left-1/2 -translate-x-1/2 z-30 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-gray-100">
+                     <div className="w-6 h-6 bg-red-600 rounded-full border-2 border-white"></div>
                   </div>
                </motion.div>
             </div>
