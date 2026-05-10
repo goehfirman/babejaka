@@ -615,7 +615,7 @@ export default function SlingshotGame() {
           )}
 
           {/* The Projectile (Ball) */}
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             <motion.div
               key={currentLevel}
               drag={gameState === "playing"}
@@ -629,6 +629,7 @@ export default function SlingshotGame() {
                 ? { x: ballPos.x, y: ballPos.y, scale: 0.35, opacity: 0.8 } 
                 : (gameState === "playing" ? { x: ballPos.x, y: ballPos.y, scale: 1, opacity: 1 } : { opacity: 0 })
               }
+              exit={{ opacity: 0, scale: 0 }}
               transition={
                 gameState === "flying" 
                 ? { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
