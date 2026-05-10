@@ -13,6 +13,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [showNameModal, setShowNameModal] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
+  const [showGamePicker, setShowGamePicker] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const isDefaultUser = profile.name === "Petualang Baca";
@@ -78,9 +79,12 @@ export default function LandingPage() {
             <button onClick={handleDiagnosis} className="btn-heritage-outline">
               DIAGNOSIS <span className="material-symbols-rounded font-bold text-2xl">troubleshoot</span>
             </button>
-            <Link href="/explore/games/slingshot" className="btn-heritage-outline !text-secondary !border-secondary/20 hover:!bg-secondary/5 flex items-center gap-3">
+            <button 
+              onClick={() => setShowGamePicker(true)}
+              className="btn-heritage-outline !text-secondary !border-secondary/20 hover:!bg-secondary/5 flex items-center gap-3"
+            >
               MAIN PERMAINAN <span className="material-symbols-rounded font-bold text-2xl">sports_esports</span>
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -231,6 +235,63 @@ export default function LandingPage() {
           <span className="material-symbols-rounded text-2xl md:text-lg">person</span>
         </div>
       </button>
+
+      {/* GAME PICKER MODAL */}
+      {showGamePicker && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+           <div className="absolute inset-0" onClick={() => setShowGamePicker(false)}></div>
+           <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in duration-300">
+              {/* Header */}
+              <div className="bg-batik-subtle p-8 md:p-12 text-center border-b border-gray-100">
+                 <h2 className="text-3xl md:text-5xl font-black text-ink mb-4 italic">Pilih <span className="text-primary">Permainan</span> Seru!</h2>
+                 <p className="text-ink-light font-bold">Ayo asah pengetahuanmu tentang Jakarta sambil bermain!</p>
+              </div>
+
+              {/* Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 md:p-12">
+                 {/* Slingshot */}
+                 <div 
+                   onClick={() => router.push('/explore/games/slingshot')}
+                   className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
+                 >
+                    <Image src="https://i.ibb.co.com/Y4FKRjTv/bg.png" alt="Katapel" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
+                       <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30">
+                          <span className="material-symbols-rounded text-white text-4xl">target</span>
+                       </div>
+                       <h3 className="text-2xl font-black text-white mb-2 tracking-tight">KATAPEL BABE JAKA</h3>
+                       <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Bidik Jawaban yang Benar!</p>
+                    </div>
+                 </div>
+
+                 {/* Tug of War */}
+                 <div 
+                   onClick={() => router.push('/explore/games/tug-of-war')}
+                   className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
+                 >
+                    <Image src="https://i.ibb.co.com/jn3fgc0/jakarta-global-city.png" alt="Tarik Tambang" fill className="object-contain p-12 bg-secondary/10 group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent"></div>
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
+                       <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30">
+                          <span className="material-symbols-rounded text-white text-4xl">groups</span>
+                       </div>
+                       <h3 className="text-2xl font-black text-white mb-2 tracking-tight">TARIK TAMBANG</h3>
+                       <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Adu Cepat Jawab Soal!</p>
+                    </div>
+                 </div>
+              </div>
+
+              {/* Close Button */}
+              <button 
+                onClick={() => setShowGamePicker(false)}
+                className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white flex items-center justify-center hover:bg-white hover:text-ink transition-all"
+              >
+                <span className="material-symbols-rounded">close</span>
+              </button>
+           </div>
+        </div>
+      )}
 
       {/* DEV MODAL */}
       {showDevModal && (
