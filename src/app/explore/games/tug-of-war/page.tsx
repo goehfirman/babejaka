@@ -239,44 +239,58 @@ export default function TugOfWarGame() {
 
   if (gameMode === "select") return <TarikTambangLobby onJoin={joinRoom} onSingle={() => setGameMode("single")} onCreate={() => {}} />;
 
-  if (gameMode === "multi-lobby") return (
-    <div className="min-h-screen bg-batik-subtle flex items-center justify-center p-6">
-       <div className="bg-white/90 backdrop-blur-xl p-12 rounded-[48px] shadow-premium max-w-2xl w-full border-4 border-white text-center">
-          <h2 className="text-sm font-black text-ink-light tracking-widest uppercase mb-8 opacity-40 italic">Menunggu Tantangan...</h2>
-          <div className="bg-gray-100/50 p-8 rounded-3xl mb-12 border border-gray-100">
-             <span className="text-[10px] font-black text-ink-light block mb-2 opacity-50 tracking-[0.3em]">KODE RAHASIA</span>
-             <div className="text-6xl font-black text-secondary tracking-tighter shadow-sm">{roomId}</div>
-          </div>
-          <div className="grid grid-cols-2 gap-12 mb-12">
-             <div className="flex flex-col items-center gap-4">
-                <div className="w-24 h-24 rounded-full bg-secondary/10 flex items-center justify-center border-4 border-secondary animate-pulse"><Users className="text-secondary" /></div>
-                <span className="font-black text-ink">{roomData?.players.p1.name}</span>
-                <span className="text-[10px] font-black text-secondary">PEMBUAT</span>
-             </div>
-             <div className="flex flex-col items-center gap-4">
-                <div className={`w-24 h-24 rounded-full flex items-center justify-center border-4 ${roomData?.players.p2 ? 'border-primary bg-primary/10' : 'border-dashed border-gray-300'}`}>
-                   {roomData?.players.p2 ? <Users className="text-primary" /> : <div className="text-gray-300 animate-spin"><RefreshCw /></div>}
-                </div>
-                <span className="font-black text-ink">{roomData?.players.p2?.name || "???"}</span>
-                <span className="text-[10px] font-black text-ink-light opacity-40">PENANTANG</span>
-             </div>
-          </div>
-          <button 
-            onClick={async () => {
-              const isReady = !roomData.players[playerRole!].isReady;
-              await updateDoc(doc(db, "rooms", roomId), { [`players.${playerRole}.isReady`]: isReady });
-              if (isReady && (roomData.players[playerRole === 'p1' ? 'p2' : 'p1']?.isReady)) {
-                await updateDoc(doc(db, "rooms", roomId), { "metadata.status": "playing" });
-              }
-            }}
-            disabled={!roomData?.players.p2}
-            className={`w-full py-6 rounded-3xl font-black text-xl transition-all shadow-glow-blue ${roomData?.players[playerRole!]?.isReady ? 'bg-success text-white' : 'bg-secondary text-white hover:-translate-y-1'}`}
-          >
-            {roomData?.players[playerRole!]?.isReady ? "SAYA SIAP!" : "MULAI TANDING"}
-          </button>
-       </div>
-    </div>
-  );
+  if (gameMode === "multi-lobby") {
+    if (!roomData) return (
+      <div className="min-h-screen bg-batik-subtle flex items-center justify-center">
+        <div className="animate-spin text-secondary"><RefreshCw size={48} /></div>
+      </div>
+    );
+
+    return (
+      <div className="min-h-screen bg-batik-subtle flex items-center justify-center p-6">
+         <div className="bg-white/90 backdrop-blur-xl p-12 rounded-[48px] shadow-premium max-w-2xl w-full border-4 border-white text-center">
+            <h2 className="text-sm font-black text-ink-light tracking-widest uppercase mb-8 opacity-40 italic">Menunggu Tantangan...</h2>
+            <div className="bg-gray-100/50 p-8 rounded-3xl mb-12 border border-gray-100">
+               <span className="text-[10px] font-black text-ink-light block mb-2 opacity-50 tracking-[0.3em]">KODE RAHASIA</span>
+               <div className="text-6xl font-black text-secondary tracking-tighter shadow-sm">{roomId}</div>
+            </div>
+            <div className="grid grid-cols-2 gap-12 mb-12">
+               <div className="flex flex-col items-center gap-4">
+                  <div className="w-24 h-24 rounded-full bg-secondary/10 flex items-center justify-center border-4 border-secondary animate-pulse"><Users className="text-secondary" /></div>
+                  <span className="font-black text-ink">{roomData.players.p1?.name || "Tunggu..."}</span>
+                  <span className="text-[10px] font-black text-secondary">PEMBUAT</span>
+               </div>
+               <div className="flex flex-col items-center gap-4">
+                  <div className={`w-24 h-24 rounded-full flex items-center justify-center border-4 ${roomData.players.p2 ? 'border-primary bg-primary/10' : 'border-dashed border-gray-300'}`}>
+                     {roomData.players.p2 ? <Users className="text-primary" /> : <div className="text-gray-300 animate-spin"><RefreshCw /></div>}
+                  </div>
+                  <span className="font-black text-ink">{roomData.players.p2?.name || "???"}</span>
+                  <span className="text-[10px] font-black text-ink-light opacity-40">PENANTANG</span>
+               </div>
+            </div>
+            <button 
+              onClick={async () => {
+                if (!playerRole || !roomId) return;
+                const isReady = !roomData.players[playerRole].isReady;
+                await updateDoc(doc(db, "rooms", roomId), { [`players.${playerRole}.isReady`]: isReady });
+                
+                // Refresh roomData check (in case snapshot is slow)
+                const freshSnap = await getDoc(doc(db, "rooms", roomId));
+                const freshData = freshSnap.data();
+                if (isReady && freshData?.players.p1?.isReady && freshData?.players.p2?.isReady) {
+                  await updateDoc(doc(db, "rooms", roomId), { "metadata.status": "playing" });
+                }
+              }}
+              disabled={!roomData.players.p2}
+              className={`w-full py-6 rounded-3xl font-black text-xl transition-all shadow-glow-blue ${roomData.players[playerRole!]?.isReady ? 'bg-success text-white' : 'bg-secondary text-white hover:-translate-y-1'}`}
+            >
+              {roomData.players[playerRole!]?.isReady ? "SAYA SIAP!" : "MULAI TANDING"}
+            </button>
+            <button onClick={() => setGameMode("select")} className="mt-6 text-ink-light font-bold text-xs hover:text-primary transition-all">BATALKAN</button>
+         </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F0F4F8] relative overflow-hidden flex flex-col">
