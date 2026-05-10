@@ -82,16 +82,16 @@ export default function SlingshotGame() {
     // Let's make it interactive: the user must "aim" roughly at the bubbles
     
     // Bubble positions (relative to screen center)
-    // Index 0: top-left, 1: top-right, 2: bottom-left, 3: bottom-right
+    // Horizontal row: left to right
     const bubbles = [
-      { x: -100, y: -450 },
-      { x: 100, y: -450 },
-      { x: -100, y: -300 },
-      { x: 100, y: -300 }
+      { x: -180, y: -400 },
+      { x: -60, y: -400 },
+      { x: 60, y: -400 },
+      { x: 180, y: -400 }
     ];
 
     let hitIndex = -1;
-    let minDist = 100;
+    let minDist = 80;
 
     bubbles.forEach((b, i) => {
       const d = Math.sqrt(Math.pow(tx - b.x, 2) + Math.pow(ty - b.y, 2));
@@ -157,7 +157,7 @@ export default function SlingshotGame() {
       </div>
 
       {/* Main Arena */}
-      <div ref={containerRef} className="flex-1 relative flex flex-col items-center pt-8 px-4">
+      <div ref={containerRef} className="flex-1 relative flex flex-col items-center pt-8 px-2">
         
         {/* 3D Wood Question Board */}
         <motion.div 
@@ -181,15 +181,15 @@ export default function SlingshotGame() {
         </motion.div>
 
         {/* Target Arena (The House & Bubbles) */}
-        <div className="relative w-full flex-1 max-w-2xl flex flex-col items-center">
+        <div className="relative w-full flex-1 flex flex-col items-center justify-start pt-12">
           
           {/* Rumah Kebaya Background (Visual Ilusion) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md opacity-20 pointer-events-none">
+          <div className="absolute top-[100px] left-1/2 -translate-x-1/2 w-full max-w-md opacity-20 pointer-events-none">
             <img src="https://i.ibb.co.com/XrnHrbqS/BABE-JAKA-3.png" className="w-full h-auto" alt="Background" />
           </div>
 
-          {/* Answer Bubbles (3D Capsules) */}
-          <div className="grid grid-cols-2 gap-6 md:gap-10 w-full max-w-md z-20">
+          {/* Answer Bubbles (3D Capsules) - Horizontal Row */}
+          <div className="grid grid-cols-4 gap-2 md:gap-4 w-full max-w-4xl z-20 px-2">
             {question.pilihan.map((text, idx) => {
               const isHit = feedback?.index === idx;
               const isCorrect = idx === question.jawabanBenar;
@@ -207,12 +207,12 @@ export default function SlingshotGame() {
                       ? { duration: 0.5 } 
                       : { repeat: Infinity, duration: 2 + idx * 0.5, ease: "easeInOut" }
                   }
-                  className={`relative p-4 rounded-full text-center transition-all cursor-pointer group`}
+                  className={`relative p-1 rounded-full text-center transition-all cursor-pointer group`}
                 >
                   {/* The 3D Capsule Look */}
                   <div className={`
-                    relative px-6 py-4 rounded-[40px] font-black text-sm md:text-base tracking-wide
-                    shadow-[0_10px_0_0_rgba(0,0,0,0.2),inset_0_4px_4px_rgba(255,255,255,0.4)]
+                    relative px-2 md:px-4 py-4 rounded-3xl font-black text-[10px] md:text-xs tracking-tight
+                    shadow-[0_8px_0_0_rgba(0,0,0,0.15),inset_0_3px_3px_rgba(255,255,255,0.4)]
                     bg-gradient-to-br from-white via-gray-50 to-gray-200
                     border border-white/50 group-hover:scale-105 active:scale-95 transition-transform
                     ${feedback && isCorrect && isHit ? 'from-green-400 to-green-600 !text-white' : ''}
@@ -256,19 +256,19 @@ export default function SlingshotGame() {
           {/* Trajectory Guide (Dots) */}
           {isDragging && (
             <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center">
-              {[...Array(8)].map((_, i) => {
-                const step = (i + 1) * 0.15;
+              {[...Array(10)].map((_, i) => {
+                const step = (i + 1) * 0.12;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
                 const dy = -ballPos.y * power * step - (400 * step);
-                const scale = 1 - (step * 0.5);
+                const scale = 1 - (step * 0.4);
                 
                 return (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.6 - (step * 0.4), x: dx, y: dy, scale }}
-                    className="absolute w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                    animate={{ opacity: 0.9 - (step * 0.3), x: dx, y: dy, scale }}
+                    className="absolute w-3.5 h-3.5 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,1)]"
                   />
                 );
               })}
