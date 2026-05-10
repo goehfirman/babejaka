@@ -6,34 +6,309 @@ import { ArrowLeft, RefreshCw, Trophy, Target } from "lucide-react";
 
 // --- Game Data ---
 const QUESTIONS = [
+  // Bagian 1: Sejarah Jakarta
   {
     id: 1,
-    soal: "Apa nama kerak dari nasi yang dimasak dengan telur khas Betawi?",
-    pilihan: ["Nasi Uduk", "Kerak Telor", "Soto Betawi", "Laksa"],
-    jawabanBenar: 1
+    soal: "Sebelum diubah namanya menjadi Jayakarta oleh Fatahillah pada tahun 1527, Jakarta dikenal dengan nama...",
+    pilihan: ["Batavia", "Tarumanegara", "Sunda Kelapa", "Banten Girang"],
+    jawabanBenar: 2
   },
   {
     id: 2,
-    soal: "Boneka raksasa khas Betawi yang sering tampil berpasangan disebut...",
-    pilihan: ["Wayang Golek", "Ondel-ondel", "Barongsai", "Kuda Lumping"],
+    soal: "Tanggal berapakah yang diperingati sebagai Hari Ulang Tahun (HUT) Kota Jakarta?",
+    pilihan: ["17 Agustus", "22 Juni", "1 Juni", "20 Mei"],
     jawabanBenar: 1
   },
   {
     id: 3,
-    soal: "Musik tiup tradisional Betawi yang mendapat pengaruh dari Eropa adalah...",
-    pilihan: ["Gamelan", "Tanjidor", "Marawis", "Rebana"],
+    soal: "Pada masa penjajahan kolonial Belanda, nama Jakarta diubah menjadi...",
+    pilihan: ["Buitenzorg", "Batavia", "Kutaraja", "Fort de Kock"],
     jawabanBenar: 1
   },
   {
     id: 4,
-    soal: "Senjata tajam tradisional khas Betawi yang diselipkan di pinggang adalah...",
-    pilihan: ["Keris", "Rencong", "Golok", "Kujang"],
-    jawabanBenar: 2
+    soal: "Pada masa pendudukan Jepang di Indonesia, nama Batavia diganti menjadi...",
+    pilihan: ["Jakarta Tokubetsu Shi", "Edo", "Syonan-to", "Batavia Shimbun"],
+    jawabanBenar: 0
   },
   {
     id: 5,
-    soal: "Minuman khas Betawi dari rempah-rempah yang tidak memabukkan disebut Bir...",
-    pilihan: ["Bintang", "Pletok", "Jawa", "Hitam"],
+    soal: "Siapakah pahlawan nasional dari Betawi yang namanya diabadikan menjadi salah satu jalan protokol terpanjang dan pusat bisnis di Jakarta?",
+    pilihan: ["Ismail Marzuki", "Benyamin Sueb", "Mohammad Husni Thamrin", "Chairil Anwar"],
+    jawabanBenar: 2
+  },
+  {
+    id: 6,
+    soal: "Rapat Raksasa yang dihadiri oleh Presiden Soekarno pada 19 September 1945 untuk mempertahankan kemerdekaan diadakan di...",
+    pilihan: ["Lapangan Banteng", "Lapangan Ikada (kini kawasan Monas)", "Tugu Proklamasi", "Istana Negara"],
+    jawabanBenar: 1
+  },
+  {
+    id: 7,
+    soal: "Gubernur DKI Jakarta yang dijuluki \"Bang Ali\" dan dikenal banyak membangun fasilitas modern, serta mencetuskan Pekan Raya Jakarta (PRJ) adalah...",
+    pilihan: ["Tjokropranolo", "Sutiyoso", "Ali Sadikin", "Wiyogo Atmodarminto"],
+    jawabanBenar: 2
+  },
+  {
+    id: 8,
+    soal: "Pelabuhan bersejarah di Jakarta Utara yang sudah ada sejak zaman Kerajaan Hindu Tarumanegara adalah...",
+    pilihan: ["Pelabuhan Tanjung Priok", "Pelabuhan Merak", "Pelabuhan Sunda Kelapa", "Pelabuhan Muara Angke"],
+    jawabanBenar: 2
+  },
+  {
+    id: 9,
+    soal: "Monumen Nasional (Monas) memiliki mahkota berupa lidah api kemerdekaan yang dilapisi oleh emas murni. Berapa berat total emas tersebut saat ini?",
+    pilihan: ["20 kg", "35 kg", "50 kg", "75 kg"],
+    jawabanBenar: 2
+  },
+  {
+    id: 10,
+    soal: "Siapakah tokoh yang memimpin penaklukan Sunda Kelapa dan mengganti namanya menjadi Jayakarta?",
+    pilihan: ["Raden Patah", "Fatahillah", "Sultan Ageng Tirtayasa", "Sultan Hasanuddin"],
+    jawabanBenar: 1
+  },
+  // Bagian 2: Seni dan Budaya Betawi
+  {
+    id: 11,
+    soal: "Boneka raksasa khas Betawi yang biasanya diarak dalam pesta rakyat dan dipercaya dapat menolak bala disebut...",
+    pilihan: ["Barong", "Ondel-ondel", "Sigale-gale", "Wayang Golek"],
+    jawabanBenar: 1
+  },
+  {
+    id: 12,
+    soal: "Kesenian teater tradisional Betawi yang sering membawakan cerita komedi dan diiringi musik Gambang Kromong adalah...",
+    pilihan: ["Ketoprak", "Ludruk", "Lenong", "Randai"],
+    jawabanBenar: 2
+  },
+  {
+    id: 13,
+    soal: "Alat musik tradisional Betawi berbentuk seperti biola yang dimainkan dengan cara digesek dan mendapat pengaruh kuat dari budaya Tionghoa adalah...",
+    pilihan: ["Tehyan", "Rebab", "Tarawangsa", "Sampe"],
+    jawabanBenar: 0
+  },
+  {
+    id: 14,
+    soal: "Kesenian musik tiup khas Betawi yang mendapat pengaruh dari budaya Eropa (Portugis dan Belanda) dan sering dimainkan untuk mengarak pengantin adalah...",
+    pilihan: ["Tanjidor", "Marawis", "Qasidah", "Keroncong"],
+    jawabanBenar: 0
+  },
+  {
+    id: 15,
+    soal: "Tradisi berbalas pantun dan adu silat dalam upacara penyambutan pengantin pria pada pernikahan adat Betawi disebut...",
+    pilihan: ["Buka Pintu", "Palang Pintu", "Seserahan", "Ngarak Pengantin"],
+    jawabanBenar: 1
+  },
+  {
+    id: 16,
+    soal: "Nama rumah adat tradisional suku Betawi yang memiliki atap berbentuk pelana lipat adalah...",
+    pilihan: ["Rumah Joglo", "Rumah Gadang", "Rumah Kebaya", "Rumah Limasan"],
+    jawabanBenar: 2
+  },
+  {
+    id: 17,
+    soal: "Ornamen kayu berbentuk segitiga berjajar yang melambangkan kejujuran dan kerja keras, biasanya terdapat di pinggiran atap (lisplang) rumah adat Betawi disebut...",
+    pilihan: ["Gigi Balang", "Pucuk Rebung", "Langit-langit", "Tumpal"],
+    jawabanBenar: 0
+  },
+  {
+    id: 18,
+    soal: "Kain khas peninggalan budaya Betawi yang biasa dikalungkan di leher oleh kaum pria, baik saat shalat maupun berlatih silat, disebut...",
+    pilihan: ["Selendang", "Sarung", "Cukin", "Ulos"],
+    jawabanBenar: 2
+  },
+  {
+    id: 19,
+    soal: "Tarian tradisional Betawi yang sangat dinamis dan sering digunakan untuk menyambut tamu kehormatan atau membuka acara adalah...",
+    pilihan: ["Tari Jaipong", "Tari Sirih Kuning", "Tari Piring", "Tari Kecak"],
+    jawabanBenar: 1
+  },
+  {
+    id: 20,
+    soal: "Pakaian adat khas pria Betawi sehari-hari yang terdiri dari kemeja tanpa kerah dan celana komprang disebut...",
+    pilihan: ["Baju Sadariah / Tikim", "Baju Surjan", "Baju Bodo", "Baju Pangsi"],
+    jawabanBenar: 0
+  },
+  // Bagian 3: Kuliner Khas Betawi
+  {
+    id: 21,
+    soal: "Makanan khas Betawi yang terbuat dari beras ketan, telur (ayam/bebek), ebi, dan kelapa sangrai, dimasak di atas wajan tanpa minyak adalah...",
+    pilihan: ["Nasi Ulam", "Ketoprak", "Kerak Telor", "Kue Rangi"],
+    jawabanBenar: 2
+  },
+  {
+    id: 22,
+    soal: "Minuman penyegar khas Betawi yang terbuat dari jahe, daun serai, dan kayu secang (memberi warna merah), serta tidak mengandung alkohol sama sekali adalah...",
+    pilihan: ["Tuak", "Bir Pletok", "Bandrek", "Bajigur"],
+    jawabanBenar: 1
+  },
+  {
+    id: 23,
+    soal: "Roti manis khas Betawi yang selalu ada dalam seserahan pernikahan adat dan melambangkan kesetiaan abadi adalah...",
+    pilihan: ["Roti Gambang", "Roti Buaya", "Roti Sisir", "Roti Kadet"],
+    jawabanBenar: 1
+  },
+  {
+    id: 24,
+    soal: "Hidangan sup berkuah gurih khas Jakarta yang menggunakan daging atau jeroan sapi, dengan kuah campuran santan dan susu adalah...",
+    pilihan: ["Soto Tangkar", "Soto Betawi", "Soto Mie", "Empal Gentong"],
+    jawabanBenar: 1
+  },
+  {
+    id: 25,
+    soal: "Sayur khas Betawi yang memiliki kuah hitam pekat karena menggunakan kluwek, disajikan dengan ikan air tawar, adalah...",
+    pilihan: ["Gabus Pucung", "Sayur Babanci", "Pindang Bandeng", "Pecak Lele"],
+    jawabanBenar: 0
+  },
+  {
+    id: 26,
+    soal: "Kue kering tradisional Betawi yang renyah dan digoreng menggunakan cetakan berbentuk bunga dinamakan...",
+    pilihan: ["Kue Cucur", "Kue Kembang Goyang", "Kue Akar Kelapa", "Kue Semprong"],
+    jawabanBenar: 1
+  },
+  {
+    id: 27,
+    soal: "Minuman atau pencuci mulut khas Betawi yang terbuat dari adonan tepung beras dan sagu aren berlapis warna (merah, putih, hijau), disajikan dengan kuah santan dan gula merah adalah...",
+    pilihan: ["Es Doger", "Es Podeng", "Es Selendang Mayang", "Es Pisang Ijo"],
+    jawabanBenar: 2
+  },
+  {
+    id: 28,
+    soal: "Hidangan sayur langka khas Betawi yang namanya mengandung kata \"sayur\" namun sebenarnya tidak menggunakan sayuran sama sekali, melainkan daging sapi/kelapa muda dan belimbing wuluh adalah...",
+    pilihan: ["Sayur Besan", "Sayur Babanci", "Sayur Godog", "Sayur Lodeh"],
+    jawabanBenar: 1
+  },
+  {
+    id: 29,
+    soal: "Asinan khas Jakarta yang terdiri dari sawi, kol, tauge, tahu, dan kerupuk mi kuning yang disiram kuah kacang bercampur cuka disebut...",
+    pilihan: ["Asinan Bogor", "Asinan Betawi", "Rujak Juhi", "Ketoprak"],
+    jawabanBenar: 1
+  },
+  {
+    id: 30,
+    soal: "Makanan percampuran budaya Betawi dan Tionghoa yang terbuat dari irisan daging dan moncong sapi, disajikan dengan kangkung, juhi, dan disiram bumbu kacang kemerahan adalah...",
+    pilihan: ["Rujak Cingur", "Rujak Shanghai", "Gado-gado", "Toge Goreng"],
+    jawabanBenar: 1
+  },
+  // Bagian 4: Landmark dan Tata Kota Jakarta
+  {
+    id: 31,
+    soal: "Selain burung Elang Bondol, flora yang menjadi maskot resmi Provinsi DKI Jakarta adalah...",
+    pilihan: ["Bunga Melati", "Bunga Anggrek", "Salak Condet", "Pohon Mahoni"],
+    jawabanBenar: 2
+  },
+  {
+    id: 32,
+    soal: "Satu-satunya wilayah di Provinsi DKI Jakarta yang berstatus sebagai Kabupaten Administrasi adalah...",
+    pilihan: ["Jakarta Utara", "Kepulauan Seribu", "Jakarta Barat", "Kota Tua"],
+    jawabanBenar: 1
+  },
+  {
+    id: 33,
+    soal: "Taman hiburan raksasa di tepi laut utara Jakarta yang di dalamnya terdapat Dunia Fantasi (Dufan) adalah...",
+    pilihan: ["Taman Mini Indonesia Indah", "Taman Impian Jaya Ancol", "Kebun Binatang Ragunan", "Taman Anggrek"],
+    jawabanBenar: 1
+  },
+  {
+    id: 34,
+    soal: "Tempat wisata edukasi di Jakarta Timur yang menampilkan miniatur kebudayaan dari seluruh provinsi di Indonesia adalah...",
+    pilihan: ["Taman Suropati", "Taman Ismail Marzuki", "Monumen Pancasila Sakti", "Taman Mini Indonesia Indah (TMII)"],
+    jawabanBenar: 3
+  },
+  {
+    id: 35,
+    soal: "Stasiun kereta api bersejarah di kawasan Kota Tua Jakarta yang dibangun pada masa Belanda dan dikenal dengan sebutan \"Stasiun Beos\" adalah...",
+    pilihan: ["Stasiun Gambir", "Stasiun Manggarai", "Stasiun Jakarta Kota", "Stasiun Jatinegara"],
+    jawabanBenar: 2
+  },
+  {
+    id: 36,
+    soal: "Pasar tekstil dan grosir terbesar di Asia Tenggara yang terletak di Jakarta Pusat adalah...",
+    pilihan: ["Pasar Senen", "Pasar Baru", "Pasar Tanah Abang", "Pasar Jatinegara"],
+    jawabanBenar: 2
+  },
+  {
+    id: 37,
+    soal: "Masjid terbesar di Asia Tenggara yang menjadi simbol toleransi karena letaknya berseberangan dengan Gereja Katedral di Jakarta adalah...",
+    pilihan: ["Masjid Sunda Kelapa", "Masjid Istiqlal", "Masjid Cut Meutia", "Masjid Agung Al-Azhar"],
+    jawabanBenar: 1
+  },
+  {
+    id: 38,
+    soal: "Sungai terpanjang dan terbesar yang membelah kota Jakarta, sering kali menjadi pusat perhatian saat musim hujan, adalah...",
+    pilihan: ["Sungai Ciliwung", "Sungai Cisadane", "Sungai Citarum", "Kali Sunter"],
+    jawabanBenar: 0
+  },
+  {
+    id: 39,
+    soal: "Kawasan perkampungan di Jagakarsa, Jakarta Selatan, yang ditetapkan pemerintah sebagai pusat pelestarian Perkampungan Budaya Betawi adalah...",
+    pilihan: ["Condet", "Kemayoran", "Setu Babakan", "Rawa Belong"],
+    jawabanBenar: 2
+  },
+  {
+    id: 40,
+    soal: "Stadion sepak bola megah berskala internasional dengan atap yang bisa dibuka-tutup yang berlokasi di Jakarta Utara adalah...",
+    pilihan: ["Stadion Utama Gelora Bung Karno", "Jakarta International Stadium (JIS)", "Stadion Lebak Bulus", "Stadion Patriot"],
+    jawabanBenar: 1
+  },
+  // Bagian 5: Tokoh, Transportasi, dan Trivia Umum
+  {
+    id: 41,
+    soal: "Siapakah tokoh legenda jagoan Betawi asal Rawa Belong yang dikenal seperti \"Robin Hood\" karena merampok penjajah untuk dibagikan kepada rakyat miskin?",
+    pilihan: ["Si Jampang", "Si Pitung", "Murtado", "Sabeni"],
+    jawabanBenar: 1
+  },
+  {
+    id: 42,
+    soal: "Selain Si Pitung, terdapat tokoh pendekar Betawi legendaris yang dijuluki \"Macan Kemayoran\". Siapakah dia?",
+    pilihan: ["Murtado", "Ji'ih", "Pitung", "Darip"],
+    jawabanBenar: 0
+  },
+  {
+    id: 43,
+    soal: "Sistem transportasi Bus Rapid Transit (BRT) pertama di Asia Tenggara yang beroperasi di Jakarta dengan jalur khusus adalah...",
+    pilihan: ["KRL Commuter Line", "MRT Jakarta", "LRT Jakarta", "TransJakarta"],
+    jawabanBenar: 3
+  },
+  {
+    id: 44,
+    soal: "Jalan tol yang melingkari pinggiran wilayah Jakarta untuk mengurai kemacetan dalam kota sering disingkat dengan...",
+    pilihan: ["JORR (Jakarta Outer Ring Road)", "JITUT (Jakarta Intra Urban Toll)", "Jagorawi", "Tol Cipularang"],
+    jawabanBenar: 0
+  },
+  {
+    id: 45,
+    soal: "Kosakata santai khas Jakarta \"Gue\" (saya) dan \"Lu\" (kamu) sebenarnya merupakan kata serapan yang berasal dari bahasa...",
+    pilihan: ["Arab", "Hokkien (Tionghoa)", "Portugis", "Belanda"],
+    jawabanBenar: 1
+  },
+  {
+    id: 46,
+    soal: "Semboyan resmi Provinsi DKI Jakarta yang tertulis pada lambang daerahnya adalah \"Jaya Raya\", yang memiliki makna...",
+    pilihan: ["Kota yang damai", "Kota yang besar dan berjaya", "Kota pahlawan", "Kota persahabatan"],
+    jawabanBenar: 1
+  },
+  {
+    id: 47,
+    soal: "Seniman legendaris Betawi, Benyamin Sueb, membintangi sebuah sinetron fenomenal pada era 90-an yang menceritakan keluarga Betawi modern. Judul sinetron tersebut adalah...",
+    pilihan: ["Si Manis Jembatan Ancol", "Keluarga Cemara", "Si Doel Anak Sekolahan", "Bajaj Bajuri"],
+    jawabanBenar: 2
+  },
+  {
+    id: 48,
+    soal: "Sebelum dipindahkan ke kawasan JIExpo Kemayoran, Pekan Raya Jakarta (Jakarta Fair) pertama kali diselenggarakan secara rutin di kawasan...",
+    pilihan: ["Senayan", "Monas (Taman Ria)", "Ancol", "Lapangan Banteng"],
+    jawabanBenar: 1
+  },
+  {
+    id: 49,
+    soal: "Pusat kesenian dan kebudayaan di Cikini, Jakarta Pusat, yang memiliki planetarium dan dinamakan dari seorang maestro musik Indonesia adalah...",
+    pilihan: ["Taman Ismail Marzuki (TIM)", "Gedung Kesenian Jakarta (GKJ)", "Bentara Budaya Jakarta", "Ciputra Artpreneur"],
+    jawabanBenar: 0
+  },
+  {
+    id: 50,
+    soal: "Kereta massal bawah tanah pertama di Indonesia yang beroperasi di Jakarta memanjang dari Lebak Bulus hingga Bundaran HI dinamakan...",
+    pilihan: ["KRL", "MRT (Mass Rapid Transit)", "LRT (Light Rail Transit)", "Aeromovel"],
     jawabanBenar: 1
   }
 ];
