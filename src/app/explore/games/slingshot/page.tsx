@@ -298,7 +298,7 @@ export default function SlingshotGame() {
               transition={
                 gameState === "flying" 
                 ? { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
-                : { type: "spring", damping: 15, stiffness: 300 }
+                : (isDragging ? { type: "tween", duration: 0 } : { type: "spring", damping: 15, stiffness: 300 })
               }
               className={`
                 z-50 w-16 h-16 rounded-full cursor-grab active:cursor-grabbing
