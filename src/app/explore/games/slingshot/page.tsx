@@ -348,12 +348,22 @@ export default function SlingshotGame() {
   const handleRelease = (event: any, info: any) => {
     if (gameState !== "playing") return;
 
-    const offset = info.offset;
+    // Apply same drag limit as handleDrag for consistency
+    let ox = info.offset.x;
+    let oy = info.offset.y;
+    const maxDrag = 120;
+    const dist = Math.sqrt(ox ** 2 + oy ** 2);
+    if (dist > maxDrag) {
+      const ratio = maxDrag / dist;
+      ox *= ratio;
+      oy *= ratio;
+    }
+
     const power = 1.5;
     
     // Reverse direction for slingshot feel
-    const targetX = -offset.x * power;
-    const targetY = -offset.y * 2.5; // Dynamic depth based on pull
+    const targetX = -ox * power;
+    const targetY = -oy * 2.5; // Dynamic depth based on pull
 
     setGameState("flying");
     setIsDragging(false);
@@ -372,10 +382,10 @@ export default function SlingshotGame() {
     // We'll place them at a depth that requires a decent pull to reach
     const targetDepth = -250;
     const bubbles = [
-      { x: -270, y: targetDepth },
-      { x: -90, y: targetDepth },
-      { x: 90, y: targetDepth },
-      { x: 270, y: targetDepth }
+      { x: -330, y: targetDepth },
+      { x: -110, y: targetDepth },
+      { x: 110, y: targetDepth },
+      { x: 330, y: targetDepth }
     ];
 
     let hitIndex = 0; 
