@@ -331,6 +331,7 @@ export default function SlingshotGame() {
   
   const slingRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const bubbleRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Shuffle logic
   const shuffleArray = (array: any[]) => {
@@ -410,7 +411,7 @@ export default function SlingshotGame() {
         
         // Trigger Star Burst from the hit bubble's screen position
         const now = Date.now();
-        const bubbleEl = document.getElementById(`bubble-${hitIndex}`);
+        const bubbleEl = bubbleRefs.current[hitIndex];
         let startX = window.innerWidth / 2;
         let startY = window.innerHeight / 2;
 
@@ -544,6 +545,7 @@ export default function SlingshotGame() {
               return (
                 <motion.div
                   key={`${currentLevel}-${idx}`}
+                  ref={el => { bubbleRefs.current[idx] = el; }}
                   initial={{ scale: 1, opacity: 1, y: 50 }}
                   animate={
                     isHit 
