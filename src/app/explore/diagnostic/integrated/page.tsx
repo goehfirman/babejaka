@@ -772,8 +772,26 @@ export default function IntegratedDiagnosticPage() {
       readingDoneTimeRef.current = null;
       setStep("fluency_reading");
     } else {
-      // Jika di bawah kriteria atau level terakhir, langsung munculkan laporan
-      setStep("result");
+      // DECISION BRIDGE — Level A langsung ke hasil, Level B-E masuk tes pemahaman dulu
+      const finalLevel = level.id;
+      if (finalLevel === 'A') {
+        setStep("result");
+      } else {
+        // Tentukan sub-level untuk cerita pemahaman
+        let subLevel = "B-1";
+        if (finalLevel === 'B') {
+           if (wpm > 80 && acc > 95) subLevel = "B-3";
+           else if (wpm > 60) subLevel = "B-2";
+           else subLevel = "B-1";
+        } else {
+           subLevel = finalLevel; // C, D, E mapped directly
+        }
+
+        const possibleStories = STORY_VARIATIONS[subLevel] || STORY_VARIATIONS["B-1"];
+        const pick = possibleStories[Math.floor(Math.random() * possibleStories.length)];
+        setSelectedStory(pick);
+        setStep("decision");
+      }
     }
   };
 
