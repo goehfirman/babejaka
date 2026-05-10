@@ -277,7 +277,7 @@ export default function TugOfWarGame() {
             {/* Unified Rope System */}
             <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                <motion.div 
-                 animate={{ x: -ropeOffset * 10 }}
+                 animate={{ x: ropeOffset * 10 }}
                  transition={{ type: "spring", stiffness: 40, damping: 15 }}
                  className="relative w-[150%] h-40 flex items-center justify-center"
                >
