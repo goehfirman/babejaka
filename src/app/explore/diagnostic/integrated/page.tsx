@@ -9,6 +9,7 @@ import { BOOKS } from "@/lib/books-data";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PointToast } from "@/components/PointToast";
+import { StarFly } from "@/components/StarFly";
 
 // --- Constants ---
 
@@ -389,6 +390,7 @@ export default function IntegratedDiagnosticPage() {
   const certificateRef = useRef<HTMLDivElement>(null);
   const { addPoints } = useProfile();
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
+  const [pendingStars, setPendingStars] = useState<number>(0);
 
   const handleGeneratePreview = async () => {
     if (!certificateRef.current) return;
@@ -781,9 +783,18 @@ export default function IntegratedDiagnosticPage() {
       // DECISION BRIDGE — Level A langsung ke hasil, Level B-E masuk tes pemahaman dulu
       const finalLevel = level.id;
       
-      // Award points for finishing diagnostic fluency phase
-      addPoints(100);
-      setEarnedPoints(100);
+      // FAIR POINT CALCULATION: Calculate total stars from all levels attempted
+      // Points = 10 pts per star.
+      // Stars per level: 95%+ = 3 stars, 80%+ = 2 stars, <80% = 1 star (effort)
+      const totalStars = nextHistory.reduce((sum, entry) => {
+        if (entry.accuracy >= 95) return sum + 3;
+        if (entry.accuracy >= 80) return sum + 2;
+        return sum + 1;
+      }, 0);
+      
+      const sessionPoints = totalStars * 10;
+      setPendingStars(totalStars); // Trigger flying animation
+      setEarnedPoints(sessionPoints);
 
       if (finalLevel === 'A') {
         setStep("result");
@@ -1581,6 +1592,13 @@ export default function IntegratedDiagnosticPage() {
       )}
        {earnedPoints && (
          <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
+       )}
+
+       {pendingStars > 0 && (
+         <StarFly count={pendingStars} onComplete={() => {
+           addPoints(pendingStars * 10);
+           setPendingStars(0);
+         }} />
        )}
     </div>
   );
