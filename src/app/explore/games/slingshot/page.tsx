@@ -518,8 +518,8 @@ export default function SlingshotGame() {
                 >
                   {/* The 3D Capsule Look - Colorful Version */}
                   <div className={`
-                    relative px-1 md:px-4 py-3 md:py-5 rounded-2xl md:rounded-3xl font-black 
-                    text-[9px] md:text-sm tracking-tight leading-tight flex items-center justify-center min-h-[60px] md:min-h-[80px]
+                    relative px-2 md:px-4 py-3 md:py-5 rounded-2xl md:rounded-3xl font-black 
+                    text-[13px] md:text-sm tracking-tight leading-tight flex items-center justify-center min-h-[65px] md:min-h-[80px]
                     shadow-[0_8px_0_0_rgba(0,0,0,0.25),inset_0_4px_4px_rgba(255,255,255,0.4)]
                     bg-gradient-to-br border border-white/30 group-hover:scale-105 active:scale-95 transition-transform
                     ${!feedback ? bubbleColors[idx % 4] + " text-white" : ""}
