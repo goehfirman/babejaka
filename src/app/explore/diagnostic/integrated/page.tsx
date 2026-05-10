@@ -357,11 +357,14 @@ export default function IntegratedDiagnosticPage() {
   const recognitionRef = useRef<any>(null);
   const isReadingRef = useRef(false);
   const currentLevelIdxRef = useRef(0);
-  
-  // MediaRecorder State
-  const [isProcessingCloud, setIsProcessingCloud] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<BlobPart[]>([]);
+  const shouldRestartRef = useRef(false);
+  // Transcript persistence across auto-restarts (tablet fix)
+  const savedTranscriptRef = useRef<string>("");
+  const lastSessionFinalsRef = useRef<string>("");
+  const bestMatchRef = useRef<number[]>([]);
+  // Word-timing tracking for Kelancaran & Intonasi measurement
+  const wordTimestampsRef = useRef<number[]>([]);
+  const lastMatchCountRef = useRef<number>(0);
 
   // Comprehension State
   const [showQuestions, setShowQuestions] = useState(false);
@@ -457,8 +460,126 @@ export default function IntegratedDiagnosticPage() {
     return matched.sort((a, b) => a - b);
   };
 
-  // --- Cloud Speech-to-Text Logic (Async) ---
-  // Voice capture is now handled inside startFluencyReading via MediaRecorder
+  // --- Speech Recognition Logic (Tablet-Robust v2) ---
+  useEffect(() => {
+    // Cleanup previous instance completely
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onaudiostart = null;
+        recognitionRef.current.onaudioend = null;
+        recognitionRef.current.abort();
+      } catch (_) { /* ignore */ }
+      recognitionRef.current = null;
+    }
+
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR || selectedLevels.length === 0) return;
+
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = "id-ID";
+    rec.maxAlternatives = 1;
+
+    rec.onaudiostart = () => { setIsMicActive(true); };
+    rec.onaudioend = () => { setIsMicActive(false); };
+
+    rec.onresult = (event: any) => {
+      // Separate final and interim results from CURRENT recognition session
+      let sessionFinals = "";
+      let sessionInterim = "";
+      for (let i = 0; i < event.results.length; ++i) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          sessionFinals += transcript + " ";
+        } else {
+          sessionInterim += transcript + " ";
+        }
+      }
+
+      // Save session finals for persistence across restarts
+      lastSessionFinalsRef.current = sessionFinals;
+
+      // Build FULL transcript: saved from previous sessions + current session
+      const fullTranscript = savedTranscriptRef.current + sessionFinals + sessionInterim;
+
+      const idx = currentLevelIdxRef.current;
+      const currentLevel = selectedLevels[idx];
+      if (!currentLevel) return;
+
+      const spokenWords = fullTranscript.toLowerCase().split(/\s+/).filter(Boolean);
+      const newMatched = matchWordsSequentially(spokenWords, currentLevel.text);
+
+      // Only update if we matched MORE words (never regress due to interim fluctuations)
+      if (newMatched.length > bestMatchRef.current.length) {
+        // Record timestamp for each NEWLY matched word
+        const now = Date.now();
+        const newWordCount = newMatched.length - lastMatchCountRef.current;
+        for (let k = 0; k < newWordCount; k++) {
+          wordTimestampsRef.current.push(now);
+        }
+        lastMatchCountRef.current = newMatched.length;
+        bestMatchRef.current = newMatched;
+        setMatchedIndices(newMatched);
+      } else if (newMatched.length === bestMatchRef.current.length) {
+        // Same count but possibly different indices — just update display
+        bestMatchRef.current = newMatched;
+        setMatchedIndices(newMatched);
+      }
+    };
+
+    // AUTO-RESTART: On tablets/mobile, Chrome often silently stops recognition
+    rec.onend = () => {
+      setIsMicActive(false);
+      if (isReadingRef.current && shouldRestartRef.current) {
+        // Persist finals from the session that just ended
+        savedTranscriptRef.current += lastSessionFinalsRef.current;
+        lastSessionFinalsRef.current = "";
+
+        // Quick restart for responsiveness
+        setTimeout(() => {
+          if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.start();
+            } catch (e: any) {
+              console.warn("[SpeechRecognition] auto-restart failed:", e.message);
+            }
+          }
+        }, 80);
+      }
+    };
+
+    rec.onerror = (event: any) => {
+      console.warn("[SpeechRecognition] error:", event.error);
+      setIsMicActive(false);
+
+      const recoverable = ["no-speech", "audio-capture", "network", "aborted"];
+      if (recoverable.includes(event.error) && isReadingRef.current && shouldRestartRef.current) {
+        setTimeout(() => {
+          if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
+            try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
+          }
+        }, 200);
+      }
+    };
+
+    recognitionRef.current = rec;
+
+    return () => {
+      shouldRestartRef.current = false;
+      try {
+        rec.onresult = null;
+        rec.onend = null;
+        rec.onerror = null;
+        rec.onaudiostart = null;
+        rec.onaudioend = null;
+        rec.abort();
+      } catch (_) { /* ignore */ }
+    };
+  }, [currentLevelIdx, selectedLevels]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -490,141 +611,115 @@ export default function IntegratedDiagnosticPage() {
     }
   }, [selectedLevels, currentLevelIdx, step]);
 
-  const startFluencyReading = async () => {
+  const startFluencyReading = () => {
     setIsReading(true);
     isReadingRef.current = true;
+    shouldRestartRef.current = true;
+    // Reset transcript persistence for fresh reading session
+    savedTranscriptRef.current = "";
+    lastSessionFinalsRef.current = "";
+    bestMatchRef.current = [];
+    // Reset timing tracking
+    wordTimestampsRef.current = [];
+    lastMatchCountRef.current = 0;
     setMatchedIndices([]);
     setStartTime(Date.now());
-    setIsMicActive(true);
-    audioChunksRef.current = [];
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      let mimeType = 'audio/webm;codecs=opus';
-      if (!window.MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'audio/mp4'; // fallback for Safari
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch (e: any) {
+        try {
+          recognitionRef.current.abort();
+          setTimeout(() => {
+            try { recognitionRef.current?.start(); } catch (_) { /* give up */ }
+          }, 100);
+        } catch (_) { /* ignore */ }
       }
-      
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.start();
-    } catch (err) {
-      console.error("Gagal mengakses mikrofon:", err);
-      alert("Akses mikrofon ditolak atau tidak tersedia. Pastikan izin mikrofon diberikan.");
-      setIsReading(false);
-      setIsMicActive(false);
     }
   };
 
   const stopFluencyReading = () => {
     setIsReading(false);
     isReadingRef.current = false;
+    shouldRestartRef.current = false;
     setIsMicActive(false);
-
     const duration = startTime ? (Date.now() - startTime) / 1000 : 1;
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) { /* ignore */ }
+    }
 
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      setIsProcessingCloud(true);
-      
-      mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorderRef.current?.mimeType });
-        
-        const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
-        reader.onloadend = async () => {
-          const base64data = (reader.result as string).split(',')[1];
+    const level = selectedLevels[currentLevelIdx];
+    const totalWords = level.text.split(" ").length;
+    const matchCount = matchedIndices.length;
+    const acc = Math.round((matchCount / totalWords) * 100);
+    const wpm = Math.round((matchCount / duration) * 60);
 
-          try {
-            const response = await fetch('/api/speech', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ audioBase64: base64data, mimeType: audioBlob.type })
-            });
+    // --- Compute timing metrics from word timestamps ---
+    const timestamps = wordTimestampsRef.current;
+    let pauseCount = 0;
+    let totalGap = 0;
+    const gaps: number[] = [];
 
-            const data = await response.json();
-            const transcript = data.transcript || "";
-            console.log("Transkrip dari Cloud:", transcript);
+    for (let i = 1; i < timestamps.length; i++) {
+      const gap = timestamps[i] - timestamps[i - 1];
+      gaps.push(gap);
+      totalGap += gap;
+      if (gap > 1500) pauseCount++; // pause = gap > 1.5 seconds
+    }
 
-            const level = selectedLevels[currentLevelIdx];
-            const spokenWords = transcript.toLowerCase().split(/\s+/).filter(Boolean);
-            const newMatched = matchWordsSequentially(spokenWords, level.text);
-            
-            // Set for UI highlight (post-recording)
-            setMatchedIndices(newMatched);
+    const avgGapMs = gaps.length > 0 ? Math.round(totalGap / gaps.length) : 0;
 
-            // Compute metrics
-            const totalWords = level.text.split(" ").length;
-            const matchCount = newMatched.length;
-            const acc = Math.round((matchCount / totalWords) * 100);
-            const wpm = Math.round((matchCount / duration) * 60);
+    // Speed consistency: coefficient of variation (lower CV = more consistent)
+    // Convert to 0-100 score where 100 = perfectly consistent
+    let speedConsistency = 50; // default if not enough data
+    if (gaps.length >= 2) {
+      const meanGap = totalGap / gaps.length;
+      const variance = gaps.reduce((sum, g) => sum + Math.pow(g - meanGap, 2), 0) / gaps.length;
+      const stdDev = Math.sqrt(variance);
+      const cv = meanGap > 0 ? stdDev / meanGap : 1; // coefficient of variation
+      // CV of 0 = perfect consistency (100), CV of 1+ = very inconsistent (0)
+      speedConsistency = Math.max(0, Math.min(100, Math.round((1 - Math.min(cv, 1)) * 100)));
+    }
 
-            // Since we process as a whole file now, timing metrics are approximated
-            const pauseCount = acc >= 80 ? 0 : 2; 
-            const avgGapMs = 300; 
-            const speedConsistency = acc >= 80 ? 90 : 60; 
+    // Get kpmRange for this level
+    const levelCharKey = level.id === 'A' ? 'A' : level.id === 'B' ? 'B1' : level.id;
+    const kpmRange = LEVEL_CHARACTERISTICS[levelCharKey]?.kpmRange || "0–30 KPM";
 
-            const levelCharKey = level.id === 'A' ? 'A' : level.id === 'B' ? 'B1' : level.id;
-            const kpmRange = LEVEL_CHARACTERISTICS[levelCharKey]?.kpmRange || "0–30 KPM";
+    const newResult: FluencyEntry = {
+      accuracy: acc,
+      wpm: wpm,
+      levelId: level.id,
+      pauseCount,
+      avgGapMs,
+      speedConsistency,
+      kpmRange
+    };
+    const nextHistory = [...fluencyHistory, newResult];
+    setFluencyHistory(nextHistory);
 
-            const newResult: FluencyEntry = {
-              accuracy: acc,
-              wpm: wpm,
-              levelId: level.id,
-              pauseCount,
-              avgGapMs,
-              speedConsistency,
-              kpmRange
-            };
-            const nextHistory = [...fluencyHistory, newResult];
-            setFluencyHistory(nextHistory);
-
-            if (acc >= 80 && currentLevelIdx < selectedLevels.length - 1) {
-              setStep("fluency_intermission");
-            } else {
-              // DECISION BRIDGE
-              const finalLevel = level.id;
-              if (finalLevel === 'A') {
-                setStep("result");
-              } else {
-                // Determine sub-level for B comprehension
-                let subLevel = "B-1";
-                if (finalLevel === 'B') {
-                   if (wpm > 80 && acc > 95) subLevel = "B-3";
-                   else if (wpm > 60) subLevel = "B-2";
-                   else subLevel = "B-1";
-                } else {
-                   subLevel = finalLevel; // C, D, E mapped directly
-                }
-
-                const possibleStories = STORY_VARIATIONS[subLevel] || STORY_VARIATIONS["B-1"];
-                const pick = possibleStories[Math.floor(Math.random() * possibleStories.length)];
-                setSelectedStory(pick);
-                setStep("decision");
-              }
-            }
-
-          } catch (err) {
-            console.error("Gagal menghubungi server AI:", err);
-            alert("Terjadi kesalahan saat memproses suara ke server Cloud.");
-            setStep("decision");
-          } finally {
-            setIsProcessingCloud(false);
-          }
-        };
-      };
-
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    if (acc >= 80 && currentLevelIdx < selectedLevels.length - 1) {
+      setStep("fluency_intermission");
     } else {
-       // fallback if no recording occurred
-       if (currentLevelIdx < selectedLevels.length - 1) setStep("decision");
+      // DECISION BRIDGE
+      const finalLevel = level.id;
+      if (finalLevel === 'A') {
+        setStep("result");
+      } else {
+        // Determine sub-level for B comprehension
+        let subLevel = "B-1";
+        if (finalLevel === 'B') {
+           if (wpm > 80 && acc > 95) subLevel = "B-3";
+           else if (wpm > 60) subLevel = "B-2";
+           else subLevel = "B-1";
+        } else {
+           subLevel = finalLevel; // C, D, E mapped directly
+        }
+
+        const possibleStories = STORY_VARIATIONS[subLevel] || STORY_VARIATIONS["B-1"];
+        const pick = possibleStories[Math.floor(Math.random() * possibleStories.length)];
+        setSelectedStory(pick);
+        setStep("decision");
+      }
     }
   };
 
