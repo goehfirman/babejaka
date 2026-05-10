@@ -15,8 +15,8 @@ import html2canvas from 'html2canvas';
 
 const LEVEL_VARIATIONS: Record<string, any[]> = {
   "A": [
-    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Buku ini baru. Aku suka baca buku. Buku ini bagus.", time: 30, image: "/images/stories/baca_buku.png" },
-    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Budi main bola. Bola Budi biru. Budi suka bola.", time: 30, image: "/images/stories/main_bola.png" }
+    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Ini roti buaya. Roti ini besar. Roti buaya enak.", time: 30, image: "/images/stories/roti_buaya_basic.png" },
+    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Ini ondel ondel. Boneka ini besar. Aku suka ondel.", time: 30, image: "/images/stories/ondel_basic.png" }
   ],
   "B": [
     { id: "B", title: "Pembaca Awal", subtitle: "Level B", text: "Pagi ini aku naik TransJakarta. Busnya bersih dan dingin. Aku pergi ke halte Bundaran HI.", time: 45, image: "/images/stories/jakarta_transjakarta.png" },
@@ -122,9 +122,9 @@ const LEVEL_CHARACTERISTICS: Record<string, any> = {
     id: "A", name: "Pembaca Dini", age: "0–7 tahun", symbol: "Bintang", color: "#FF4757",
     kpmRange: "0–30 KPM",
     ability: "Membaca kata-kata dasar sederhana tanpa huruf konsonan berangkap yang sulit.",
-    content: "Fokus pada objek harian anak (Buku, Bola).",
+    content: "Fokus pada budaya Betawi dasar (Roti Buaya, Ondel-ondel).",
     language: "Kosakata sangat sederhana (1-2 suku kata per kata), struktur kalimat subjek-predikat-objek dasar.",
-    visual: "Gambar anak membaca dan bermain bola sangat dominan."
+    visual: "Gambar roti buaya dan boneka ondel-ondel sangat dominan."
   },
   "B1": {
     id: "B1", name: "Pembaca Awal", age: "6–8 tahun", symbol: "Lingkaran", color: "#8E44AD",
