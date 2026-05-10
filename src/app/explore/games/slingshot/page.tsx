@@ -184,11 +184,19 @@ export default function SlingshotGame() {
         <div className="relative w-full flex-1 flex flex-col items-center justify-start pt-12">
           
           {/* Answer Bubbles (3D Capsules) - Horizontal Row */}
-          <div className="grid grid-cols-4 gap-2 md:gap-4 w-full max-w-4xl z-20 px-2">
+          <div className="grid grid-cols-4 gap-1.5 md:gap-4 w-full max-w-5xl z-20 px-1 md:px-4">
             {question.pilihan.map((text, idx) => {
               const isHit = feedback?.index === idx;
               const isCorrect = idx === question.jawabanBenar;
               
+              // 3D Color Palette
+              const bubbleColors = [
+                "from-rose-400 via-rose-500 to-rose-700 shadow-rose-900/40", // Red
+                "from-sky-400 via-sky-500 to-sky-700 shadow-sky-900/40",   // Blue
+                "from-emerald-400 via-emerald-500 to-emerald-700 shadow-emerald-900/40", // Green
+                "from-amber-400 via-amber-500 to-amber-700 shadow-amber-900/40" // Amber
+              ];
+
               return (
                 <motion.div
                   key={idx}
@@ -202,19 +210,20 @@ export default function SlingshotGame() {
                       ? { duration: 0.5 } 
                       : { repeat: Infinity, duration: 2 + idx * 0.5, ease: "easeInOut" }
                   }
-                  className={`relative p-1 rounded-full text-center transition-all cursor-pointer group`}
+                  className={`relative rounded-full text-center transition-all cursor-pointer group`}
                 >
-                  {/* The 3D Capsule Look */}
+                  {/* The 3D Capsule Look - Colorful Version */}
                   <div className={`
-                    relative px-2 md:px-4 py-4 rounded-3xl font-black text-[10px] md:text-xs tracking-tight
-                    shadow-[0_8px_0_0_rgba(0,0,0,0.15),inset_0_3px_3px_rgba(255,255,255,0.4)]
-                    bg-gradient-to-br from-white via-gray-50 to-gray-200
-                    border border-white/50 group-hover:scale-105 active:scale-95 transition-transform
+                    relative px-1 md:px-4 py-3 md:py-5 rounded-2xl md:rounded-3xl font-black 
+                    text-[9px] md:text-sm tracking-tight leading-tight flex items-center justify-center min-h-[60px] md:min-h-[80px]
+                    shadow-[0_8px_0_0_rgba(0,0,0,0.25),inset_0_4px_4px_rgba(255,255,255,0.4)]
+                    bg-gradient-to-br border border-white/30 group-hover:scale-105 active:scale-95 transition-transform
+                    ${!feedback ? bubbleColors[idx % 4] + " text-white" : ""}
                     ${feedback && isCorrect && isHit ? 'from-green-400 to-green-600 !text-white' : ''}
                     ${feedback && !isCorrect && isHit ? 'from-red-400 to-red-600 !text-white' : ''}
-                    ${!feedback ? 'text-ink' : (isCorrect ? 'text-green-600' : 'text-ink opacity-40')}
+                    ${feedback && !isHit ? 'opacity-20 grayscale' : ''}
                   `}>
-                    {text}
+                    <span className="drop-shadow-md">{text}</span>
                   </div>
                 </motion.div>
               );
