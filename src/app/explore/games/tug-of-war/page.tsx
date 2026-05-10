@@ -16,18 +16,29 @@ import {
 } from "firebase/firestore";
 import TarikTambangLobby from "./TarikTambangLobby";
 
+import confetti from "canvas-confetti";
+
 // --- SFX Helper ---
 const playSound = (type: 'pull' | 'win' | 'correct' | 'wrong') => {
-  // Logic to play sound (Placeholders for user to add actual mp3 files)
   const sounds: Record<string, string> = {
-    pull: "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3", // Short pull sound
-    win: "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3",  // Cheer
+    pull: "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3",
+    win: "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3",
     correct: "https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3",
     wrong: "https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"
   };
   const audio = new Audio(sounds[type]);
   audio.volume = 0.5;
-  audio.play().catch(() => {}); // Catch browser autoplay block
+  audio.play().catch(() => {});
+};
+
+const playWinCelebration = () => {
+  playSound('win');
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF']
+  });
 };
 
 const QUESTIONS = [
@@ -57,14 +68,9 @@ export default function TugOfWarGame() {
   const answerRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Calculation for 2.5D Rope Position
-  // Base 50 + (opponentScore - playerScore)
-  // Multi: p1 is left (score pulls to 0), p2 is right (score pulls to 100)
   const calculateMultiPos = () => {
     if (!roomData) return 50;
-    // Use the synced ropePosition from Firestore if available
-    if (roomData.gameplay?.ropePosition !== undefined) {
-      return roomData.gameplay.ropePosition;
-    }
+    if (roomData.gameplay?.ropePosition !== undefined) return roomData.gameplay.ropePosition;
     const p1Score = roomData.players.p1.score || 0;
     const p2Score = roomData.players.p2?.score || 0;
     return 50 + (p2Score - p1Score);
@@ -80,11 +86,14 @@ export default function TugOfWarGame() {
         const data = snap.data();
         setRoomData(data);
         if (data.metadata.status === "playing") setGameMode("multi-playing");
-        if (data.metadata.status === "finished") setGameState("gameOver");
+        if (data.metadata.status === "finished") {
+          setGameState("gameOver");
+          if (data.metadata.winner === playerRole) playWinCelebration();
+        }
       }
     });
     return () => unsub();
-  }, [roomId]);
+  }, [roomId, playerRole]);
 
   // --- Actions ---
   const createRoom = async () => {
@@ -126,15 +135,19 @@ export default function TugOfWarGame() {
     if (isCorrect) playSound('correct'); else playSound('wrong');
 
     if (gameMode === "single") {
+      let pS = playerScore;
+      let oS = opponentScore;
       if (isCorrect) {
         const power = duration < 2 ? 4 : (duration < 5 ? 2 : 1);
-        setPlayerScore(s => s + power);
+        pS += power;
+        setPlayerScore(pS);
         triggerStars(index);
         playSound('pull');
       } else {
-        setOpponentScore(s => s + 2);
+        oS += 2;
+        setOpponentScore(oS);
       }
-      checkWin(playerScore, opponentScore);
+      checkWin(pS, oS);
       setTimeout(() => { 
         setCurrentLevel(p => (p + 1) % QUESTIONS.length); 
         setFeedback(null); 
@@ -170,7 +183,6 @@ export default function TugOfWarGame() {
           "metadata.status": "finished",
           "metadata.winner": currentPos <= 40 ? "p1" : "p2"
         });
-        playSound('win');
       }
  
       setTimeout(() => { setFeedback(null); setCurrentLevel(p => (p + 1) % QUESTIONS.length); setStartTime(Date.now()); }, 1500);
@@ -181,7 +193,7 @@ export default function TugOfWarGame() {
     const currentPos = 50 + (o - p);
     if (currentPos <= 40 || currentPos >= 60) {
       setGameState("gameOver");
-      playSound('win');
+      if (currentPos <= 40) playWinCelebration();
     }
   };
 
@@ -293,7 +305,11 @@ export default function TugOfWarGame() {
 
                   {/* Player 1 (Ujung Kiri - Lebih Jauh) */}
                   <motion.div 
-                    animate={{ rotate: ropePosition < 50 ? 20 : 0 }}
+                    animate={{ 
+                      rotate: ropePosition < 50 ? 20 : 0,
+                      y: gameState === 'gameOver' && ropePosition >= 60 ? 100 : 0,
+                      opacity: gameState === 'gameOver' && ropePosition >= 60 ? 0 : 1
+                    }}
                     className="absolute left-[5%] flex flex-col items-center"
                   >
                      <div className="relative group">
@@ -307,7 +323,11 @@ export default function TugOfWarGame() {
 
                   {/* Player 2 (Ujung Kanan - Lebih Jauh) */}
                   <motion.div 
-                    animate={{ rotate: ropePosition > 50 ? -20 : 0 }}
+                    animate={{ 
+                      rotate: ropePosition > 50 ? -20 : 0,
+                      y: gameState === 'gameOver' && ropePosition <= 40 ? 100 : 0,
+                      opacity: gameState === 'gameOver' && ropePosition <= 40 ? 0 : 1
+                    }}
                     className="absolute right-[5%] flex flex-col items-center scale-x-[-1]"
                   >
                      <div className="relative group">
@@ -346,14 +366,21 @@ export default function TugOfWarGame() {
                  </div>
               </motion.div>
             ) : (
-              <div className="bg-white p-12 rounded-[4rem] shadow-premium text-center border-4 border-white max-w-md w-full">
-                 <Trophy className="mx-auto text-secondary w-16 h-16 mb-6" />
-                 <h2 className="text-4xl font-black text-ink mb-2 tracking-tighter">MENANG MUTLAK!</h2>
-                 <p className="font-bold text-ink-light mb-10 italic">Hebat! Kamu berhasil menarik lawan hingga terjatuh!</p>
-                 <button onClick={() => window.location.reload()} className="w-full bg-secondary text-white font-black py-5 rounded-3xl shadow-glow-blue flex items-center justify-center gap-3 hover:scale-[1.02] transition-all">
-                    <RefreshCw /> MAIN LAGI
-                 </button>
-              </div>
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-white p-12 rounded-[4rem] shadow-premium text-center border-4 border-white max-w-md w-full relative overflow-hidden"
+              >
+                 <div className="absolute inset-0 bg-gradient-to-b from-yellow-50 to-transparent opacity-50"></div>
+                 <div className="relative z-10">
+                    <Trophy className="mx-auto text-yellow-500 w-20 h-20 mb-6 drop-shadow-lg animate-bounce" />
+                    <h2 className="text-4xl font-black text-ink mb-2 tracking-tighter">MENANG MUTLAK!</h2>
+                    <p className="font-bold text-ink-light mb-10 italic">Hebat! Kamu berhasil menarik lawan hingga terjatuh!</p>
+                    <button onClick={() => window.location.reload()} className="w-full bg-secondary text-white font-black py-5 rounded-3xl shadow-glow-blue flex items-center justify-center gap-3 hover:scale-[1.02] transition-all">
+                       <RefreshCw /> MAIN LAGI
+                    </button>
+                 </div>
+              </motion.div>
             )}
          </AnimatePresence>
       </div>
