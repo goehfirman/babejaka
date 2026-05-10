@@ -359,11 +359,12 @@ export default function SlingshotGame() {
       oy *= ratio;
     }
 
-    const power = 1.5;
+    const powerX = 4.5;
+    const powerY = 3.5;
     
     // Reverse direction for slingshot feel
-    const targetX = -ox * power;
-    const targetY = -oy * 2.5; // Dynamic depth based on pull
+    const targetX = -ox * powerX;
+    const targetY = -oy * powerY; // Dynamic depth based on pull
 
     setGameState("flying");
     setIsDragging(false);
@@ -380,12 +381,12 @@ export default function SlingshotGame() {
   const checkCollision = (tx: number, ty: number) => {
     // Bubble positions (relative to screen center)
     // We'll place them at a depth that requires a decent pull to reach
-    const targetDepth = -250;
+    const targetDepth = -350;
     const bubbles = [
-      { x: -330, y: targetDepth },
-      { x: -110, y: targetDepth },
-      { x: 110, y: targetDepth },
-      { x: 330, y: targetDepth }
+      { x: -360, y: targetDepth },
+      { x: -120, y: targetDepth },
+      { x: 120, y: targetDepth },
+      { x: 360, y: targetDepth }
     ];
 
     let hitIndex = 0; 
@@ -578,9 +579,10 @@ export default function SlingshotGame() {
             <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-30">
               {[...Array(7)].map((_, i) => {
                 const step = (i + 1) / 7; // Last dot at exactly 1.0
-                const power = 1.5;
-                const dx = -ballPos.x * power * step;
-                const dy = -ballPos.y * 2.5 * step;
+                const powerX = 4.5;
+                const powerY = 3.5;
+                const dx = -ballPos.x * powerX * step;
+                const dy = -ballPos.y * powerY * step;
                 const scale = 1.3 - (step * 0.8); // More dramatic perspective
                 
                 return (
