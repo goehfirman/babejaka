@@ -10,14 +10,16 @@ interface NamePromptModalProps {
 }
 
 export default function NamePromptModal({ onClose, onSuccess, isCompulsory = false }: NamePromptModalProps) {
-  const { updateProfile } = useProfile();
+  const { login } = useProfile();
   const [inputName, setInputName] = useState("");
+  const [inputSchool, setInputSchool] = useState("");
 
   const saveName = (e: React.FormEvent) => {
     e.preventDefault();
     const name = inputName.trim();
-    if (name) {
-      updateProfile({ name });
+    const school = inputSchool.trim();
+    if (name && school) {
+      login(name, school);
       if (onSuccess) onSuccess(name);
       if (onClose) onClose();
     }
@@ -49,10 +51,10 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
           </h2>
           
           <p className="text-xs md:text-sm font-bold text-ink-light mb-10 leading-relaxed text-center opacity-60 px-4">
-            Tuliskan namamu. Ayo kita berpetualang bersama Babe Jaka!
+            Tuliskan nama dan sekolahmu. Ayo kita berpetualang bersama Babe Jaka!
           </p>
           
-          <form onSubmit={saveName} className="space-y-6">
+          <form onSubmit={saveName} className="space-y-4">
             <div className="relative group">
               <input 
                 type="text" 
@@ -60,15 +62,25 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
                 onChange={(e) => setInputName(e.target.value)}
                 placeholder="NAMAMU DI SINI"
                 autoFocus
-                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-5 text-lg font-black text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center tracking-widest focus:scale-[1.01]"
+                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-black text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center tracking-widest focus:scale-[1.01]"
+              />
+            </div>
+
+            <div className="relative group">
+              <input 
+                type="text" 
+                value={inputSchool}
+                onChange={(e) => setInputSchool(e.target.value)}
+                placeholder="NAMA SEKOLAHMU"
+                className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-black text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center tracking-widest focus:scale-[1.01]"
               />
             </div>
             
             <button 
               type="submit" 
-              disabled={!inputName.trim()}
+              disabled={!inputName.trim() || !inputSchool.trim()}
               className={`w-full py-5 rounded-2xl font-black text-lg tracking-[0.2em] transition-all uppercase flex items-center justify-center gap-3 ${
-                inputName.trim() 
+                inputName.trim() && inputSchool.trim()
                 ? 'btn-heritage shadow-glow-red' 
                 : 'bg-gray-100 text-gray-300 cursor-not-allowed'
               }`}

@@ -3,7 +3,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 export interface UserProfile {
   name: string;
-  className: string; // Keeping field name but conceptually "Status/Bio"
+  className: string; 
+  schoolName: string;
   avatarSeed: string;
   points: number;
 }
@@ -11,15 +12,18 @@ export interface UserProfile {
 const DEFAULT_PROFILE: UserProfile = {
   name: "Petualang Baca",
   className: "Pendatang Baru",
+  schoolName: "",
   avatarSeed: "42",
   points: 0,
 };
 
-const STORAGE_KEY = "babe_jaka_user_profile";
+const ACTIVE_USER_KEY = "babe_jaka_active_user";
+const USERS_LIST_KEY = "babe_jaka_all_users";
 
 interface ProfileContextValue {
   profile: UserProfile;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  login: (name: string, schoolName: string) => void;
   addPoints: (amount: number) => void;
   logout: () => void;
   getAvatarUrl: () => string;
@@ -32,35 +36,78 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    const savedActive = localStorage.getItem(ACTIVE_USER_KEY);
+    if (savedActive) {
       try {
-        setProfile(JSON.parse(saved));
+        setProfile(JSON.parse(savedActive));
       } catch (e) {
-        console.error("Failed to load profile", e);
+        console.error("Failed to load active profile", e);
       }
     }
     setLoaded(true);
   }, []);
 
+  const saveToStorage = (p: UserProfile) => {
+    // Save as active user
+    localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(p));
+    
+    // Also save/update in the master list
+    const allUsersRaw = localStorage.getItem(USERS_LIST_KEY);
+    let allUsers: UserProfile[] = allUsersRaw ? JSON.parse(allUsersRaw) : [];
+    
+    const existingIdx = allUsers.findIndex(u => 
+      u.name.toLowerCase() === p.name.toLowerCase() && 
+      u.schoolName.toLowerCase() === p.schoolName.toLowerCase()
+    );
+
+    if (existingIdx >= 0) {
+      allUsers[existingIdx] = p;
+    } else {
+      allUsers.push(p);
+    }
+    
+    localStorage.setItem(USERS_LIST_KEY, JSON.stringify(allUsers));
+  };
+
   const updateProfile = (updates: Partial<UserProfile>) => {
     setProfile(prev => {
       const next = { ...prev, ...updates };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      saveToStorage(next);
       return next;
     });
+  };
+
+  const login = (name: string, schoolName: string) => {
+    const allUsersRaw = localStorage.getItem(USERS_LIST_KEY);
+    const allUsers: UserProfile[] = allUsersRaw ? JSON.parse(allUsersRaw) : [];
+    
+    const existing = allUsers.find(u => 
+      u.name.toLowerCase() === name.toLowerCase() && 
+      u.schoolName.toLowerCase() === schoolName.toLowerCase()
+    );
+
+    if (existing) {
+      // Restore previous data
+      setProfile(existing);
+      localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(existing));
+    } else {
+      // Create new profile but keep defaults
+      const newProfile = { ...DEFAULT_PROFILE, name, schoolName, avatarSeed: Math.floor(Math.random() * 1000).toString() };
+      setProfile(newProfile);
+      saveToStorage(newProfile);
+    }
   };
 
   const addPoints = (amount: number) => {
     setProfile(prev => {
       const next = { ...prev, points: (prev.points || 0) + amount };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      saveToStorage(next);
       return next;
     });
   };
 
   const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ACTIVE_USER_KEY);
     setProfile(DEFAULT_PROFILE);
   };
 
@@ -71,7 +118,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile, addPoints, logout, getAvatarUrl }}>
+    <ProfileContext.Provider value={{ profile, updateProfile, login, addPoints, logout, getAvatarUrl }}>
       {children}
     </ProfileContext.Provider>
   );
@@ -80,10 +127,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 export function useProfile() {
   const ctx = useContext(ProfileContext);
   if (!ctx) {
-    // Fallback for pages that don't wrap with ProfileProvider
     return {
       profile: DEFAULT_PROFILE,
       updateProfile: () => {},
+      login: () => {},
       addPoints: () => {},
       logout: () => {},
       getAvatarUrl: () => `https://api.dicebear.com/9.x/fun-emoji/svg?seed=42`,
