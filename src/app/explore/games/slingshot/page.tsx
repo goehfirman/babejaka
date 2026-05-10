@@ -351,7 +351,7 @@ export default function SlingshotGame() {
     
     // Reverse direction for slingshot feel
     const targetX = -offset.x * power;
-    const targetY = -offset.y * power - 150; // Synchronized with dots
+    const targetY = -150; // Fixed depth to always land on bubbles
 
     setGameState("flying");
     setIsDragging(false);
@@ -367,12 +367,7 @@ export default function SlingshotGame() {
   };
 
   const checkCollision = (tx: number, ty: number) => {
-    // In a real game we'd check coordinates, 
-    // for this pseudo-3D UI we'll simulate a random hit or just pick the center
-    // Let's make it interactive: the user must "aim" roughly at the bubbles
-    
     // Bubble positions (relative to screen center)
-    // Horizontal row: left to right
     const bubbles = [
       { x: -180, y: -150 },
       { x: -60, y: -150 },
@@ -563,7 +558,7 @@ export default function SlingshotGame() {
                 const step = (i + 1) * 0.14;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
-                const dy = -ballPos.y * power * step - (150 * step);
+                const dy = -150 * step;
                 const scale = 1.1 - (step * 0.2); // Less scaling down
                 
                 return (
