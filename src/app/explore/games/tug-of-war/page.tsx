@@ -385,9 +385,9 @@ export default function TugOfWarGame() {
                   >
                      <div className="relative group">
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
-                        <img src="https://i.ibb.co.com/d4jXMJp2/babe-bingung.png" className="w-44 h-44 object-contain drop-shadow-2xl grayscale opacity-70" />
+                        <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-44 h-44 object-contain drop-shadow-2xl" />
                         <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-600 text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap scale-x-[-1]">
-                           {gameMode === "single" ? "BOT" : roomData?.players.p2?.name || "LAWAN"}
+                           {gameMode === "single" ? "BOT" : roomData.players.p2?.name || "LAWAN"}
                         </div>
                      </div>
                   </motion.div>
