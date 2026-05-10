@@ -257,8 +257,6 @@ export default function TugOfWarGame() {
 
       <div className="flex-1 flex flex-col items-center justify-center">
          <div className="relative w-full max-w-6xl h-96 mb-12 flex items-center justify-center">
-            {/* Ground / Background Zone */}
-            <div className="absolute inset-0 bg-[#F0F7FF] rounded-[2rem] border-2 border-blue-100 shadow-inner"></div>
             
             {/* Strategic Finish Lines (Thin & Clear) */}
             <div className="absolute inset-0 flex justify-between items-center px-[40%] pointer-events-none">
@@ -276,8 +274,8 @@ export default function TugOfWarGame() {
             {/* Center Reference Line (dotted) */}
             <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 border-l-2 border-dashed border-blue-200 opacity-50 z-0"></div>
 
-            {/* Unified Rope System */}
-            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            {/* Unified Rope System - Removed overflow-hidden to prevent clipping */}
+            <div className="absolute inset-0 flex items-center justify-center">
                <motion.div 
                  animate={{ x: (ropePosition - 50) + "%" }}
                  transition={{ type: "spring", stiffness: 40, damping: 15 }}
