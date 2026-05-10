@@ -350,6 +350,8 @@ export default function IntegratedDiagnosticPage() {
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
   const [fluencyHistory, setFluencyHistory] = useState<FluencyEntry[]>([]);
   const [isReading, setIsReading] = useState(false);
+  const [isLevelCompleted, setIsLevelCompleted] = useState(false);
+  const readingDoneTimeRef = useRef<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
   const [matchedIndices, setMatchedIndices] = useState<number[]>([]);
@@ -531,6 +533,18 @@ export default function IntegratedDiagnosticPage() {
         lastMatchCountRef.current = newMatched.length;
         bestMatchRef.current = newMatched;
         setMatchedIndices(newMatched);
+
+        const totalWords = currentLevel.text.split(" ").length;
+        if (newMatched.length >= totalWords && !readingDoneTimeRef.current) {
+          readingDoneTimeRef.current = Date.now();
+          setIsLevelCompleted(true);
+          if (recognitionRef.current) {
+            try { recognitionRef.current.abort(); } catch (_) {}
+          }
+          setTimeout(() => {
+            stopFluencyReading();
+          }, 2500);
+        }
       } else if (newMatched.length === bestMatchRef.current.length) {
         // Same count but possibly different indices — just update display
         bestMatchRef.current = newMatched;
@@ -590,13 +604,13 @@ export default function IntegratedDiagnosticPage() {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (isReading && timeLeft > 0) {
+    if (isReading && timeLeft > 0 && !isLevelCompleted) {
       timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && !isLevelCompleted) {
       stopFluencyReading();
     }
     return () => clearInterval(timer);
-  }, [isReading, timeLeft]);
+  }, [isReading, timeLeft, isLevelCompleted]);
 
   // --- Repeater Action (Mobile Fallback) ---
   const handleRepeatReading = () => {
@@ -607,6 +621,8 @@ export default function IntegratedDiagnosticPage() {
     wordTimestampsRef.current = [];
     lastMatchCountRef.current = 0;
     setMatchedIndices([]);
+    setIsLevelCompleted(false);
+    readingDoneTimeRef.current = null;
     
     // Quick restart mic
     if (recognitionRef.current) {
@@ -643,6 +659,8 @@ export default function IntegratedDiagnosticPage() {
     setIsReading(true);
     isReadingRef.current = true;
     shouldRestartRef.current = true;
+    setIsLevelCompleted(false);
+    readingDoneTimeRef.current = null;
     // Reset transcript persistence for fresh reading session
     savedTranscriptRef.current = "";
     lastSessionFinalsRef.current = "";
@@ -671,7 +689,12 @@ export default function IntegratedDiagnosticPage() {
     isReadingRef.current = false;
     shouldRestartRef.current = false;
     setIsMicActive(false);
-    const duration = startTime ? (Date.now() - startTime) / 1000 : 1;
+
+    let duration = startTime ? (Date.now() - startTime) / 1000 : 1;
+    if (readingDoneTimeRef.current && startTime) {
+      duration = (readingDoneTimeRef.current - startTime) / 1000;
+    }
+
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch (_) { /* ignore */ }
     }
@@ -971,6 +994,15 @@ export default function IntegratedDiagnosticPage() {
          {/* 2. Fluency Reading — Read Along-Inspired */}
          {step === "fluency_reading" && selectedLevels.length > 0 && (
             <div className="animate-bounce-in max-w-6xl mx-auto">
+               {isLevelCompleted && (
+                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                   <div className="bg-white rounded-3xl p-10 text-center shadow-2xl animate-bounce-in max-w-sm mx-auto border-4 border-[#5AAFD1]">
+                     <div className="text-6xl mb-4">🏆</div>
+                     <h3 className="text-2xl font-black text-[#5AAFD1] mb-2">Luar Biasa!</h3>
+                     <p className="text-[#666666] font-bold">Semua kata berhasil kamu baca dengan sempurna!</p>
+                   </div>
+                 </div>
+               )}
                <div className="card-bubbly bg-[#FFFAF0] p-8 md:p-12 min-h-[400px] flex flex-col justify-between relative overflow-hidden">
                   
                   {/* Progress Bar (Read Along style) */}
