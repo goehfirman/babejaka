@@ -77,29 +77,28 @@ export default function ReadingRoom() {
   const [awardedPages, setAwardedPages] = useState<Set<number>>(new Set());
   const [pageStartTime, setPageStartTime] = useState(Date.now());
   const hasEarnedFinishRef = useRef(false);
+  const flipBookRef = useRef<any>(null);
 
+  // Hook for page timer
   useEffect(() => {
      setPageStartTime(Date.now());
   }, [currentPage]);
 
-
-
+  // Hook for navigation auto-hide
   useEffect(() => {
      const resetNavVisibility = (e: MouseEvent) => {
         setIsNavVisible(true);
         if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
         
-        // Keep visible if mouse is near top, otherwise hide after 2.5s idle
         if (e.clientY > 80) {
            navTimeoutRef.current = setTimeout(() => {
-              // Only auto-hide if menu isn't open
               setIsNavVisible(false);
            }, 2500);
         }
      };
 
      window.addEventListener('mousemove', resetNavVisibility);
-     navTimeoutRef.current = setTimeout(() => setIsNavVisible(false), 3000); // Initial hide preview
+     navTimeoutRef.current = setTimeout(() => setIsNavVisible(false), 3000);
 
      return () => {
         window.removeEventListener('mousemove', resetNavVisibility);
@@ -107,6 +106,7 @@ export default function ReadingRoom() {
      };
   }, []);
 
+  // Hook for fullscreen
   useEffect(() => {
      const handleFullscreenChange = () => {
         const isFull = !!(document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement);
@@ -125,100 +125,7 @@ export default function ReadingRoom() {
      };
   }, []);
 
-  const toggleFullscreen = (e: React.MouseEvent) => {
-     e.preventDefault();
-     e.stopPropagation();
-     
-     const doc = window.document;
-     const docEl = doc.documentElement;
-
-     const requestFullScreen = docEl.requestFullscreen || (docEl as any).mozRequestFullScreen || (docEl as any).webkitRequestFullScreen || (docEl as any).msRequestFullscreen;
-     const cancelFullScreen = doc.exitFullscreen || (doc as any).mozCancelFullScreen || (doc as any).webkitExitFullscreen || (doc as any).msExitFullscreen;
-
-     const currentFullScreen = doc.fullscreenElement || (doc as any).mozFullScreenElement || (doc as any).webkitFullscreenElement || (doc as any).msFullscreenElement;
-
-     if (!currentFullScreen && !isCssFullscreen) {
-        if (requestFullScreen) {
-            requestFullScreen.call(docEl).catch(() => {
-                // Beranjak ke CSS full screen jika mode asli ditolak browser (misal dalam iframe)
-                setIsCssFullscreen(true);
-                setIsFullscreen(true);
-            });
-        } else {
-            setIsCssFullscreen(true);
-            setIsFullscreen(true);
-        }
-     } else {
-        if (cancelFullScreen && currentFullScreen) cancelFullScreen.call(doc);
-        setIsCssFullscreen(false);
-        setIsFullscreen(false);
-     }
-  };
-
-  const handleZoom = () => {
-     setZoomLevel((prev) => {
-        if (prev === 1) return 1.25;
-        if (prev === 1.25) return 1.5;
-        return 1;
-     });
-  };
-
-  const flipBookRef = useRef<any>(null);
-
-  if (!isLoaded) return <div className="min-h-screen bg-[#F0F8FF] flex items-center justify-center font-black text-[#A0AEC0] uppercase tracking-widest">Mempersiapkan Buku...</div>;
-
-  const book = allBooks.find(b => String(b.id) === String(bookId));
-
-  if (!book) {
-    return (
-      <div className="min-h-screen bg-[#F0F8FF] flex flex-col items-center justify-center p-10 text-center">
-        <div className="w-20 h-20 bg-[#FFE2E5] text-[#FF4757] rounded-3xl flex items-center justify-center mb-6 border-4 border-[#FF4757]/10 shadow-sm">
-          <span className="material-symbols-rounded text-5xl">sentiment_dissatisfied</span>
-        </div>
-        <h2 className="text-2xl font-black text-[#333333] mb-4 uppercase">Buku Tidak Ditemukan</h2>
-        <p className="text-[#A0AEC0] font-bold max-w-md mb-8">
-          Maaf, koleksi buku ini mungkin sudah dihapus atau tidak tersedia. Silakan cek perpustakaan untuk membaca buku lainnya!
-        </p>
-        <Link href="/explore/library" className="btn-bubbly rounded-full py-4 px-8">
-          KEMBALI KE PERPUSTAKAAN
-        </Link>
-      </div>
-    );
-  }
-
-  const STORY_PAGES = book.pages;
-
-  const nextButtonClick = () => {
-     if (flipBookRef.current) {
-        flipBookRef.current.pageFlip().flipNext();
-     }
-  };
-
-  const prevButtonClick = () => {
-     if (flipBookRef.current) {
-        flipBookRef.current.pageFlip().flipPrev();
-     }
-  };
-
-  const onPage = (e: any) => {
-     const newPage = e.data;
-     setCurrentPage(newPage);
-     
-     // Detect reaching the end of the book (back cover)
-     if (newPage >= bookElementsCount - 1 && !hasEarnedFinishRef.current) {
-        addPoints(50);
-        setEarnedPoints(50);
-        hasEarnedFinishRef.current = true;
-        
-        // Final celebration stars
-        const now = Date.now();
-        const positions = Array.from({ length: 10 }).map(() => ({
-           x: window.innerWidth / 2,
-           y: window.innerHeight / 2
-        }));
-        setPendingStars({ count: 10, timestamp: now, positions });
-     }
-  };
+  const book = useMemo(() => allBooks.find(b => String(b.id) === String(bookId)), [allBooks, bookId]);
 
   // Convert linear sequence to Left/Right spread pairs
   const bookElements = useMemo(() => {
@@ -226,7 +133,6 @@ export default function ReadingRoom() {
     const elements = [];
     const STORY_PAGES = book.pages;
     
-    // Front Cover (Right, index 0)
     const levelCode = book.level.includes('Dini') ? 'A' : 
                      book.level.includes('B-1') ? 'B1' : 
                      book.level.includes('B-2') ? 'B2' : 
@@ -237,15 +143,8 @@ export default function ReadingRoom() {
                      'E';
                      
     elements.push(<PageCover key="cover" title={book.title} image={book.illustration} level={levelCode}></PageCover>);
-    
-    // Empty page behind cover (Left, index 1)
-    elements.push(<Page key="blank-1" number={0}>
-      <div className="opacity-30 flex flex-col items-center">
-        <span className="material-symbols-rounded text-6xl">menu_book</span>
-      </div>
-    </Page>);
+    elements.push(<Page key="blank-1" number={0}><div className="opacity-30 flex flex-col items-center"><span className="material-symbols-rounded text-6xl">menu_book</span></div></Page>);
 
-    // Title Intro Page (Right, index 2)
     let pageCounter = 1;
     elements.push(<Page key="title" number={pageCounter++}>
       <div className="flex flex-col items-center justify-center text-center px-4">
@@ -256,53 +155,16 @@ export default function ReadingRoom() {
 
     STORY_PAGES.forEach((pageData, index) => {
        const hasText = pageData.text && pageData.text.trim().length > 0;
-       
        if (hasText) {
-           // Image Page with frame
-           elements.push(
-              <Page key={`page-img-${index}`} number={pageCounter++}>
-                 <div className="w-full h-[60vh] md:h-[65vh] max-h-[600px] relative rounded-2xl overflow-hidden border-4 border-[#E2E8F0] shadow-sm bg-white shrink-0">
-                   <Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} />
-                 </div>
-              </Page>
-           );
-
-           // Text Page
-           elements.push(
-              <Page key={`page-text-${index}`} number={pageCounter++}>
-                 <span className="material-symbols-rounded absolute top-12 left-10 text-6xl text-[#E2E8F0] opacity-50 z-[1] hidden md:block">format_quote</span>
-                 <div className="flex flex-col justify-center items-start h-full w-full px-2 md:px-8 relative z-10">
-                    <p className={`${currentFontConfig.size} ${currentFontConfig.family} font-medium leading-[1.8] text-[#333333] tracking-wide select-none transition-all duration-300 text-left`}>
-                       {pageData.text}
-                    </p>
-                 </div>
-              </Page>
-           );
+           elements.push(<Page key={`page-img-${index}`} number={pageCounter++}><div className="w-full h-[60vh] md:h-[65vh] max-h-[600px] relative rounded-2xl overflow-hidden border-4 border-[#E2E8F0] shadow-sm bg-white shrink-0"><Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} /></div></Page>);
+           elements.push(<Page key={`page-text-${index}`} number={pageCounter++}><span className="material-symbols-rounded absolute top-12 left-10 text-6xl text-[#E2E8F0] opacity-50 z-[1] hidden md:block">format_quote</span><div className="flex flex-col justify-center items-start h-full w-full px-2 md:px-8 relative z-10"><p className={`${currentFontConfig.size} ${currentFontConfig.family} font-medium leading-[1.8] text-[#333333] tracking-wide select-none transition-all duration-300 text-left`}>{pageData.text}</p></div></Page>);
        } else {
-           // Full Bleed Image Page (no text)
-           elements.push(
-              <Page key={`page-img-full-${index}`} number={pageCounter++} fullBleed={true}>
-                 <div className="w-full h-full relative bg-white flex items-center justify-center overflow-hidden">
-                   <Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain scale-90" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} />
-                 </div>
-              </Page>
-           );
+           elements.push(<Page key={`page-img-full-${index}`} number={pageCounter++} fullBleed={true}><div className="w-full h-full relative bg-white flex items-center justify-center overflow-hidden"><Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain scale-90" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} /></div></Page>);
        }
     });
 
-    // End empty page to give a visual break before back cover
-    elements.push(<Page key="blank-end" number={pageCounter++}>
-      <div className="text-center">
-        <h2 className="text-2xl font-black text-[#A0AEC0] mb-4">Tamat</h2>
-      </div>
-    </Page>);
-    
-    // Fit out parity for proper back-cover closing if necessary
-    if (elements.length % 2 === 0) {
-        elements.push(<Page key="pad-blank" number={pageCounter++}><div /></Page>);
-    }
-
-    // Back Cover (Right)
+    elements.push(<Page key="blank-end" number={pageCounter++}><div className="text-center"><h2 className="text-2xl font-black text-[#A0AEC0] mb-4">Tamat</h2></div></Page>);
+    if (elements.length % 2 === 0) elements.push(<Page key="pad-blank" number={pageCounter++}><div /></Page>);
     elements.push(<PageCover key="back-cover" title={`${book.title}`} image={book.cover} />);
     
     return elements;
@@ -310,20 +172,14 @@ export default function ReadingRoom() {
 
   const bookElementsCount = bookElements.length;
 
+  // Real-time point awarding effect
   useEffect(() => {
      const timer = setInterval(() => {
         const duration = Date.now() - pageStartTime;
-        // 10 seconds threshold and not already awarded for this page
         if (duration >= 10000 && !awardedPages.has(currentPage) && currentPage > 0 && currentPage < bookElementsCount - 1) {
            setAwardedPages(prev => new Set(prev).add(currentPage));
-           
-           // Trigger 5 stars flying from center
            const now = Date.now();
-           const positions = Array.from({ length: 5 }).map(() => ({
-              x: window.innerWidth / 2,
-              y: window.innerHeight / 2
-           }));
-           
+           const positions = Array.from({ length: 5 }).map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
            setPendingStars({ count: 5, timestamp: now, positions });
            setEarnedPoints(5);
         }
@@ -331,36 +187,64 @@ export default function ReadingRoom() {
      return () => clearInterval(timer);
   }, [currentPage, pageStartTime, awardedPages, bookElementsCount]);
 
+  // --- Early Returns (AFTER Hooks) ---
+  if (!isLoaded) return <div className="min-h-screen bg-[#F0F8FF] flex items-center justify-center font-black text-[#A0AEC0] uppercase tracking-widest">Mempersiapkan Buku...</div>;
+  if (!book) return (
+    <div className="min-h-screen bg-[#F0F8FF] flex flex-col items-center justify-center p-10 text-center">
+      <div className="w-20 h-20 bg-[#FFE2E5] text-[#FF4757] rounded-3xl flex items-center justify-center mb-6 border-4 border-[#FF4757]/10 shadow-sm"><span className="material-symbols-rounded text-5xl">sentiment_dissatisfied</span></div>
+      <h2 className="text-2xl font-black text-[#333333] mb-4 uppercase">Buku Tidak Ditemukan</h2>
+      <p className="text-[#A0AEC0] font-bold max-w-md mb-8">Maaf, koleksi buku ini mungkin sudah dihapus atau tidak tersedia.</p>
+      <Link href="/explore/library" className="btn-bubbly rounded-full py-4 px-8">KEMBALI KE PERPUSTAKAAN</Link>
+    </div>
+  );
+
+  // --- Handlers ---
+  const toggleFullscreen = (e: React.MouseEvent) => {
+     e.preventDefault();
+     const doc = window.document;
+     const docEl = doc.documentElement;
+     const requestFullScreen = docEl.requestFullscreen || (docEl as any).mozRequestFullScreen || (docEl as any).webkitRequestFullScreen || (docEl as any).msRequestFullscreen;
+     const cancelFullScreen = doc.exitFullscreen || (doc as any).mozCancelFullScreen || (doc as any).webkitExitFullscreen || (doc as any).msExitFullscreen;
+     const currentFullScreen = doc.fullscreenElement || (doc as any).mozFullScreenElement || (doc as any).webkitFullscreenElement || (doc as any).msFullscreenElement;
+
+     if (!currentFullScreen && !isCssFullscreen) {
+        if (requestFullScreen) { requestFullScreen.call(docEl).catch(() => { setIsCssFullscreen(true); setIsFullscreen(true); }); }
+        else { setIsCssFullscreen(true); setIsFullscreen(true); }
+     } else {
+        if (cancelFullScreen && currentFullScreen) cancelFullScreen.call(doc);
+        setIsCssFullscreen(false); setIsFullscreen(false);
+     }
+  };
+
+  const handleZoom = () => setZoomLevel((prev) => prev === 1 ? 1.25 : prev === 1.25 ? 1.5 : 1);
+  const nextButtonClick = () => flipBookRef.current?.pageFlip().flipNext();
+  const prevButtonClick = () => flipBookRef.current?.pageFlip().flipPrev();
+  
+  const onPage = (e: any) => {
+     const newPage = e.data;
+     setCurrentPage(newPage);
+     if (newPage >= bookElementsCount - 1 && !hasEarnedFinishRef.current) {
+        addPoints(50);
+        setEarnedPoints(50);
+        hasEarnedFinishRef.current = true;
+        const now = Date.now();
+        const positions = Array.from({ length: 10 }).map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
+        setPendingStars({ count: 10, timestamp: now, positions });
+     }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-[#E5E7EB] font-body text-[#333333] relative overflow-hidden">
-      
-      {/* Top bar Tooling */}
       <header className={`bg-white px-4 md:px-8 py-3 flex w-full items-center justify-between z-[60] shadow-[0_2px_10px_rgba(0,0,0,0.05)] border-b border-[#E2E8F0] absolute top-0 left-0 right-0 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isNavVisible ? 'translate-y-0' : '-translate-y-full'}`} onMouseEnter={() => setIsNavVisible(true)}>
          <div className="w-12 md:w-32 flex justify-start">
-            <Link href="/explore/library" className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all">
-               <span className="material-symbols-rounded text-2xl">arrow_back</span>
-            </Link>
+            <Link href="/explore/library" className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all"><span className="material-symbols-rounded text-2xl">arrow_back</span></Link>
          </div>
-
-          <div className="text-center animate-bounce-in flex-1 flex flex-col items-center">
-            <h1 className="text-sm md:text-base font-bold text-[#4B5563] flex items-center justify-center gap-2 mb-0.5">
-               <span className="material-symbols-rounded text-[#8B5CF6] text-lg">menu_book</span>
-               {book.title}
-            </h1>
-            {/* Realtime Point Counter in Header */}
-            <div id="navbar-points" className="flex items-center gap-1.5 bg-[#FFFBEB] px-3 py-1 rounded-full border-2 border-[#FEF3C7] shadow-sm">
-               <span className="text-sm">⭐</span>
-               <span className="text-xs font-black text-[#D97706]">{profile.points}</span>
-            </div>
-          </div>
-         
+         <div className="text-center animate-bounce-in flex-1 flex flex-col items-center">
+            <h1 className="text-sm md:text-base font-bold text-[#4B5563] flex items-center justify-center gap-2 mb-0.5"><span className="material-symbols-rounded text-[#8B5CF6] text-lg">menu_book</span>{book.title}</h1>
+            <div id="navbar-points" className="flex items-center gap-1.5 bg-[#FFFBEB] px-3 py-1 rounded-full border-2 border-[#FEF3C7] shadow-sm"><span className="text-sm">⭐</span><span className="text-xs font-black text-[#D97706]">{profile.points}</span></div>
+         </div>
          <div className="flex relative w-12 md:w-32 justify-end">
-             <button onClick={() => setShowFontMenu(!showFontMenu)} className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${showFontMenu ? 'bg-[#FFB347] text-white' : 'text-[#A0AEC0] hover:bg-[#F8FAFC] hover:text-[#FFB347]'}`}>
-                <span className="material-symbols-rounded text-2xl">text_format</span>
-             </button>
-             
-             {/* Font Customization Dropdown */}
+             <button onClick={() => setShowFontMenu(!showFontMenu)} className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${showFontMenu ? 'bg-[#FFB347] text-white' : 'text-[#A0AEC0] hover:bg-[#F8FAFC] hover:text-[#FFB347]'}`}><span className="material-symbols-rounded text-2xl">text_format</span></button>
              {showFontMenu && (
                <div className="absolute top-12 right-0 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-xl p-4 z-50 animate-bounce-in">
                   <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest mb-3">Ukuran Huruf</p>
@@ -372,9 +256,7 @@ export default function ReadingRoom() {
                   <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest mb-3">Jenis Huruf</p>
                   <div className="space-y-2">
                      {[{id: "font-sans", label: "Modern"}, {id: "font-serif", label: "Klasik"}, {id: "font-mono", label: "Mesin Tik"}].map(font => (
-                        <button key={font.id} onClick={() => setCurrentFontConfig({...currentFontConfig, family: font.id})} className={`w-full text-left px-4 py-2 ${font.id} rounded-xl text-sm font-bold border-2 transition-all ${currentFontConfig.family === font.id ? 'bg-[#87CEEB] text-white border-[#5AAFD1]' : 'bg-[#F8FAFC] text-[#666666] border-transparent hover:border-[#E2E8F0]'}`}>
-                           {font.label}
-                        </button>
+                        <button key={font.id} onClick={() => setCurrentFontConfig({...currentFontConfig, family: font.id})} className={`w-full text-left px-4 py-2 ${font.id} rounded-xl text-sm font-bold border-2 transition-all ${currentFontConfig.family === font.id ? 'bg-[#87CEEB] text-white border-[#5AAFD1]' : 'bg-[#F8FAFC] text-[#666666] border-transparent hover:border-[#E2E8F0]'}`}>{font.label}</button>
                      ))}
                   </div>
                </div>
@@ -383,54 +265,22 @@ export default function ReadingRoom() {
       </header>
 
       <main className={`flex-1 flex w-full relative overflow-hidden transition-all duration-300 ${isCssFullscreen ? 'fixed inset-0 z-[100] bg-[#E5E7EB]' : 'z-10 pt-16'}`}>
-        
-        {/* Flipbook Wrapper */}
         <div className={`absolute inset-0 flex items-center justify-center p-4 md:p-8 z-20 transition-transform duration-300 ease-in-out`} style={{ transform: `scale(${zoomLevel})` }}>
            <div className={`w-[90vw] md:w-[75vw] max-w-[1000px] h-[60vh] md:h-[65vh] max-h-[600px] flex items-center justify-center`}>
-              <FlipBook
-                 width={550}
-                 height={750}
-                 size="stretch"
-                 minWidth={300}
-                 maxWidth={1200}
-                 minHeight={400}
-                 maxHeight={750}
-                 maxShadowOpacity={0.5}
-                 showCover={true}
-                 mobileScrollSupport={true}
-                 usePortrait={false}
-                 onFlip={onPage}
-                 className="flip-book-custom"
-                 ref={flipBookRef}
-                 useMouseEvents={true}
-              >
+              <FlipBook width={550} height={750} size="stretch" minWidth={300} maxWidth={1200} minHeight={400} maxHeight={750} maxShadowOpacity={0.5} showCover={true} mobileScrollSupport={true} usePortrait={false} onFlip={onPage} className="flip-book-custom" ref={flipBookRef} useMouseEvents={true}>
                   {bookElements}
               </FlipBook>
            </div>
         </div>
 
-        {/* Floating Controls Overlay */}
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-between px-2 md:px-8">
-            <button 
-               onClick={prevButtonClick} 
-               className={`w-12 h-12 md:w-16 md:h-16 bg-[#4B5563] text-white rounded-full flex items-center justify-center transition-all shadow-lg hover:bg-[#374151] hover:scale-105 active:scale-95 pointer-events-auto opacity-70 hover:opacity-100 ${currentPage === 0 ? 'invisible' : ''}`}
-            >
-               <span className="material-symbols-rounded text-2xl md:text-3xl pr-1">arrow_back_ios</span>
-            </button>
-            <button 
-               onClick={nextButtonClick} 
-               className={`w-12 h-12 md:w-16 md:h-16 bg-[#4B5563] text-white rounded-full flex items-center justify-center transition-all shadow-lg hover:bg-[#374151] hover:scale-105 active:scale-95 pointer-events-auto opacity-70 hover:opacity-100 ${(currentPage >= bookElements.length - 2) ? 'invisible' : ''}`}
-            >
-               <span className="material-symbols-rounded text-2xl md:text-3xl pl-1">arrow_forward_ios</span>
-            </button>
+            <button onClick={prevButtonClick} className={`w-12 h-12 md:w-16 md:h-16 bg-[#4B5563] text-white rounded-full flex items-center justify-center transition-all shadow-lg hover:bg-[#374151] hover:scale-105 active:scale-95 pointer-events-auto opacity-70 hover:opacity-100 ${currentPage === 0 ? 'invisible' : ''}`}><span className="material-symbols-rounded text-2xl md:text-3xl pr-1">arrow_back_ios</span></button>
+            <button onClick={nextButtonClick} className={`w-12 h-12 md:w-16 md:h-16 bg-[#4B5563] text-white rounded-full flex items-center justify-center transition-all shadow-lg hover:bg-[#374151] hover:scale-105 active:scale-95 pointer-events-auto opacity-70 hover:opacity-100 ${(currentPage >= bookElementsCount - 2) ? 'invisible' : ''}`}><span className="material-symbols-rounded text-2xl md:text-3xl pl-1">arrow_forward_ios</span></button>
         </div>
 
-        {/* Floating Bottom Pill */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 pointer-events-none z-50 flex">
            <div className="bg-[#1F2937] text-white px-6 py-3 rounded-full shadow-2xl flex items-center justify-center gap-6 pointer-events-auto">
-              <span className="text-sm font-medium tracking-wide">
-                 {currentPage} / {bookElements.length - 1}
-              </span>
+              <span className="text-sm font-medium tracking-wide">{currentPage} / {bookElementsCount - 1}</span>
               <div className="h-4 w-px bg-white/20"></div>
               <Link href="/explore/library" className="hover:text-[#FFB347] transition-colors"><span className="material-symbols-rounded text-xl">home</span></Link>
               <button onClick={handleZoom} className={`transition-colors ${zoomLevel > 1 ? 'text-[#FFB347]' : 'hover:text-[#FFB347]'}`}><span className="material-symbols-rounded text-xl">zoom_in</span></button>
@@ -438,13 +288,8 @@ export default function ReadingRoom() {
            </div>
         </div>
 
-       {earnedPoints && (
-         <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
-       )}
-
-       <StarFly burst={pendingStars} onStarHit={() => {
-         addPoints(1); // Increment by 1 for each star hitting the target
-       }} />
+       {earnedPoints && <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />}
+       <StarFly burst={pendingStars} onStarHit={() => addPoints(1)} />
       </main>
     </div>
   );
