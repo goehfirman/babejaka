@@ -375,8 +375,8 @@ export default function SlingshotGame() {
       { x: 180, y: -150 }
     ];
 
-    let hitIndex = -1;
-    let minDist = 80;
+    let hitIndex = 0; // Default to first
+    let minDist = Infinity;
 
     bubbles.forEach((b, i) => {
       const d = Math.sqrt(Math.pow(tx - b.x, 2) + Math.pow(ty - b.y, 2));
