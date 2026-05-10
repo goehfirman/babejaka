@@ -1,15 +1,4 @@
 import { NextResponse } from 'next/server';
-import speech from '@google-cloud/speech';
-
-// Initialize the client. We'll only pass credentials if they exist, 
-// so it doesn't crash during build or local dev if env vars are missing.
-const client = new speech.SpeechClient({
-  credentials: {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  },
-  projectId: process.env.GOOGLE_PROJECT_ID || process.env.GOOGLE_CLIENT_EMAIL?.split('@')[1]?.split('.')[0],
-});
 
 export async function POST(request: Request) {
   try {
@@ -19,30 +8,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Data audio tidak ditemukan' }, { status: 400 });
     }
 
-    const audio = {
-      content: audioBase64,
-    };
-    
-    // Konfigurasi ini krusial. Karena kita menerima file dari web browser (MediaRecorder),
-    // kita set WEBM_OPUS untuk Android/Chrome, atau biarkan Google mendeteksi dari header.
-    // Untuk amannya, kita pass languageCode saja dan biarkan Google mendeteksi format.
-    // Jika gagal, kita akan melakukan penyesuaian khusus WEBM_OPUS.
-    const config = {
-      languageCode: 'id-ID',
-      // Jika diperlukan WEBM_OPUS di masa depan:
-      // encoding: mimeType.includes('webm') ? 'WEBM_OPUS' : undefined,
-    };
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Konfigurasi GOOGLE_API_KEY tidak ditemukan di server.' }, { status: 500 });
+    }
+
+    const url = `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`;
 
     const requestPayload = {
-      audio: audio,
-      config: config,
+      config: {
+        languageCode: 'id-ID',
+      },
+      audio: {
+        content: audioBase64,
+      },
     };
 
-    console.log("Mengirim permintaan ke Google Cloud Speech...");
-    const [response] = await client.recognize(requestPayload);
+    console.log("Mengirim permintaan ke Google Cloud Speech (REST API)...");
     
-    const transcription = response.results
-      ?.map(result => result.alternatives?.[0]?.transcript)
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestPayload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('Google API Error:', data);
+      throw new Error(data.error?.message || 'Terjadi kesalahan dari Google Speech API');
+    }
+
+    const transcription = data.results
+      ?.map((result: any) => result.alternatives?.[0]?.transcript)
       .join(' ');
 
     console.log("Hasil Transkrip:", transcription);
@@ -53,3 +53,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
