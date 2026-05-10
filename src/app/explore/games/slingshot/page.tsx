@@ -113,7 +113,12 @@ export default function SlingshotGame() {
       setFeedback(null);
     }
 
-    setGameState("result");
+    setGameState("hit");
+    
+    // Delay result popup so explosion can be seen
+    setTimeout(() => {
+      setGameState("result");
+    }, 2000);
   };
 
   const nextQuestion = () => {
@@ -282,7 +287,7 @@ export default function SlingshotGame() {
           )}
 
           {/* Explosion / Particles (When Hit) */}
-          {gameState === "result" && (
+          {(gameState === "hit" || gameState === "result") && (
             <div className="absolute pointer-events-none overflow-visible" style={{ left: `calc(50% + ${ballPos.x}px)`, bottom: `calc(120px - ${ballPos.y}px)` }}>
               {[...Array(12)].map((_, i) => {
                 const angle = (i / 12) * Math.PI * 2;
