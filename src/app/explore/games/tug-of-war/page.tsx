@@ -160,15 +160,15 @@ export default function TugOfWarGame() {
       await updateDoc(doc(db, "rooms", roomId), updates);
       if (isCorrect) { triggerStars(index); playSound('pull'); }
       
-      // Check Win: Marker enters Finish Zone (35 or 65)
+      // Check Win: Marker enters Finish Zone (40 or 60)
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
       const p2S = updates[`players.p2.score`] || roomData.players.p2?.score || 0;
       const currentPos = 50 + (p2S - p1S);
       
-      if (currentPos <= 35 || currentPos >= 65) {
+      if (currentPos <= 40 || currentPos >= 60) {
         await updateDoc(doc(db, "rooms", roomId), {
           "metadata.status": "finished",
-          "metadata.winner": currentPos <= 35 ? "p1" : "p2"
+          "metadata.winner": currentPos <= 40 ? "p1" : "p2"
         });
         playSound('win');
       }
@@ -179,7 +179,7 @@ export default function TugOfWarGame() {
  
   const checkWin = (p: number, o: number) => {
     const currentPos = 50 + (o - p);
-    if (currentPos <= 35 || currentPos >= 65) {
+    if (currentPos <= 40 || currentPos >= 60) {
       setGameState("gameOver");
       playSound('win');
     }
@@ -261,7 +261,7 @@ export default function TugOfWarGame() {
             <div className="absolute inset-0 bg-[#F0F7FF] rounded-[2rem] border-2 border-blue-100 shadow-inner"></div>
             
             {/* Strategic Finish Lines (Thin & Clear) */}
-            <div className="absolute inset-0 flex justify-between items-center px-[35%] pointer-events-none">
+            <div className="absolute inset-0 flex justify-between items-center px-[40%] pointer-events-none">
                {/* Finish P1 Line */}
                <div className="h-full w-1 bg-red-500/40 relative">
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-2 py-0.5 rounded text-[8px] font-black shadow-sm">FINISH</div>
