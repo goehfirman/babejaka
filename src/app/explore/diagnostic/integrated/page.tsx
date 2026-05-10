@@ -749,28 +749,20 @@ export default function IntegratedDiagnosticPage() {
     setFluencyHistory(nextHistory);
 
     if (acc >= 80 && currentLevelIdx < selectedLevels.length - 1) {
-      setStep("fluency_intermission");
+      // Otomatis lanjut ke level selanjutnya
+      const next = currentLevelIdx + 1;
+      setCurrentLevelIdx(next);
+      setTimeLeft(selectedLevels[next].time);
+      setMatchedIndices([]);
+      setStep("fluency_reading");
+      
+      setIsReading(false);
+      isReadingRef.current = false;
+      setIsLevelCompleted(false);
+      readingDoneTimeRef.current = null;
     } else {
-      // DECISION BRIDGE
-      const finalLevel = level.id;
-      if (finalLevel === 'A') {
-        setStep("result");
-      } else {
-        // Determine sub-level for B comprehension
-        let subLevel = "B-1";
-        if (finalLevel === 'B') {
-           if (wpm > 80 && acc > 95) subLevel = "B-3";
-           else if (wpm > 60) subLevel = "B-2";
-           else subLevel = "B-1";
-        } else {
-           subLevel = finalLevel; // C, D, E mapped directly
-        }
-
-        const possibleStories = STORY_VARIATIONS[subLevel] || STORY_VARIATIONS["B-1"];
-        const pick = possibleStories[Math.floor(Math.random() * possibleStories.length)];
-        setSelectedStory(pick);
-        setStep("decision");
-      }
+      // Jika di bawah kriteria atau level terakhir, langsung munculkan laporan
+      setStep("result");
     }
   };
 
