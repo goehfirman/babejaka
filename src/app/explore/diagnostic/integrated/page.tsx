@@ -1100,7 +1100,9 @@ export default function IntegratedDiagnosticPage() {
                    <div className="fixed top-4 left-4 right-4 z-50 animate-bounce-in">
                      <div className="bg-white rounded-2xl p-5 text-center shadow-2xl border-4 border-[#5AAFD1]">
                        <div className="flex items-center justify-center gap-3">
-                         <span className="text-4xl">🏆</span>
+                        <div className="w-16 h-16 relative flex-shrink-0 animate-bounce">
+                          <Image src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" alt="Babe Jaka" fill className="object-contain" unoptimized />
+                        </div>
                          <div>
                            <h3 className="text-lg font-black text-[#5AAFD1]">Luar Biasa!</h3>
                            <p className="text-xs text-[#666666] font-bold">Lihat kata yang berwarna biru di bawah 👇</p>
@@ -1112,7 +1114,9 @@ export default function IntegratedDiagnosticPage() {
                    /* Desktop: Overlay penuh */
                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
                      <div className="bg-white rounded-3xl p-10 text-center shadow-2xl animate-bounce-in max-w-sm mx-auto border-4 border-[#5AAFD1]">
-                       <div className="text-6xl mb-4">🏆</div>
+                        <div className="w-32 h-32 relative mx-auto mb-6 animate-bounce">
+                          <Image src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" alt="Babe Jaka" fill className="object-contain" unoptimized />
+                        </div>
                        <h3 className="text-2xl font-black text-[#5AAFD1] mb-2">Luar Biasa!</h3>
                        <p className="text-[#666666] font-bold">Semua kata berhasil kamu baca dengan sempurna!</p>
                      </div>
