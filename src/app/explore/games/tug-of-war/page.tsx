@@ -260,18 +260,16 @@ export default function TugOfWarGame() {
             {/* Ground / Background Zone */}
             <div className="absolute inset-0 bg-[#F0F7FF] rounded-[2rem] border-2 border-blue-100 shadow-inner"></div>
             
-            {/* Striped Finish Zones (Strategic Placement) */}
-            <div className="absolute inset-0 flex justify-between items-center px-[25%] pointer-events-none">
-               {/* Finish P1 Zone */}
-               <div className="h-full w-20 bg-repeat bg-center opacity-20 border-x border-gray-300" 
-                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P1</div>
+            {/* Strategic Finish Lines (Thin & Clear) */}
+            <div className="absolute inset-0 flex justify-between items-center px-[35%] pointer-events-none">
+               {/* Finish P1 Line */}
+               <div className="h-full w-1 bg-red-500/40 relative">
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-2 py-0.5 rounded text-[8px] font-black shadow-sm">FINISH</div>
                </div>
                
-               {/* Finish P2 Zone */}
-               <div className="h-full w-20 bg-repeat bg-center opacity-20 border-x border-gray-300" 
-                    style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P2</div>
+               {/* Finish P2 Line */}
+               <div className="h-full w-1 bg-red-500/40 relative">
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-500 text-white px-2 py-0.5 rounded text-[8px] font-black shadow-sm">FINISH</div>
                </div>
             </div>
 
