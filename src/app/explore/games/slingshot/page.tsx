@@ -360,7 +360,7 @@ export default function SlingshotGame() {
     }
 
     const powerX = 4.5;
-    const powerY = 3.5;
+    const powerY = 4.5;
     
     // Reverse direction for slingshot feel
     const targetX = -ox * powerX;
@@ -381,7 +381,7 @@ export default function SlingshotGame() {
   const checkCollision = (tx: number, ty: number) => {
     // Bubble positions (relative to screen center)
     // We'll place them at a depth that requires a decent pull to reach
-    const targetDepth = -350;
+    const targetDepth = -450;
     const bubbles = [
       { x: -360, y: targetDepth },
       { x: -120, y: targetDepth },
@@ -495,7 +495,7 @@ export default function SlingshotGame() {
         </motion.div>
 
         {/* Target Arena (The House & Bubbles) */}
-        <div className="relative w-full flex-1 flex flex-col items-center justify-start pt-12">
+        <div className="relative w-full flex-1 flex flex-col items-center justify-start pt-2">
           
           {/* Answer Bubbles (3D Capsules) - Horizontal Row */}
           <div className="grid grid-cols-4 gap-1.5 md:gap-4 w-full max-w-5xl z-20 px-1 md:px-4">
@@ -580,7 +580,7 @@ export default function SlingshotGame() {
               {[...Array(7)].map((_, i) => {
                 const step = (i + 1) / 7; // Last dot at exactly 1.0
                 const powerX = 4.5;
-                const powerY = 3.5;
+                const powerY = 4.5;
                 const dx = -ballPos.x * powerX * step;
                 const dy = -ballPos.y * powerY * step;
                 const scale = 1.3 - (step * 0.8); // More dramatic perspective
