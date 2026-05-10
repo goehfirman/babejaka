@@ -627,7 +627,7 @@ export default function SlingshotGame() {
           )}
 
           {/* Projectile (Ball) Origin Container */}
-          <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-[999]">
+          <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-16 h-16 flex justify-center items-center z-[999]">
             <motion.div
               key={currentLevel}
               drag={gameState === "playing"}
@@ -636,7 +636,7 @@ export default function SlingshotGame() {
               onDragStart={() => setIsDragging(true)}
               onDrag={(e, info) => setBallPos({ x: info.offset.x, y: info.offset.y })}
               onDragEnd={handleRelease}
-              initial={{ x: 0, y: 0, opacity: 1 }}
+              initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
               animate={{
                 x: ballPos.x,
                 y: ballPos.y,
@@ -658,7 +658,7 @@ export default function SlingshotGame() {
               <img 
                 src="https://i.ibb.co.com/Z3ZtMW4/Desain-tanpa-judul.png" 
                 alt="Projectile"
-                className="w-full h-full object-contain drop-shadow-2xl"
+                className="w-full h-full object-contain drop-shadow-2xl pointer-events-none"
                 style={{ filter: "drop-shadow(0 10px 10px rgba(0,0,0,0.5))" }}
               />
             </motion.div>
