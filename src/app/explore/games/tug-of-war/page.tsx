@@ -426,11 +426,35 @@ export default function TugOfWarGame() {
                 animate={{ scale: 1, opacity: 1 }}
                 className="bg-white p-12 rounded-[4rem] shadow-premium text-center border-4 border-white max-w-md w-full relative overflow-hidden"
               >
-                 <div className="absolute inset-0 bg-gradient-to-b from-yellow-50 to-transparent opacity-50"></div>
+                 <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-transparent opacity-50"></div>
                  <div className="relative z-10">
-                    <Trophy className="mx-auto text-yellow-500 w-20 h-20 mb-6 drop-shadow-lg animate-bounce" />
-                    <h2 className="text-4xl font-black text-ink mb-2 tracking-tighter">MENANG MUTLAK!</h2>
-                    <p className="font-bold text-ink-light mb-10 italic">Hebat! Kamu berhasil menarik lawan hingga terjatuh!</p>
+                    {(() => {
+                      const isMulti = gameMode !== "single";
+                      const won = isMulti 
+                        ? (roomData?.metadata.winner === playerRole)
+                        : (ropePosition <= 40);
+
+                      if (won) {
+                        return (
+                          <>
+                            <Trophy className="mx-auto text-yellow-500 w-20 h-20 mb-6 drop-shadow-lg animate-bounce" />
+                            <h2 className="text-4xl font-black text-ink mb-2 tracking-tighter">MENANG MUTLAK!</h2>
+                            <p className="font-bold text-ink-light mb-10 italic">Hebat! Kamu berhasil menarik lawan hingga terjatuh!</p>
+                          </>
+                        );
+                      } else {
+                        return (
+                          <>
+                            <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                              <RefreshCw className="text-gray-400 w-10 h-10" />
+                            </div>
+                            <h2 className="text-4xl font-black text-ink mb-2 tracking-tighter uppercase">Ayo Coba Lagi!</h2>
+                            <p className="font-bold text-ink-light mb-10 italic">Hampir saja! Jangan menyerah, asah lagi kemampuanmu!</p>
+                          </>
+                        );
+                      }
+                    })()}
+                    
                     <button onClick={() => window.location.reload()} className="w-full bg-secondary text-white font-black py-5 rounded-3xl shadow-glow-blue flex items-center justify-center gap-3 hover:scale-[1.02] transition-all">
                        <RefreshCw /> MAIN LAGI
                     </button>
