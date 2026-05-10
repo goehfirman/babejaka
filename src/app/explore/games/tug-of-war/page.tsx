@@ -127,12 +127,12 @@ export default function TugOfWarGame() {
 
     if (gameMode === "single") {
       if (isCorrect) {
-        const power = duration < 2 ? 10 : (duration < 5 ? 5 : 2);
+        const power = duration < 2 ? 4 : (duration < 5 ? 2 : 1);
         setPlayerScore(s => s + power);
         triggerStars(index);
         playSound('pull');
       } else {
-        setOpponentScore(s => s + 5);
+        setOpponentScore(s => s + 2);
       }
       checkWin(playerScore, opponentScore);
       setTimeout(() => { 
@@ -144,7 +144,7 @@ export default function TugOfWarGame() {
       // Multiplayer
       if (!roomId || !playerRole || !roomData) return;
       
-      const power = isCorrect ? (duration < 2 ? 10 : 5) : 0;
+      const power = isCorrect ? (duration < 2 ? 4 : 2) : 0;
       const otherRole = playerRole === "p1" ? "p2" : "p1";
       
       const currentScore = (roomData.players as any)[playerRole].score || 0;
@@ -152,34 +152,34 @@ export default function TugOfWarGame() {
         [`players.${playerRole}.score`]: currentScore + power,
         [`players.${playerRole}.lastAnswerStatus`]: isCorrect ? "correct" : "wrong"
       };
-
+ 
       if (!isCorrect) {
-        updates[`players.${otherRole}.score`] = (roomData.players[otherRole]?.score || 0) + 5;
+        updates[`players.${otherRole}.score`] = (roomData.players[otherRole]?.score || 0) + 2;
       }
-
+ 
       await updateDoc(doc(db, "rooms", roomId), updates);
       if (isCorrect) { triggerStars(index); playSound('pull'); }
       
-      // Check Win: Marker enters Finish Zone (0-15 or 85-100)
+      // Check Win: Marker enters Finish Zone (35 or 65)
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
       const p2S = updates[`players.p2.score`] || roomData.players.p2?.score || 0;
       const currentPos = 50 + (p2S - p1S);
       
-      if (currentPos <= 15 || currentPos >= 85) {
+      if (currentPos <= 35 || currentPos >= 65) {
         await updateDoc(doc(db, "rooms", roomId), {
           "metadata.status": "finished",
-          "metadata.winner": currentPos <= 15 ? "p1" : "p2"
+          "metadata.winner": currentPos <= 35 ? "p1" : "p2"
         });
         playSound('win');
       }
-
+ 
       setTimeout(() => { setFeedback(null); setCurrentLevel(p => (p + 1) % QUESTIONS.length); setStartTime(Date.now()); }, 1500);
     }
   };
-
+ 
   const checkWin = (p: number, o: number) => {
     const currentPos = 50 + (o - p);
-    if (currentPos <= 15 || currentPos >= 85) {
+    if (currentPos <= 35 || currentPos >= 65) {
       setGameState("gameOver");
       playSound('win');
     }
@@ -260,16 +260,16 @@ export default function TugOfWarGame() {
             {/* Ground / Background Zone */}
             <div className="absolute inset-0 bg-[#F0F7FF] rounded-[2rem] border-2 border-blue-100 shadow-inner"></div>
             
-            {/* Striped Finish Zones (as per image) */}
-            <div className="absolute inset-0 flex justify-between items-center pointer-events-none">
-               {/* Finish P1 Zone (0-15%) */}
-               <div className="h-full w-[15%] bg-repeat bg-center opacity-20 border-r border-gray-300" 
+            {/* Striped Finish Zones (Strategic Placement) */}
+            <div className="absolute inset-0 flex justify-between items-center px-[25%] pointer-events-none">
+               {/* Finish P1 Zone */}
+               <div className="h-full w-20 bg-repeat bg-center opacity-20 border-x border-gray-300" 
                     style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P1</div>
                </div>
                
-               {/* Finish P2 Zone (85-100%) */}
-               <div className="h-full w-[15%] bg-repeat bg-center opacity-20 border-l border-gray-300" 
+               {/* Finish P2 Zone */}
+               <div className="h-full w-20 bg-repeat bg-center opacity-20 border-x border-gray-300" 
                     style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P2</div>
                </div>
@@ -295,10 +295,10 @@ export default function TugOfWarGame() {
                      <div className="w-6 h-6 bg-red-600 rounded-full border-2 border-white"></div>
                   </div>
 
-                  {/* Player 1 (Ujung Kiri) */}
+                  {/* Player 1 (Ujung Kiri - Lebih Jauh) */}
                   <motion.div 
                     animate={{ rotate: ropePosition < 50 ? 20 : 0 }}
-                    className="absolute left-[20%] flex flex-col items-center"
+                    className="absolute left-[5%] flex flex-col items-center"
                   >
                      <div className="relative group">
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
@@ -309,10 +309,10 @@ export default function TugOfWarGame() {
                      </div>
                   </motion.div>
 
-                  {/* Player 2 (Ujung Kanan) */}
+                  {/* Player 2 (Ujung Kanan - Lebih Jauh) */}
                   <motion.div 
                     animate={{ rotate: ropePosition > 50 ? -20 : 0 }}
-                    className="absolute right-[20%] flex flex-col items-center scale-x-[-1]"
+                    className="absolute right-[5%] flex flex-col items-center scale-x-[-1]"
                   >
                      <div className="relative group">
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
