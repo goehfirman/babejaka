@@ -372,10 +372,10 @@ export default function SlingshotGame() {
     // We'll place them at a depth that requires a decent pull to reach
     const targetDepth = -250;
     const bubbles = [
-      { x: -180, y: targetDepth },
-      { x: -60, y: targetDepth },
-      { x: 60, y: targetDepth },
-      { x: 180, y: targetDepth }
+      { x: -270, y: targetDepth },
+      { x: -90, y: targetDepth },
+      { x: 90, y: targetDepth },
+      { x: 270, y: targetDepth }
     ];
 
     let hitIndex = 0; 
