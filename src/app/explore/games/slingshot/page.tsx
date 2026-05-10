@@ -266,7 +266,7 @@ export default function SlingshotGame() {
                 const step = (i + 1) * 0.14;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
-                const dy = -ballPos.y * power * step - (250 * step);
+                const dy = -ballPos.y * power * step - (125 * step);
                 const scale = 1 - (step * 0.4);
                 
                 return (
