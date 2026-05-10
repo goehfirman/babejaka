@@ -253,13 +253,7 @@ export default function ReadingRoom() {
                 <span className="text-sm">⭐</span>
                 <span className="text-xs font-black text-[#D97706]">{profile.points}</span>
              </div>
-             <button 
-               onClick={toggleFullscreen}
-               className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all"
-               title="Layar Penuh"
-             >
-               <span className="material-symbols-rounded text-2xl">{isFullscreen || isCssFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
-             </button>
+
              <button onClick={() => setShowFontMenu(!showFontMenu)} className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${showFontMenu ? 'bg-[#FFB347] text-white' : 'text-[#A0AEC0] hover:bg-[#F8FAFC] hover:text-[#FFB347]'}`}><span className="material-symbols-rounded text-2xl">text_format</span></button>
              {showFontMenu && (
                <div className="absolute top-12 right-0 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-xl p-4 z-50 animate-bounce-in">

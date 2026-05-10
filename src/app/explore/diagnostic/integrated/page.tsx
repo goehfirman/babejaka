@@ -1157,13 +1157,7 @@ export default function IntegratedDiagnosticPage() {
 
                       {/* Right: Actions & Timer Group */}
                       <div className="flex items-center gap-4">
-                         <button 
-                           onClick={toggleFullscreen}
-                           className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#A0AEC0] hover:text-[#5AAFD1] border-2 border-[#E2E8F0] shadow-sm transition-all active:scale-95"
-                           title="Layar Penuh"
-                         >
-                           <span className="material-symbols-rounded text-2xl">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
-                         </button>
+
                          {!isReading ? (
                             <button 
                               onClick={startFluencyReading} 
