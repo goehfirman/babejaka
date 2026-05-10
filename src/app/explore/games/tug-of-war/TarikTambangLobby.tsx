@@ -46,17 +46,29 @@ export default function TarikTambangLobby({ onCreate, onJoin, onSingle, isJoinin
             <p className="text-ink-light font-bold text-xs mb-6">Masukkan 4 angka rahasia untuk bertanding dengan temanmu!</p>
             
             <div className="space-y-4 mt-6">
-              <input 
-                type="text" 
-                maxLength={4}
-                value={joinCode}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^0-9]/g, '');
-                  setJoinCode(val);
-                }}
-                placeholder="____" 
-                className="w-full px-6 py-6 bg-gray-50 rounded-3xl border-4 border-gray-100 font-black text-center text-4xl tracking-[0.5em] focus:border-secondary outline-none transition-all placeholder:text-gray-200"
-              />
+              <div className="relative">
+                <input 
+                  type="text" 
+                  maxLength={4}
+                  value={joinCode}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setJoinCode(val);
+                  }}
+                  placeholder="____" 
+                  className="w-full px-6 py-6 bg-gray-50 rounded-3xl border-4 border-gray-100 font-black text-center text-4xl tracking-[0.5em] focus:border-secondary outline-none transition-all placeholder:text-gray-200"
+                />
+                <button 
+                  onClick={() => {
+                    const random = Math.floor(1000 + Math.random() * 9000).toString();
+                    setJoinCode(random);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-secondary hover:bg-secondary hover:text-white transition-all active:scale-90"
+                  title="Acak Kode"
+                >
+                  <RefreshCw size={20} />
+                </button>
+              </div>
               <button 
                 onClick={() => onJoin(joinCode)}
                 disabled={joinCode.length !== 4 || isJoining}
