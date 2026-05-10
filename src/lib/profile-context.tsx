@@ -1,5 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { db } from "./firebase";
+import { doc, setDoc, onSnapshot, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 export interface UserProfile {
   name: string;
@@ -35,11 +37,29 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [loaded, setLoaded] = useState(false);
 
+  // Firestore Document ID helper
+  const getDocId = (name: string, school: string) => {
+    return `${name.toLowerCase().trim()}_${school.toLowerCase().trim()}`.replace(/\s+/g, '_');
+  };
+
   useEffect(() => {
     const savedActive = localStorage.getItem(ACTIVE_USER_KEY);
     if (savedActive) {
       try {
-        setProfile(JSON.parse(savedActive));
+        const localProfile = JSON.parse(savedActive);
+        setProfile(localProfile);
+        
+        // Start Realtime Sync with Firestore
+        const docId = getDocId(localProfile.name, localProfile.schoolName);
+        const unsub = onSnapshot(doc(db, "users", docId), (docSnap) => {
+          if (docSnap.exists()) {
+            const cloudData = docSnap.data() as UserProfile;
+            setProfile(cloudData);
+            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(cloudData));
+          }
+        });
+        
+        return () => unsub();
       } catch (e) {
         console.error("Failed to load active profile", e);
       }
@@ -47,26 +67,31 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setLoaded(true);
   }, []);
 
-  const saveToStorage = (p: UserProfile) => {
-    // Save as active user
+  const saveToStorage = async (p: UserProfile) => {
+    // 1. LocalStorage Active
     localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(p));
     
-    // Also save/update in the master list
+    // 2. LocalStorage Master List (Legacy support)
     const allUsersRaw = localStorage.getItem(USERS_LIST_KEY);
     let allUsers: UserProfile[] = allUsersRaw ? JSON.parse(allUsersRaw) : [];
-    
     const existingIdx = allUsers.findIndex(u => 
       u.name.toLowerCase() === p.name.toLowerCase() && 
       u.schoolName.toLowerCase() === p.schoolName.toLowerCase()
     );
-
-    if (existingIdx >= 0) {
-      allUsers[existingIdx] = p;
-    } else {
-      allUsers.push(p);
-    }
-    
+    if (existingIdx >= 0) allUsers[existingIdx] = p;
+    else allUsers.push(p);
     localStorage.setItem(USERS_LIST_KEY, JSON.stringify(allUsers));
+
+    // 3. Firestore Realtime Sync
+    try {
+      const docId = getDocId(p.name, p.schoolName);
+      await setDoc(doc(db, "users", docId), {
+        ...p,
+        lastUpdated: new Date().toISOString()
+      }, { merge: true });
+    } catch (err) {
+      console.warn("Cloud sync failed (offline?), using local storage.", err);
+    }
   };
 
   const updateProfile = (updates: Partial<UserProfile>) => {
@@ -77,21 +102,34 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const login = (name: string, schoolName: string) => {
+  const login = async (name: string, schoolName: string) => {
+    const docId = getDocId(name, schoolName);
+    
+    try {
+      // Try to fetch from Cloud first
+      const docSnap = await getDoc(doc(db, "users", docId));
+      if (docSnap.exists()) {
+        const cloudProfile = docSnap.data() as UserProfile;
+        setProfile(cloudProfile);
+        saveToStorage(cloudProfile);
+        return;
+      }
+    } catch (err) {
+      console.error("Firebase login check failed", err);
+    }
+
+    // Fallback to local or create new
     const allUsersRaw = localStorage.getItem(USERS_LIST_KEY);
     const allUsers: UserProfile[] = allUsersRaw ? JSON.parse(allUsersRaw) : [];
-    
     const existing = allUsers.find(u => 
       u.name.toLowerCase() === name.toLowerCase() && 
       u.schoolName.toLowerCase() === schoolName.toLowerCase()
     );
 
     if (existing) {
-      // Restore previous data
       setProfile(existing);
-      localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(existing));
+      saveToStorage(existing);
     } else {
-      // Create new profile but keep defaults
       const newProfile = { ...DEFAULT_PROFILE, name, schoolName, avatarSeed: Math.floor(Math.random() * 1000).toString() };
       setProfile(newProfile);
       saveToStorage(newProfile);
