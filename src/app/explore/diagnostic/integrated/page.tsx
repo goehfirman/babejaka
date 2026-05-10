@@ -535,7 +535,10 @@ export default function IntegratedDiagnosticPage() {
         setMatchedIndices(newMatched);
 
         const totalWords = currentLevel.text.split(" ").length;
-        if (newMatched.length >= totalWords && !readingDoneTimeRef.current) {
+        const lastWordIndex = totalWords - 1;
+        // Berhenti otomatis ketika kata TERAKHIR berhasil diucapkan
+        // (meskipun ada kata di tengah yang terlewat)
+        if (newMatched.includes(lastWordIndex) && !readingDoneTimeRef.current) {
           readingDoneTimeRef.current = Date.now();
           setIsLevelCompleted(true);
           if (recognitionRef.current) {
