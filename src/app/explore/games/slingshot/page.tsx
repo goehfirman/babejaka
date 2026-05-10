@@ -402,7 +402,7 @@ export default function SlingshotGame() {
 
     if (hitIndex !== -1) {
       if (hitIndex === question.jawabanBenar) {
-        setScore(s => s + 10);
+        setScore(s => s + 5);
         setFeedback({ type: "correct", index: hitIndex });
       } else {
         setFeedback({ type: "wrong", index: hitIndex });
