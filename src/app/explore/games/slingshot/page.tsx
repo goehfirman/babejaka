@@ -253,6 +253,28 @@ export default function SlingshotGame() {
              />
           </svg>
 
+          {/* Trajectory Guide (Dots) */}
+          {isDragging && (
+            <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center">
+              {[...Array(8)].map((_, i) => {
+                const step = (i + 1) * 0.15;
+                const power = 1.5;
+                const dx = -ballPos.x * power * step;
+                const dy = -ballPos.y * power * step - (400 * step);
+                const scale = 1 - (step * 0.5);
+                
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.6 - (step * 0.4), x: dx, y: dy, scale }}
+                    className="absolute w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                  />
+                );
+              })}
+            </div>
+          )}
+
           {/* The Projectile (Ball) */}
           <AnimatePresence>
             <motion.div
