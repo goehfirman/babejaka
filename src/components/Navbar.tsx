@@ -50,19 +50,7 @@ export default function Navbar() {
               <span className="hidden lg:inline">Peringkat</span>
             </Link>
 
-            <button 
-              onClick={() => {
-                if (!document.fullscreenElement) {
-                  document.documentElement.requestFullscreen().catch(console.error);
-                } else {
-                  document.exitFullscreen().catch(console.error);
-                }
-              }}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-secondary hover:bg-white border border-gray-100 shadow-sm transition-all active:scale-95"
-              title="Layar Penuh"
-            >
-              <span className="material-symbols-rounded text-2xl">fullscreen</span>
-            </button>
+
 
             {/* Hamburger Button (Mobile Only) */}
             <button 
@@ -101,6 +89,20 @@ export default function Navbar() {
                 </button>
               </div>
             )}
+
+            <button 
+              onClick={() => {
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen().catch(console.error);
+                } else {
+                  document.exitFullscreen().catch(console.error);
+                }
+              }}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-secondary hover:bg-white border border-gray-100 shadow-sm transition-all active:scale-95"
+              title="Layar Penuh"
+            >
+              <span className="material-symbols-rounded text-2xl">fullscreen</span>
+            </button>
           </div>
         </div>
 
