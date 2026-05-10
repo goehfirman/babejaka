@@ -34,10 +34,12 @@ const playSound = (type: 'pull' | 'win' | 'correct' | 'wrong') => {
 const playWinCelebration = () => {
   playSound('win');
   confetti({
-    particleCount: 150,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF']
+    particleCount: 200,
+    spread: 100,
+    origin: { x: 0.5, y: 0.5 },
+    colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF'],
+    gravity: 0.5,
+    scalar: 1.2
   });
 };
 
