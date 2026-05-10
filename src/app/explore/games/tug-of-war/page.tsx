@@ -356,38 +356,40 @@ export default function TugOfWarGame() {
                      <div className="w-6 h-6 bg-red-600 rounded-full border-2 border-white"></div>
                   </div>
 
-                  {/* Player 1 (Ujung Kiri - Lebih Jauh) */}
+                  {/* Player 1 (Ujung Kiri) */}
                   <motion.div 
                     animate={{ 
                       rotate: ropePosition < 50 ? 20 : 0,
-                      y: gameState === 'gameOver' && ropePosition >= 60 ? 100 : 0,
-                      opacity: gameState === 'gameOver' && ropePosition >= 60 ? 0 : 1
+                      y: (gameState === 'gameOver' && ropePosition >= 60) ? 200 : 0,
+                      opacity: (gameState === 'gameOver' && ropePosition >= 60) ? 0 : 1
                     }}
+                    transition={{ type: "spring", stiffness: 50 }}
                     className="absolute left-[5%] flex flex-col items-center"
                   >
-                     <div className="relative group">
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
-                        <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-44 h-44 object-contain drop-shadow-2xl" />
-                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap">
-                           {gameMode === "single" ? "KAMU" : roomData?.players.p1.name}
+                     <div className="relative">
+                        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black/10 rounded-[100%] blur-xl"></div>
+                        <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-48 h-48 object-contain drop-shadow-2xl" alt="P1" />
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                           {gameMode === "single" ? "KAMU" : roomData?.players.p1?.name || "PEMAIN 1"}
                         </div>
                      </div>
                   </motion.div>
 
-                  {/* Player 2 (Ujung Kanan - Lebih Jauh) */}
+                  {/* Player 2 (Ujung Kanan) */}
                   <motion.div 
                     animate={{ 
                       rotate: ropePosition > 50 ? -20 : 0,
-                      y: gameState === 'gameOver' && ropePosition <= 40 ? 100 : 0,
-                      opacity: gameState === 'gameOver' && ropePosition <= 40 ? 0 : 1
+                      y: (gameState === 'gameOver' && ropePosition <= 40) ? 200 : 0,
+                      opacity: (gameState === 'gameOver' && ropePosition <= 40) ? 0 : 1
                     }}
+                    transition={{ type: "spring", stiffness: 50 }}
                     className="absolute right-[5%] flex flex-col items-center scale-x-[-1]"
                   >
-                     <div className="relative group">
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
-                        <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-44 h-44 object-contain drop-shadow-2xl" />
-                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-600 text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap scale-x-[-1]">
-                           {gameMode === "single" ? "BOT" : roomData.players.p2?.name || "LAWAN"}
+                     <div className="relative">
+                        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black/10 rounded-[100%] blur-xl"></div>
+                        <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-48 h-48 object-contain drop-shadow-2xl" alt="P2" />
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-secondary text-white text-[10px] font-black px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap scale-x-[-1]">
+                           {gameMode === "single" ? "BOT" : roomData?.players.p2?.name || "LAWAN"}
                         </div>
                      </div>
                   </motion.div>
