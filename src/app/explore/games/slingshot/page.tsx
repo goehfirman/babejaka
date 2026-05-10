@@ -615,8 +615,9 @@ export default function SlingshotGame() {
           )}
 
           {/* The Projectile (Ball) */}
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             <motion.div
+              key={currentLevel}
               drag={gameState === "playing"}
               dragConstraints={{ top: 0, bottom: 150, left: -100, right: 100 }}
               dragElastic={0.1}
