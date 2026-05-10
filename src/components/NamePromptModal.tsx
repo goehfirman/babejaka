@@ -13,15 +13,23 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
   const { login } = useProfile();
   const [inputName, setInputName] = useState("");
   const [inputSchool, setInputSchool] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const saveName = (e: React.FormEvent) => {
+  const saveName = async (e: React.FormEvent) => {
     e.preventDefault();
     const name = inputName.trim();
     const school = inputSchool.trim();
     if (name && school) {
-      login(name, school);
-      if (onSuccess) onSuccess(name);
-      if (onClose) onClose();
+      setIsLoading(true);
+      try {
+        await login(name, school);
+        if (onSuccess) onSuccess(name);
+        if (onClose) onClose();
+      } catch (err) {
+        console.error("Login failed", err);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -78,14 +86,19 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
             
             <button 
               type="submit" 
-              disabled={!inputName.trim() || !inputSchool.trim()}
+              disabled={!inputName.trim() || !inputSchool.trim() || isLoading}
               className={`w-full py-5 rounded-2xl font-black text-lg tracking-wider transition-all flex items-center justify-center gap-3 ${
-                inputName.trim() && inputSchool.trim()
+                inputName.trim() && inputSchool.trim() && !isLoading
                 ? 'btn-heritage shadow-glow-red' 
                 : 'bg-gray-100 text-gray-300 cursor-not-allowed'
               }`}
             >
-              Mulai Petualangan
+              {isLoading ? (
+                <>
+                  <span className="material-symbols-rounded animate-spin">progress_activity</span>
+                  MEMPERSIAPKAN...
+                </>
+              ) : 'Mulai Petualangan'}
             </button>
           </form>
 
