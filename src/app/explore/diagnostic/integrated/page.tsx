@@ -1101,7 +1101,7 @@ export default function IntegratedDiagnosticPage() {
                      <div className="bg-white rounded-2xl p-5 text-center shadow-2xl border-4 border-[#5AAFD1]">
                        <div className="flex items-center justify-center gap-3">
                         <img 
-                          src="https://i.ibb.co.com/3mXHdz2Z/kepala-babe.png" 
+                          src="https://i.ibb.co.com/1GKyHbCJ/kepala-babe.png" 
                           alt="Babe Jaka" 
                           className="h-16 w-auto object-contain animate-bounce" 
                         />
@@ -1117,7 +1117,7 @@ export default function IntegratedDiagnosticPage() {
                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
                      <div className="bg-white rounded-3xl p-10 text-center shadow-2xl animate-bounce-in max-w-sm mx-auto border-4 border-[#5AAFD1]">
                         <img 
-                          src="https://i.ibb.co.com/3mXHdz2Z/kepala-babe.png" 
+                          src="https://i.ibb.co.com/1GKyHbCJ/kepala-babe.png" 
                           alt="Babe Jaka" 
                           className="h-32 w-auto mx-auto mb-6 object-contain animate-bounce" 
                         />

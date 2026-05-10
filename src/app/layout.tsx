@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "BABE JAKA - Jakarta Kota Global",
   description: "Aplikasi Diagnosis Literasi Masa Depan dengan Harmoni Budaya Betawi dan Teknologi Global.",
   icons: {
-    icon: "https://i.ibb.co.com/3mXHdz2Z/kepala-babe.png"
+    icon: "https://i.ibb.co.com/1GKyHbCJ/kepala-babe.png"
   }
 };
 
