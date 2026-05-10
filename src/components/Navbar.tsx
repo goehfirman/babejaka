@@ -18,6 +18,9 @@ export default function Navbar() {
 
   const isDefaultUser = profile.name === "Petualang Baca";
 
+  // Hide Navbar on game pages
+  if (pathname?.includes("/explore/games")) return null;
+
   // Hide navbar on specialized reading pages and potentially landing if we want, 
   // but user said CONSISTENT in every page. 
   // Specialized Reading Room has its own logic, so we hide it there.
