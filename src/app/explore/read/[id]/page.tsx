@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import BrandLogo from "@/components/BrandLogo";
 import { useProfile } from "@/lib/profile-context";
 import { PointToast } from "@/components/PointToast";
+import { StarFly } from "@/components/StarFly";
 
 // Dynamically import react-pageflip to avoid SSR 'window is not defined' errors
 const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false });
@@ -70,9 +71,18 @@ export default function ReadingRoom() {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const navTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  const { addPoints } = useProfile();
+  const { addPoints, profile } = useProfile();
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
-  const hasEarnedRef = useRef(false);
+  const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
+  const [awardedPages, setAwardedPages] = useState<Set<number>>(new Set());
+  const [pageStartTime, setPageStartTime] = useState(Date.now());
+  const hasEarnedFinishRef = useRef(false);
+
+  useEffect(() => {
+     setPageStartTime(Date.now());
+  }, [currentPage]);
+
+
 
   useEffect(() => {
      const resetNavVisibility = (e: MouseEvent) => {
@@ -195,94 +205,131 @@ export default function ReadingRoom() {
      setCurrentPage(newPage);
      
      // Detect reaching the end of the book (back cover)
-     if (newPage >= bookElements.length - 1 && !hasEarnedRef.current) {
+     if (newPage >= bookElementsCount - 1 && !hasEarnedFinishRef.current) {
         addPoints(50);
         setEarnedPoints(50);
-        hasEarnedRef.current = true;
+        hasEarnedFinishRef.current = true;
+        
+        // Final celebration stars
+        const now = Date.now();
+        const positions = Array.from({ length: 10 }).map(() => ({
+           x: window.innerWidth / 2,
+           y: window.innerHeight / 2
+        }));
+        setPendingStars({ count: 10, timestamp: now, positions });
      }
   };
 
   // Convert linear sequence to Left/Right spread pairs
-  const bookElements = [];
-  
-  // Front Cover (Right, index 0)
-  const levelCode = book.level.includes('Dini') ? 'A' : 
-                   book.level.includes('B-1') ? 'B1' : 
-                   book.level.includes('B-2') ? 'B2' : 
-                   book.level.includes('B-3') ? 'B3' : 
-                   book.level.includes('Awal') ? 'B' : 
-                   book.level.includes('Semenjana') ? 'C' : 
-                   book.level.includes('Madya') ? 'D' : 
-                   'E';
-                   
-  bookElements.push(<PageCover key="cover" title={book.title} image={book.illustration} level={levelCode}></PageCover>);
-  
-  // Empty page behind cover (Left, index 1)
-  bookElements.push(<Page key="blank-1" number={0}>
-    <div className="opacity-30 flex flex-col items-center">
-      <span className="material-symbols-rounded text-6xl">menu_book</span>
-    </div>
-  </Page>);
+  const bookElements = useMemo(() => {
+    if (!book) return [];
+    const elements = [];
+    const STORY_PAGES = book.pages;
+    
+    // Front Cover (Right, index 0)
+    const levelCode = book.level.includes('Dini') ? 'A' : 
+                     book.level.includes('B-1') ? 'B1' : 
+                     book.level.includes('B-2') ? 'B2' : 
+                     book.level.includes('B-3') ? 'B3' : 
+                     book.level.includes('Awal') ? 'B' : 
+                     book.level.includes('Semenjana') ? 'C' : 
+                     book.level.includes('Madya') ? 'D' : 
+                     'E';
+                     
+    elements.push(<PageCover key="cover" title={book.title} image={book.illustration} level={levelCode}></PageCover>);
+    
+    // Empty page behind cover (Left, index 1)
+    elements.push(<Page key="blank-1" number={0}>
+      <div className="opacity-30 flex flex-col items-center">
+        <span className="material-symbols-rounded text-6xl">menu_book</span>
+      </div>
+    </Page>);
 
-  // Title Intro Page (Right, index 2)
-  let pageCounter = 1;
-  bookElements.push(<Page key="title" number={pageCounter++}>
-    <div className="flex flex-col items-center justify-center text-center px-4">
-      <h2 className="text-3xl font-black text-[#FFB347] mb-4 drop-shadow-sm">{book.title}</h2>
-      <p className="text-lg font-medium text-[#666666] leading-relaxed">{book.desc}</p>
-    </div>
-  </Page>);
+    // Title Intro Page (Right, index 2)
+    let pageCounter = 1;
+    elements.push(<Page key="title" number={pageCounter++}>
+      <div className="flex flex-col items-center justify-center text-center px-4">
+        <h2 className="text-3xl font-black text-[#FFB347] mb-4 drop-shadow-sm">{book.title}</h2>
+        <p className="text-lg font-medium text-[#666666] leading-relaxed">{book.desc}</p>
+      </div>
+    </Page>);
 
-  STORY_PAGES.forEach((pageData, index) => {
-     const hasText = pageData.text && pageData.text.trim().length > 0;
-     
-     if (hasText) {
-         // Image Page with frame
-         bookElements.push(
-            <Page key={`page-img-${index}`} number={pageCounter++}>
-               <div className="w-full h-[60vh] md:h-[65vh] max-h-[600px] relative rounded-2xl overflow-hidden border-4 border-[#E2E8F0] shadow-sm bg-white shrink-0">
-                 <Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} />
-               </div>
-            </Page>
-         );
+    STORY_PAGES.forEach((pageData, index) => {
+       const hasText = pageData.text && pageData.text.trim().length > 0;
+       
+       if (hasText) {
+           // Image Page with frame
+           elements.push(
+              <Page key={`page-img-${index}`} number={pageCounter++}>
+                 <div className="w-full h-[60vh] md:h-[65vh] max-h-[600px] relative rounded-2xl overflow-hidden border-4 border-[#E2E8F0] shadow-sm bg-white shrink-0">
+                   <Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} />
+                 </div>
+              </Page>
+           );
 
-         // Text Page
-         bookElements.push(
-            <Page key={`page-text-${index}`} number={pageCounter++}>
-               <span className="material-symbols-rounded absolute top-12 left-10 text-6xl text-[#E2E8F0] opacity-50 z-[1] hidden md:block">format_quote</span>
-               <div className="flex flex-col justify-center items-start h-full w-full px-2 md:px-8 relative z-10">
-                  <p className={`${currentFontConfig.size} ${currentFontConfig.family} font-medium leading-[1.8] text-[#333333] tracking-wide select-none transition-all duration-300 text-left`}>
-                     {pageData.text}
-                  </p>
-               </div>
-            </Page>
-         );
-     } else {
-         // Full Bleed Image Page (no text)
-         bookElements.push(
-            <Page key={`page-img-full-${index}`} number={pageCounter++} fullBleed={true}>
-               <div className="w-full h-full relative bg-white flex items-center justify-center overflow-hidden">
-                 <Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain scale-90" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} />
-               </div>
-            </Page>
-         );
-     }
-  });
+           // Text Page
+           elements.push(
+              <Page key={`page-text-${index}`} number={pageCounter++}>
+                 <span className="material-symbols-rounded absolute top-12 left-10 text-6xl text-[#E2E8F0] opacity-50 z-[1] hidden md:block">format_quote</span>
+                 <div className="flex flex-col justify-center items-start h-full w-full px-2 md:px-8 relative z-10">
+                    <p className={`${currentFontConfig.size} ${currentFontConfig.family} font-medium leading-[1.8] text-[#333333] tracking-wide select-none transition-all duration-300 text-left`}>
+                       {pageData.text}
+                    </p>
+                 </div>
+              </Page>
+           );
+       } else {
+           // Full Bleed Image Page (no text)
+           elements.push(
+              <Page key={`page-img-full-${index}`} number={pageCounter++} fullBleed={true}>
+                 <div className="w-full h-full relative bg-white flex items-center justify-center overflow-hidden">
+                   <Image src={pageData.image} alt={`Ilustrasi ${index + 1}`} fill className="object-contain scale-90" unoptimized={typeof pageData.image === 'string' && pageData.image.startsWith('data:')} />
+                 </div>
+              </Page>
+           );
+       }
+    });
 
-  // End empty page to give a visual break before back cover
-  bookElements.push(<Page key="blank-end" number={pageCounter++}>
-    <div className="text-center">
-      <h2 className="text-2xl font-black text-[#A0AEC0] mb-4">Tamat</h2>
-    </div>
-  </Page>);
-  
-  // Fit out parity for proper back-cover closing if necessary
-  if (bookElements.length % 2 === 0) {
-      bookElements.push(<Page key="pad-blank" number={pageCounter++}><div /></Page>);
-  }
+    // End empty page to give a visual break before back cover
+    elements.push(<Page key="blank-end" number={pageCounter++}>
+      <div className="text-center">
+        <h2 className="text-2xl font-black text-[#A0AEC0] mb-4">Tamat</h2>
+      </div>
+    </Page>);
+    
+    // Fit out parity for proper back-cover closing if necessary
+    if (elements.length % 2 === 0) {
+        elements.push(<Page key="pad-blank" number={pageCounter++}><div /></Page>);
+    }
 
-  // Back Cover (Right)
-  bookElements.push(<PageCover key="back-cover" title={`${book.title}`} image={book.cover} />);
+    // Back Cover (Right)
+    elements.push(<PageCover key="back-cover" title={`${book.title}`} image={book.cover} />);
+    
+    return elements;
+  }, [book, currentFontConfig]);
+
+  const bookElementsCount = bookElements.length;
+
+  useEffect(() => {
+     const timer = setInterval(() => {
+        const duration = Date.now() - pageStartTime;
+        // 10 seconds threshold and not already awarded for this page
+        if (duration >= 10000 && !awardedPages.has(currentPage) && currentPage > 0 && currentPage < bookElementsCount - 1) {
+           setAwardedPages(prev => new Set(prev).add(currentPage));
+           
+           // Trigger 5 stars flying from center
+           const now = Date.now();
+           const positions = Array.from({ length: 5 }).map(() => ({
+              x: window.innerWidth / 2,
+              y: window.innerHeight / 2
+           }));
+           
+           setPendingStars({ count: 5, timestamp: now, positions });
+           setEarnedPoints(5);
+        }
+     }, 1000);
+     return () => clearInterval(timer);
+  }, [currentPage, pageStartTime, awardedPages, bookElementsCount]);
 
 
   return (
@@ -296,12 +343,17 @@ export default function ReadingRoom() {
             </Link>
          </div>
 
-         <div className="text-center animate-bounce-in flex-1">
-            <h1 className="text-lg md:text-xl font-bold text-[#4B5563] flex items-center justify-center gap-2">
-               <span className="material-symbols-rounded text-[#8B5CF6]">menu_book</span>
+          <div className="text-center animate-bounce-in flex-1 flex flex-col items-center">
+            <h1 className="text-sm md:text-base font-bold text-[#4B5563] flex items-center justify-center gap-2 mb-0.5">
+               <span className="material-symbols-rounded text-[#8B5CF6] text-lg">menu_book</span>
                {book.title}
             </h1>
-         </div>
+            {/* Realtime Point Counter in Header */}
+            <div id="navbar-points" className="flex items-center gap-1.5 bg-[#FFFBEB] px-3 py-1 rounded-full border-2 border-[#FEF3C7] shadow-sm">
+               <span className="text-sm">⭐</span>
+               <span className="text-xs font-black text-[#D97706]">{profile.points}</span>
+            </div>
+          </div>
          
          <div className="flex relative w-12 md:w-32 justify-end">
              <button onClick={() => setShowFontMenu(!showFontMenu)} className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${showFontMenu ? 'bg-[#FFB347] text-white' : 'text-[#A0AEC0] hover:bg-[#F8FAFC] hover:text-[#FFB347]'}`}>
@@ -389,6 +441,10 @@ export default function ReadingRoom() {
        {earnedPoints && (
          <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
        )}
+
+       <StarFly burst={pendingStars} onStarHit={() => {
+         addPoints(1); // Increment by 1 for each star hitting the target
+       }} />
       </main>
     </div>
   );
