@@ -272,52 +272,52 @@ export default function TugOfWarGame() {
             </div>
 
             {/* Center Reference Line (dotted) */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-0.5 h-full border-l-2 border-dashed border-blue-200 opacity-50"></div>
+            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-0.5 border-l-2 border-dashed border-blue-200 opacity-50 z-0"></div>
 
-            {/* Rope with Flag/Marker */}
-            <div className="absolute bottom-[100px] w-full h-12 flex items-center overflow-hidden">
+            {/* Unified Rope System */}
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                <motion.div 
-                 animate={{ x: -ropeOffset * 8 }}
-                 className="relative h-6 bg-[#A0522D] shadow-md rounded-sm flex items-center justify-center"
-                 style={{ width: '200%', left: '-50%' }}
+                 animate={{ x: -ropeOffset * 10 }}
+                 transition={{ type: "spring", stiffness: 40, damping: 15 }}
+                 className="relative w-[150%] h-40 flex items-center justify-center"
                >
-                  <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #000 25%, transparent 25%, transparent 50%, #000 50%, #000 75%, transparent 75%, transparent)', backgroundSize: '10px 10px' }}></div>
-                  
-                  {/* Circular Red Marker (as per image) */}
-                  <div className="absolute left-1/2 -translate-x-1/2 z-30 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-gray-100">
+                  {/* The Rope */}
+                  <div className="absolute w-full h-6 bg-[#A0522D] shadow-xl rounded-full flex items-center">
+                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #000 25%, transparent 25%, transparent 50%, #000 50%, #000 75%, transparent 75%, transparent)', backgroundSize: '15px 15px' }}></div>
+                  </div>
+
+                  {/* Red Center Marker */}
+                  <div className="absolute left-1/2 -translate-x-1/2 z-30 w-12 h-12 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-gray-50">
                      <div className="w-6 h-6 bg-red-600 rounded-full border-2 border-white"></div>
                   </div>
-               </motion.div>
-            </div>
 
-            {/* Players with perspective tilting and shadows */}
-            <div className="absolute inset-0 flex justify-between items-end px-20 pb-20">
-               {/* Player Side */}
-               <motion.div 
-                 animate={{ 
-                   x: -ropeOffset * 8, 
-                   rotate: ropePosition < 50 ? 15 : 0,
-                   scale: 1.1 
-                 }}
-                 className="relative group"
-               >
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black/10 rounded-[100%] blur-md"></div>
-                  <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-40 h-40 object-contain drop-shadow-2xl" />
-                  <div className="absolute -top-12 left-0 bg-primary text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg">KAMU</div>
-               </motion.div>
+                  {/* Player 1 (Ujung Kiri) */}
+                  <motion.div 
+                    animate={{ rotate: ropePosition < 50 ? 20 : 0 }}
+                    className="absolute left-[20%] flex flex-col items-center"
+                  >
+                     <div className="relative group">
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
+                        <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" className="w-44 h-44 object-contain drop-shadow-2xl" />
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap">
+                           {gameMode === "single" ? "KAMU" : roomData?.players.p1.name}
+                        </div>
+                     </div>
+                  </motion.div>
 
-               {/* Opponent Side */}
-               <motion.div 
-                 animate={{ 
-                   x: -ropeOffset * 8, 
-                   rotate: ropePosition > 50 ? -15 : 0,
-                   scale: 1.1
-                 }}
-                 className="relative group scale-x-[-1]"
-               >
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black/10 rounded-[100%] blur-md"></div>
-                  <img src="https://i.ibb.co.com/d4jXMJp2/babe-bingung.png" className="w-40 h-40 object-contain drop-shadow-2xl grayscale opacity-70" />
-                  <div className="absolute -top-12 left-0 bg-gray-600 text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg scale-x-[-1]">LAWAN</div>
+                  {/* Player 2 (Ujung Kanan) */}
+                  <motion.div 
+                    animate={{ rotate: ropePosition > 50 ? -20 : 0 }}
+                    className="absolute right-[20%] flex flex-col items-center scale-x-[-1]"
+                  >
+                     <div className="relative group">
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/10 rounded-[100%] blur-md"></div>
+                        <img src="https://i.ibb.co.com/d4jXMJp2/babe-bingung.png" className="w-44 h-44 object-contain drop-shadow-2xl grayscale opacity-70" />
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-600 text-white text-[10px] font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap scale-x-[-1]">
+                           {gameMode === "single" ? "BOT" : roomData?.players.p2?.name || "LAWAN"}
+                        </div>
+                     </div>
+                  </motion.div>
                </motion.div>
             </div>
          </div>
