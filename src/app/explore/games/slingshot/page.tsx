@@ -73,7 +73,7 @@ export default function SlingshotGame() {
     // Bubbles are roughly at top half of screen
     setTimeout(() => {
       checkCollision(targetX, targetY);
-    }, 600);
+    }, 800); // Matched with transition duration
   };
 
   const checkCollision = (tx: number, ty: number) => {
@@ -290,10 +290,14 @@ export default function SlingshotGame() {
               onDragEnd={handleRelease}
               animate={
                 gameState === "flying" 
-                ? { x: ballPos.x, y: ballPos.y, scale: 0.4, opacity: 0 } 
+                ? { x: ballPos.x, y: ballPos.y, scale: 0.35, opacity: 0.8 } 
                 : (gameState === "playing" ? { x: ballPos.x, y: ballPos.y, scale: 1, opacity: 1 } : { opacity: 0 })
               }
-              transition={gameState === "flying" ? { duration: 0.6, ease: "easeOut" } : { type: "spring", damping: 12, stiffness: 200 }}
+              transition={
+                gameState === "flying" 
+                ? { duration: 0.8, ease: [0.22, 1, 0.36, 1] } 
+                : { type: "spring", damping: 15, stiffness: 300 }
+              }
               className={`
                 z-50 w-16 h-16 rounded-full cursor-grab active:cursor-grabbing
                 shadow-[0_10px_20px_rgba(0,0,0,0.3),inset_0_-5px_10px_rgba(0,0,0,0.2)]
