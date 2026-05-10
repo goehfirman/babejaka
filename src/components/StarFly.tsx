@@ -15,15 +15,29 @@ interface StarFlyProps {
 
 export function StarFly({ burst, onStarHit }: StarFlyProps) {
   const [activeStars, setActiveStars] = useState<ActiveStar[]>([]);
+  const [targetPos, setTargetPos] = useState({ x: 0, y: 0 });
   const lastBurstTimestamp = useRef(0);
 
   useEffect(() => {
     if (burst.count > 0 && burst.timestamp > lastBurstTimestamp.current) {
       lastBurstTimestamp.current = burst.timestamp;
       
+      // Update target position based on navbar-points ID
+      const targetEl = document.getElementById("navbar-points");
+      if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        setTargetPos({ 
+          x: rect.left + rect.width / 2, 
+          y: rect.top + rect.height / 2 
+        });
+      } else {
+        // Fallback to top right
+        setTargetPos({ x: window.innerWidth - 100, y: 40 });
+      }
+
       const newStars = burst.positions.map((pos, i) => ({
         id: `${burst.timestamp}-${i}`,
-        delay: i * 80, // Slightly faster staggered start
+        delay: i * 80,
         startX: pos.x,
         startY: pos.y
       }));
@@ -38,7 +52,10 @@ export function StarFly({ burst, onStarHit }: StarFlyProps) {
   };
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[1000]">
+    <div className="fixed inset-0 pointer-events-none z-[1000]" style={{ 
+      '--target-x': `${targetPos.x}px`, 
+      '--target-y': `${targetPos.y}px` 
+    } as React.CSSProperties}>
       {activeStars.map((star) => (
         <div
           key={star.id}
@@ -60,22 +77,19 @@ export function StarFly({ burst, onStarHit }: StarFlyProps) {
             transform: translate(0, 0) scale(0) rotate(0deg);
             opacity: 0;
           }
-          20% {
-            transform: translate(0, -20px) scale(1.5) rotate(20deg);
+          15% {
+            transform: translate(0, -30px) scale(1.6) rotate(30deg);
             opacity: 1;
           }
           100% {
-            /* Target: roughly where the navbar points are (top right) */
-            /* Using vw/vh to reach the navbar area from any start position */
-            left: calc(100vw - 120px);
-            top: 40px;
-            transform: scale(0.2) rotate(720deg);
+            left: var(--target-x);
+            top: var(--target-y);
+            transform: scale(0.1) rotate(720deg);
             opacity: 0;
           }
         }
         .animate-fly-to-nav {
-          /* Increased duration for smoother, less "monotonous" movement */
-          animation: fly-to-nav 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+          animation: fly-to-nav 1.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
         }
       `}</style>
     </div>

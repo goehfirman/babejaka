@@ -60,7 +60,7 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-2 md:gap-3 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 ml-1">
                 {/* Point Counter */}
-                <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-sm mr-1">
+                <div id="navbar-points" className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-sm mr-1">
                   <span className="text-lg">⭐</span>
                   <span className="text-[13px] font-black text-[#FFB347]">{profile.points || 0}</span>
                 </div>
