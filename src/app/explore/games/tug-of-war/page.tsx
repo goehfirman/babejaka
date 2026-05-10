@@ -103,48 +103,59 @@ export default function TugOfWarGame() {
     return () => unsub();
   }, [roomId, playerRole]);
 
+  const [isJoining, setIsJoining] = useState(false);
+
   // --- Actions ---
   const joinRoom = async (code: string) => {
-    const docRef = doc(db, "rooms", code);
-    const snap = await getDoc(docRef);
-    
-    if (!snap.exists()) {
-      // CREATE AS P1
-      const newRoom = {
-        metadata: { status: "waiting", createdAt: serverTimestamp(), winner: null },
-        players: {
-          p1: { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null },
-          p2: null
-        },
-        gameplay: { ropePosition: 50, currentLevel: 0 }
-      };
-      await setDoc(docRef, newRoom);
-      setRoomId(code);
-      setPlayerRole("p1");
-      setGameMode("multi-lobby");
-    } else {
-      // JOIN AS P2
-      const data = snap.data();
-      if (!data.players.p2) {
-        if (data.players.p1.name === profile.name) {
-          // Rejoining as P1
-          setRoomId(code);
-          setPlayerRole("p1");
-          setGameMode("multi-lobby");
-          return;
-        }
-        await updateDoc(docRef, { "players.p2": { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null } });
+    if (isJoining) return;
+    setIsJoining(true);
+    try {
+      const docRef = doc(db, "rooms", code);
+      const snap = await getDoc(docRef);
+      
+      if (!snap.exists()) {
+        // CREATE AS P1
+        const newRoom = {
+          metadata: { status: "waiting", createdAt: serverTimestamp(), winner: null },
+          players: {
+            p1: { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null },
+            p2: null
+          },
+          gameplay: { ropePosition: 50, currentLevel: 0 }
+        };
+        await setDoc(docRef, newRoom);
         setRoomId(code);
-        setPlayerRole("p2");
+        setPlayerRole("p1");
         setGameMode("multi-lobby");
       } else {
-        // Re-check if it's p1 or p2 rejoining
-        if (data.players.p1.name === profile.name) {
-          setRoomId(code); setPlayerRole("p1"); setGameMode("multi-lobby");
-        } else if (data.players.p2.name === profile.name) {
-          setRoomId(code); setPlayerRole("p2"); setGameMode("multi-lobby");
-        } else alert("Ruangan Penuh!");
+        // JOIN AS P2
+        const data = snap.data();
+        if (!data.players.p2) {
+          if (data.players.p1.name === profile.name) {
+            setRoomId(code);
+            setPlayerRole("p1");
+            setGameMode("multi-lobby");
+          } else {
+            await updateDoc(docRef, { "players.p2": { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null } });
+            setRoomId(code);
+            setPlayerRole("p2");
+            setGameMode("multi-lobby");
+          }
+        } else {
+          if (data.players.p1.name === profile.name) {
+            setRoomId(code); setPlayerRole("p1"); setGameMode("multi-lobby");
+          } else if (data.players.p2.name === profile.name) {
+            setRoomId(code); setPlayerRole("p2"); setGameMode("multi-lobby");
+          } else {
+            alert("Ruangan Penuh! Gunakan kode lain.");
+          }
+        }
       }
+    } catch (err) {
+      console.error(err);
+      alert("Gagal terhubung ke database. Coba lagi.");
+    } finally {
+      setIsJoining(false);
     }
   };
 
@@ -237,7 +248,7 @@ export default function TugOfWarGame() {
     }
   };
 
-  if (gameMode === "select") return <TarikTambangLobby onJoin={joinRoom} onSingle={() => setGameMode("single")} onCreate={() => {}} />;
+  if (gameMode === "select") return <TarikTambangLobby onJoin={joinRoom} onSingle={() => setGameMode("single")} onCreate={() => {}} isJoining={isJoining} />;
 
   if (gameMode === "multi-lobby") {
     if (!roomData) return (

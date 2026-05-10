@@ -1,15 +1,16 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, LogIn, Swords, Users, Star } from "lucide-react";
+import { Plus, LogIn, Swords, Users, Star, RefreshCw } from "lucide-react";
 
 interface LobbyProps {
   onCreate: () => void;
   onJoin: (code: string) => void;
   onSingle: () => void;
+  isJoining?: boolean;
 }
 
-export default function TarikTambangLobby({ onCreate, onJoin, onSingle }: LobbyProps) {
+export default function TarikTambangLobby({ onCreate, onJoin, onSingle, isJoining }: LobbyProps) {
   const [joinCode, setJoinCode] = useState("");
 
   return (
@@ -58,12 +59,12 @@ export default function TarikTambangLobby({ onCreate, onJoin, onSingle }: LobbyP
               />
               <button 
                 onClick={() => onJoin(joinCode)}
-                disabled={joinCode.length !== 4}
+                disabled={joinCode.length !== 4 || isJoining}
                 className={`w-full py-6 rounded-3xl font-black text-xl transition-all flex items-center justify-center gap-2 ${
-                  joinCode.length === 4 ? 'bg-secondary text-white shadow-glow-blue active:scale-95' : 'bg-gray-100 text-gray-300'
+                  joinCode.length === 4 && !isJoining ? 'bg-secondary text-white shadow-glow-blue active:scale-95' : 'bg-gray-100 text-gray-300'
                 }`}
               >
-                MULAI TANDING
+                {isJoining ? <RefreshCw className="animate-spin" /> : "MULAI TANDING"}
               </button>
             </div>
           </div>
