@@ -1599,9 +1599,7 @@ export default function IntegratedDiagnosticPage() {
           </div>
         </div>
       )}
-       {earnedPoints && (
-         <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
-       )}
+
 
        <StarFly burst={pendingStars} onStarHit={() => {
          addPoints(1); // 1 bintang = 1 poin

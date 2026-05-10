@@ -181,7 +181,6 @@ export default function ReadingRoom() {
            const now = Date.now();
            const positions = Array.from({ length: 5 }).map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
            setPendingStars({ count: 5, timestamp: now, positions });
-           setEarnedPoints(5);
         }
      }, 1000);
      return () => clearInterval(timer);
@@ -225,7 +224,6 @@ export default function ReadingRoom() {
      setCurrentPage(newPage);
      if (newPage >= bookElementsCount - 1 && !hasEarnedFinishRef.current) {
         addPoints(50);
-        setEarnedPoints(50);
         hasEarnedFinishRef.current = true;
         const now = Date.now();
         const positions = Array.from({ length: 10 }).map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
@@ -239,11 +237,18 @@ export default function ReadingRoom() {
          <div className="w-12 md:w-32 flex justify-start">
             <Link href="/explore/library" className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all"><span className="material-symbols-rounded text-2xl">arrow_back</span></Link>
          </div>
-         <div className="text-center animate-bounce-in flex-1 flex flex-col items-center">
-            <h1 className="text-sm md:text-base font-bold text-[#4B5563] flex items-center justify-center gap-2 mb-0.5"><span className="material-symbols-rounded text-[#8B5CF6] text-lg">menu_book</span>{book.title}</h1>
-            <div id="navbar-points" className="flex items-center gap-1.5 bg-[#FFFBEB] px-3 py-1 rounded-full border-2 border-[#FEF3C7] shadow-sm"><span className="text-sm">⭐</span><span className="text-xs font-black text-[#D97706]">{profile.points}</span></div>
+         <div className="text-center animate-bounce-in flex-1">
+            <h1 className="text-sm md:text-base font-bold text-[#4B5563] flex items-center justify-center gap-2">
+               <span className="material-symbols-rounded text-[#8B5CF6] text-lg">menu_book</span>
+               {book.title}
+            </h1>
          </div>
-         <div className="flex relative w-12 md:w-32 justify-end">
+         <div className="flex items-center gap-3 relative w-auto md:w-48 justify-end">
+             {/* Total Points in Top Right */}
+             <div id="navbar-points" className="flex items-center gap-1.5 bg-[#FFFBEB] px-3 py-1 rounded-full border-2 border-[#FEF3C7] shadow-sm">
+                <span className="text-sm">⭐</span>
+                <span className="text-xs font-black text-[#D97706]">{profile.points}</span>
+             </div>
              <button onClick={() => setShowFontMenu(!showFontMenu)} className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${showFontMenu ? 'bg-[#FFB347] text-white' : 'text-[#A0AEC0] hover:bg-[#F8FAFC] hover:text-[#FFB347]'}`}><span className="material-symbols-rounded text-2xl">text_format</span></button>
              {showFontMenu && (
                <div className="absolute top-12 right-0 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-xl p-4 z-50 animate-bounce-in">
@@ -288,7 +293,7 @@ export default function ReadingRoom() {
            </div>
         </div>
 
-       {earnedPoints && <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />}
+
        <StarFly burst={pendingStars} onStarHit={() => addPoints(1)} />
       </main>
     </div>
