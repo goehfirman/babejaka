@@ -390,7 +390,7 @@ export default function IntegratedDiagnosticPage() {
   const certificateRef = useRef<HTMLDivElement>(null);
   const { addPoints } = useProfile();
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
-  const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number }>({ count: 0, timestamp: 0 });
+  const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
 
   const handleGeneratePreview = async () => {
     if (!certificateRef.current) return;
@@ -531,10 +531,24 @@ export default function IntegratedDiagnosticPage() {
       if (newMatched.length > bestMatchRef.current.length) {
         // Record timestamp for each NEWLY matched word
         const now = Date.now();
-        const newWordCount = newMatched.length - bestMatchRef.current.length;
+        const prevCount = bestMatchRef.current.length;
+        const newWordCount = newMatched.length - prevCount;
         
-        // Trigger flying stars for EACH new word matched
-        setPendingStars({ count: newWordCount, timestamp: now });
+        // Capture positions of newly matched words
+        const positions: { x: number; y: number }[] = [];
+        for (let k = prevCount; k < newMatched.length; k++) {
+          const el = document.getElementById(`word-${k}`);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            positions.push({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+          } else {
+            // Fallback to center if element not found
+            positions.push({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+          }
+        }
+
+        // Trigger flying stars from SPECIFIC word positions
+        setPendingStars({ count: newWordCount, timestamp: now, positions });
 
         for (let k = 0; k < newWordCount; k++) {
           wordTimestampsRef.current.push(now);
@@ -1161,6 +1175,7 @@ export default function IntegratedDiagnosticPage() {
                               return (
                                 <span 
                                   key={i} 
+                                  id={`word-${i}`}
                                   className={`relative transition-all duration-200 ${
                                     match 
                                       ? 'text-[#1E88E5] scale-105' // Blue for correct (Read Along style)

@@ -4,26 +4,28 @@ import React, { useEffect, useState, useRef } from "react";
 interface ActiveStar {
   id: string;
   delay: number;
+  startX: number;
+  startY: number;
 }
 
 interface StarFlyProps {
-  burst: { count: number; timestamp: number }; // Passing an object with timestamp forces update even if count is same
+  burst: { count: number; timestamp: number; positions: { x: number; y: number }[] };
   onStarHit: () => void;
 }
 
 export function StarFly({ burst, onStarHit }: StarFlyProps) {
   const [activeStars, setActiveStars] = useState<ActiveStar[]>([]);
-  
-  // Track bursts to avoid duplicate triggers if same count is sent twice
   const lastBurstTimestamp = useRef(0);
 
   useEffect(() => {
     if (burst.count > 0 && burst.timestamp > lastBurstTimestamp.current) {
       lastBurstTimestamp.current = burst.timestamp;
       
-      const newStars = Array.from({ length: Math.min(burst.count, 5) }).map((_, i) => ({
+      const newStars = burst.positions.map((pos, i) => ({
         id: `${burst.timestamp}-${i}`,
-        delay: i * 100,
+        delay: i * 80, // Slightly faster staggered start
+        startX: pos.x,
+        startY: pos.y
       }));
       
       setActiveStars(prev => [...prev, ...newStars]);
@@ -40,8 +42,10 @@ export function StarFly({ burst, onStarHit }: StarFlyProps) {
       {activeStars.map((star) => (
         <div
           key={star.id}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl md:text-3xl animate-fly-to-nav"
+          className="absolute text-2xl md:text-3xl animate-fly-to-nav"
           style={{
+            left: star.startX,
+            top: star.startY,
             animationDelay: `${star.delay}ms`,
             animationFillMode: "forwards",
           }}
@@ -53,21 +57,25 @@ export function StarFly({ burst, onStarHit }: StarFlyProps) {
       <style jsx global>{`
         @keyframes fly-to-nav {
           0% {
-            transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            transform: translate(0, 0) scale(0) rotate(0deg);
             opacity: 0;
           }
           20% {
-            transform: translate(-50%, -50%) scale(1.5) rotate(20deg);
+            transform: translate(0, -20px) scale(1.5) rotate(20deg);
             opacity: 1;
           }
           100% {
             /* Target: roughly where the navbar points are (top right) */
-            transform: translate(calc(45vw - 60px), -45vh) scale(0.2) rotate(360deg);
+            /* Using vw/vh to reach the navbar area from any start position */
+            left: calc(100vw - 120px);
+            top: 40px;
+            transform: scale(0.2) rotate(720deg);
             opacity: 0;
           }
         }
         .animate-fly-to-nav {
-          animation: fly-to-nav 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          /* Increased duration for smoother, less "monotonous" movement */
+          animation: fly-to-nav 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
         }
       `}</style>
     </div>
