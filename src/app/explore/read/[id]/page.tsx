@@ -71,7 +71,7 @@ export default function ReadingRoom() {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const navTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  const { addPoints, profile } = useProfile();
+  const { addPoints, profile, completeBook } = useProfile();
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
   const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
   const [awardedPages, setAwardedPages] = useState<Set<number>>(new Set());

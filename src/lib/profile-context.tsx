@@ -9,6 +9,8 @@ export interface UserProfile {
   schoolName: string;
   avatarSeed: string;
   points: number;
+  completedBooks?: string[]; // Array of book IDs
+  badges?: string[];        // Array of badge IDs
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -17,6 +19,8 @@ const DEFAULT_PROFILE: UserProfile = {
   schoolName: "",
   avatarSeed: "42",
   points: 0,
+  completedBooks: [],
+  badges: [],
 };
 
 const ACTIVE_USER_KEY = "babe_jaka_active_user";
@@ -27,6 +31,8 @@ interface ProfileContextValue {
   updateProfile: (updates: Partial<UserProfile>) => void;
   login: (name: string, schoolName: string) => void;
   addPoints: (amount: number) => void;
+  completeBook: (bookId: string) => void;
+  awardBadge: (badgeId: string) => void;
   logout: () => void;
   getAvatarUrl: () => string;
 }
@@ -54,8 +60,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         const unsub = onSnapshot(doc(db, "users", docId), (docSnap) => {
           if (docSnap.exists()) {
             const cloudData = docSnap.data() as UserProfile;
-            setProfile(cloudData);
-            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(cloudData));
+            // Ensure arrays exist even if cloud data is old
+            const sanitized: UserProfile = {
+              ...cloudData,
+              completedBooks: cloudData.completedBooks || [],
+              badges: cloudData.badges || [],
+            };
+            setProfile(sanitized);
+            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(sanitized));
           }
         });
         
@@ -110,8 +122,13 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const docSnap = await getDoc(doc(db, "users", docId));
       if (docSnap.exists()) {
         const cloudProfile = docSnap.data() as UserProfile;
-        setProfile(cloudProfile);
-        saveToStorage(cloudProfile);
+        const sanitized: UserProfile = {
+           ...cloudProfile,
+           completedBooks: cloudProfile.completedBooks || [],
+           badges: cloudProfile.badges || [],
+        };
+        setProfile(sanitized);
+        saveToStorage(sanitized);
         return;
       }
     } catch (err) {
@@ -127,10 +144,22 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     );
 
     if (existing) {
-      setProfile(existing);
-      saveToStorage(existing);
+      const sanitized: UserProfile = {
+         ...existing,
+         completedBooks: existing.completedBooks || [],
+         badges: existing.badges || [],
+      };
+      setProfile(sanitized);
+      saveToStorage(sanitized);
     } else {
-      const newProfile = { ...DEFAULT_PROFILE, name, schoolName, avatarSeed: Math.floor(Math.random() * 1000).toString() };
+      const newProfile = { 
+        ...DEFAULT_PROFILE, 
+        name, 
+        schoolName, 
+        avatarSeed: Math.floor(Math.random() * 1000).toString(),
+        completedBooks: [],
+        badges: []
+      };
       setProfile(newProfile);
       saveToStorage(newProfile);
     }
@@ -139,6 +168,26 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const addPoints = (amount: number) => {
     setProfile(prev => {
       const next = { ...prev, points: (prev.points || 0) + amount };
+      saveToStorage(next);
+      return next;
+    });
+  };
+
+  const completeBook = (bookId: string) => {
+    setProfile(prev => {
+      const current = prev.completedBooks || [];
+      if (current.includes(bookId)) return prev;
+      const next = { ...prev, completedBooks: [...current, bookId] };
+      saveToStorage(next);
+      return next;
+    });
+  };
+
+  const awardBadge = (badgeId: string) => {
+    setProfile(prev => {
+      const current = prev.badges || [];
+      if (current.includes(badgeId)) return prev;
+      const next = { ...prev, badges: [...current, badgeId] };
       saveToStorage(next);
       return next;
     });
@@ -156,7 +205,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   if (!loaded) return null;
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile, login, addPoints, logout, getAvatarUrl }}>
+    <ProfileContext.Provider value={{ profile, updateProfile, login, addPoints, completeBook, awardBadge, logout, getAvatarUrl }}>
       {children}
     </ProfileContext.Provider>
   );
@@ -170,6 +219,8 @@ export function useProfile() {
       updateProfile: () => {},
       login: () => {},
       addPoints: () => {},
+      completeBook: () => {},
+      awardBadge: () => {},
       logout: () => {},
       getAvatarUrl: () => `https://api.dicebear.com/9.x/fun-emoji/svg?seed=42`,
     };
