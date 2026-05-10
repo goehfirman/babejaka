@@ -183,11 +183,6 @@ export default function SlingshotGame() {
         {/* Target Arena (The House & Bubbles) */}
         <div className="relative w-full flex-1 flex flex-col items-center justify-start pt-12">
           
-          {/* Rumah Kebaya Background (Visual Ilusion) */}
-          <div className="absolute top-[100px] left-1/2 -translate-x-1/2 w-full max-w-md opacity-20 pointer-events-none">
-            <img src="https://i.ibb.co.com/XrnHrbqS/BABE-JAKA-3.png" className="w-full h-auto" alt="Background" />
-          </div>
-
           {/* Answer Bubbles (3D Capsules) - Horizontal Row */}
           <div className="grid grid-cols-4 gap-2 md:gap-4 w-full max-w-4xl z-20 px-2">
             {question.pilihan.map((text, idx) => {
