@@ -313,6 +313,8 @@ const QUESTIONS = [
   }
 ];
 
+const MAX_QUESTIONS = 5;
+
 export default function SlingshotGame() {
   const router = useRouter();
   const [currentLevel, setCurrentLevel] = useState(0);
@@ -333,7 +335,7 @@ export default function SlingshotGame() {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled;
+    return shuffled.slice(0, MAX_QUESTIONS); // Limit to 5
   };
 
   useEffect(() => {
@@ -407,7 +409,7 @@ export default function SlingshotGame() {
   };
 
   const nextQuestion = () => {
-    if (currentLevel < gameQuestions.length - 1) {
+    if (currentLevel < MAX_QUESTIONS - 1) {
       setCurrentLevel(l => l + 1);
       setGameState("playing");
       setFeedback(null);
@@ -434,17 +436,28 @@ export default function SlingshotGame() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 p-4 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <div className="relative z-50 p-4 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-200">
         <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600">
           <ArrowLeft size={24} />
         </button>
-        <div className="flex flex-col items-center">
-          <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">KATAPEL JAKA</span>
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-black text-secondary">Skor: {score}</span>
+        
+        <div className="flex-1 max-w-md mx-8 flex flex-col items-center gap-1">
+          <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${((currentLevel + 1) / MAX_QUESTIONS) * 100}%` }}
+              className="h-full bg-gradient-to-r from-primary to-secondary"
+            />
           </div>
+          <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">
+            SOAL {currentLevel + 1} DARI {MAX_QUESTIONS}
+          </span>
         </div>
-        <div className="w-10"></div>
+
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">SKOR</span>
+          <span className="text-xl font-black text-secondary">{score}</span>
+        </div>
       </div>
 
       {/* Main Arena */}
