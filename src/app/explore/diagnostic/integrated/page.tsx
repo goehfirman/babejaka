@@ -350,6 +350,7 @@ export default function IntegratedDiagnosticPage() {
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0);
   const [fluencyHistory, setFluencyHistory] = useState<FluencyEntry[]>([]);
   const [isReading, setIsReading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
   const [matchedIndices, setMatchedIndices] = useState<number[]>([]);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -425,6 +426,12 @@ export default function IntegratedDiagnosticPage() {
 
   useEffect(() => {
     initializePool();
+    if (typeof window !== "undefined") {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      if (/android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) || /windows phone/i.test(userAgent)) {
+        setIsMobile(true);
+      }
+    }
   }, []);
 
   // Keep refs in sync with state so callbacks never use stale values
@@ -480,7 +487,7 @@ export default function IntegratedDiagnosticPage() {
 
     const rec = new SR();
     rec.continuous = true;
-    rec.interimResults = true;
+    rec.interimResults = !isMobile;
     rec.lang = "id-ID";
     rec.maxAlternatives = 1;
 
@@ -548,7 +555,7 @@ export default function IntegratedDiagnosticPage() {
               console.warn("[SpeechRecognition] auto-restart failed:", e.message);
             }
           }
-        }, 80);
+        }, isMobile ? 500 : 80);
       }
     };
 
@@ -562,7 +569,7 @@ export default function IntegratedDiagnosticPage() {
           if (isReadingRef.current && shouldRestartRef.current && recognitionRef.current) {
             try { recognitionRef.current.start(); } catch (_) { /* ignore */ }
           }
-        }, 200);
+        }, isMobile ? 800 : 200);
       }
     };
 
@@ -590,6 +597,27 @@ export default function IntegratedDiagnosticPage() {
     }
     return () => clearInterval(timer);
   }, [isReading, timeLeft]);
+
+  // --- Repeater Action (Mobile Fallback) ---
+  const handleRepeatReading = () => {
+    // Reset all tracking for current level
+    savedTranscriptRef.current = "";
+    lastSessionFinalsRef.current = "";
+    bestMatchRef.current = [];
+    wordTimestampsRef.current = [];
+    lastMatchCountRef.current = 0;
+    setMatchedIndices([]);
+    
+    // Quick restart mic
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+        setTimeout(() => {
+          try { recognitionRef.current?.start(); } catch (_) {}
+        }, 300);
+      } catch (_) {}
+    }
+  };
 
   // --- Fluency Actions ---
   const startDiagnostic = () => {
@@ -996,6 +1024,14 @@ export default function IntegratedDiagnosticPage() {
                                    <span className="material-symbols-rounded text-white text-base">{isMicActive ? 'mic' : 'mic_off'}</span>
                                  </div>
                                </div>
+
+                               <button 
+                                 onClick={handleRepeatReading}
+                                 className="btn-bubbly rounded-full px-4 py-3 !bg-[#FFB300] !shadow-[0_4px_0_#FF8F00] flex items-center justify-center text-white transition-transform hover:scale-105 active:scale-95"
+                                 title="Ulangi Kalimat"
+                               >
+                                 <span className="material-symbols-rounded text-xl">replay</span>
+                               </button>
 
                                <button 
                                  onClick={stopFluencyReading} 
