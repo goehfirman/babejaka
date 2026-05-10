@@ -864,25 +864,46 @@ export default function IntegratedDiagnosticPage() {
     };
 
     let totalScore = 0;
+    let quizStars = 0;
     selectedStory.questions.forEach((q:any, i:number) => {
       let qScore = 0;
+      let qPoints = 0;
+
       if (q.type === 'mc') {
-        if (compAnswers[i] === q.correctAnswers![0]) qScore = 100;
+        if (compAnswers[i] === q.correctAnswers![0]) {
+          qScore = 100;
+          qPoints = 1;
+        }
       } else if (q.type === 'cmc') {
         const corrects = q.correctAnswers!;
         const arr = compAnswers[i] as number[];
         let matches = 0, misses = 0;
         arr.forEach(a => corrects.includes(a) ? matches++ : misses++);
         qScore = Math.max(0, (matches / corrects.length) * 100 - (misses * 50));
+        if (qScore >= 90) qPoints = 2; // CMC 2 points
+        else if (qScore >= 50) qPoints = 1; // Partial credit? User said 2, let's stick to 2 for full.
       } else if (q.type === 'essay') {
         qScore = essayResults[i]?.score || 0;
+        qPoints = Math.round(qScore / 20); // 0-100 mapped to 0-5
       }
       
       totalScore += qScore;
+      quizStars += qPoints;
+
       if (q.barrettLevel && masteryTemp[q.barrettLevel]) {
         masteryTemp[q.barrettLevel].push(qScore);
       }
     });
+
+    // Trigger flying stars for quiz points
+    if (quizStars > 0) {
+      const now = Date.now();
+      const positions = Array.from({ length: Math.min(quizStars, 15) }).map(() => ({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+      }));
+      setPendingStars({ count: quizStars, timestamp: now, positions });
+    }
 
     // Calculate mastery per barrett level
     const masteryFinal: Record<string, number> = {};
