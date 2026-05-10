@@ -323,7 +323,7 @@ export default function SlingshotGame() {
   const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [ballPos, setBallPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [gameQuestions, setGameQuestions] = useState(QUESTIONS);
+  const [gameQuestions, setGameQuestions] = useState(QUESTIONS.slice(0, MAX_QUESTIONS));
   
   const slingRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -335,7 +335,7 @@ export default function SlingshotGame() {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, MAX_QUESTIONS); // Limit to 5
+    return shuffled.slice(0, MAX_QUESTIONS); 
   };
 
   useEffect(() => {
@@ -353,7 +353,7 @@ export default function SlingshotGame() {
     
     // Reverse direction for slingshot feel
     const targetX = -offset.x * power;
-    const targetY = -150; // Fixed depth to always land on bubbles
+    const targetY = -300; // Increased depth for better reach on mobile
 
     setGameState("flying");
     setIsDragging(false);
@@ -362,22 +362,21 @@ export default function SlingshotGame() {
     setBallPos({ x: targetX, y: targetY });
 
     // Determine which bubble it hits (simple hit detection)
-    // Bubbles are roughly at top half of screen
     setTimeout(() => {
       checkCollision(targetX, targetY);
-    }, 800); // Matched with transition duration
+    }, 800); 
   };
 
   const checkCollision = (tx: number, ty: number) => {
     // Bubble positions (relative to screen center)
     const bubbles = [
-      { x: -180, y: -150 },
-      { x: -60, y: -150 },
-      { x: 60, y: -150 },
-      { x: 180, y: -150 }
+      { x: -180, y: -300 },
+      { x: -60, y: -300 },
+      { x: 60, y: -300 },
+      { x: 180, y: -300 }
     ];
 
-    let hitIndex = 0; // Default to first
+    let hitIndex = 0; 
     let minDist = Infinity;
 
     bubbles.forEach((b, i) => {
@@ -396,20 +395,18 @@ export default function SlingshotGame() {
         setFeedback({ type: "wrong", index: hitIndex });
       }
     } else {
-      // Missed
       setFeedback(null);
     }
 
     setGameState("hit");
     
-    // Delay result popup so explosion can be seen
     setTimeout(() => {
       setGameState("result");
     }, 2000);
   };
 
   const nextQuestion = () => {
-    if (currentLevel < MAX_QUESTIONS - 1) {
+    if (currentLevel < gameQuestions.length - 1) {
       setCurrentLevel(l => l + 1);
       setGameState("playing");
       setFeedback(null);
@@ -436,7 +433,7 @@ export default function SlingshotGame() {
       </div>
 
       {/* Header */}
-      <div className="relative z-50 p-4 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <div className="relative z-[100] p-4 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-200">
         <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600">
           <ArrowLeft size={24} />
         </button>
@@ -445,12 +442,12 @@ export default function SlingshotGame() {
           <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
             <motion.div 
               initial={{ width: 0 }}
-              animate={{ width: `${((currentLevel + 1) / MAX_QUESTIONS) * 100}%` }}
+              animate={{ width: `${((currentLevel + 1) / Math.min(gameQuestions.length, MAX_QUESTIONS)) * 100}%` }}
               className="h-full bg-gradient-to-r from-primary to-secondary"
             />
           </div>
           <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">
-            SOAL {currentLevel + 1} DARI {MAX_QUESTIONS}
+            SOAL {Math.min(currentLevel + 1, MAX_QUESTIONS)} DARI {Math.min(gameQuestions.length, MAX_QUESTIONS)}
           </span>
         </div>
 
@@ -571,7 +568,7 @@ export default function SlingshotGame() {
                 const step = (i + 1) * 0.14;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
-                const dy = -150 * step;
+                const dy = -300 * step;
                 const scale = 1.1 - (step * 0.2); // Less scaling down
                 
                 return (
