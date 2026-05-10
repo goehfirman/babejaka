@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, RefreshCw, Trophy, Target } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trophy, Target, Star } from "lucide-react";
+import { useProfile } from "@/lib/profile-context";
+import { StarFly } from "@/components/StarFly";
 
 // --- Game Data ---
 const QUESTIONS = [
@@ -317,8 +319,10 @@ const MAX_QUESTIONS = 5;
 
 export default function SlingshotGame() {
   const router = useRouter();
+  const { profile, addPoints } = useProfile();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [score, setScore] = useState(0);
+  const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
   const [gameState, setGameState] = useState("playing"); // playing, flying, result, gameOver
   const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [ballPos, setBallPos] = useState({ x: 0, y: 0 });
@@ -403,6 +407,15 @@ export default function SlingshotGame() {
     if (hitIndex !== -1) {
       if (hitIndex === question.jawabanBenar) {
         setScore(s => s + 5);
+        
+        // Trigger Star Burst
+        const now = Date.now();
+        const positions = Array.from({ length: 5 }).map(() => ({
+          x: window.innerWidth / 2 + (Math.random() * 200 - 100),
+          y: window.innerHeight / 2 + (Math.random() * 200 - 100)
+        }));
+        setPendingStars({ count: 5, timestamp: now, positions });
+
         setFeedback({ type: "correct", index: hitIndex });
       } else {
         setFeedback({ type: "wrong", index: hitIndex });
@@ -465,8 +478,15 @@ export default function SlingshotGame() {
         </div>
 
         <div className="flex flex-col items-end">
-          <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">SKOR</span>
-          <span className="text-xl font-black text-secondary">{score}</span>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-sm">
+             <div className="flex flex-col items-end">
+               <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">POIN BINTANG</span>
+               <div className="flex items-center gap-1.5">
+                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 animate-pulse" />
+                  <span className="text-xl font-black text-ink">{profile.points || 0}</span>
+               </div>
+             </div>
+          </div>
         </div>
       </div>
 
@@ -744,6 +764,8 @@ export default function SlingshotGame() {
           animation: shake 0.2s ease-in-out 0s 2;
         }
       `}</style>
+      {/* Star Animation Layer */}
+      <StarFly burst={pendingStars} onStarHit={() => addPoints(1)} />
     </div>
   );
 }
