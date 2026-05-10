@@ -540,13 +540,16 @@ export default function IntegratedDiagnosticPage() {
         // (meskipun ada kata di tengah yang terlewat)
         if (newMatched.includes(lastWordIndex) && !readingDoneTimeRef.current) {
           readingDoneTimeRef.current = Date.now();
-          setIsLevelCompleted(true);
           if (recognitionRef.current) {
             try { recognitionRef.current.abort(); } catch (_) {}
           }
+          // Mobile: popup langsung muncul, PC: delay 1 detik agar highlight terlihat dulu
+          setTimeout(() => {
+            setIsLevelCompleted(true);
+          }, isMobile ? 0 : 1000);
           setTimeout(() => {
             stopFluencyReading();
-          }, isMobile ? 5000 : 2500);
+          }, isMobile ? 5000 : 3500);
         }
       } else if (newMatched.length === bestMatchRef.current.length) {
         // Same count but possibly different indices — just update display
