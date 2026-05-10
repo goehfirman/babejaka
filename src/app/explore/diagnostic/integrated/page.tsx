@@ -22,7 +22,7 @@ const LEVEL_VARIATIONS: Record<string, any[]> = {
   ],
   "B": [
     { id: "B", title: "Pembaca Awal", subtitle: "Level B", text: "Pagi ini aku naik TransJakarta. Busnya bersih dan dingin. Aku pergi ke halte Bundaran HI.", time: 45, image: "/images/stories/jakarta_transjakarta.png" },
-    { id: "B", title: "Pembaca Awal", subtitle: "Level B", text: "Beni makan kerak telor di taman. Kerak telor itu gurih dan enak. Ada serundeng di dalamnya.", time: 45, image: "https://i.ibb.co.com/4gW3NvzP/kerak-telor.png" }
+    { id: "B", title: "Pembaca Awal", subtitle: "Level B", text: "Beni makan kerak telor di taman. Kerak telor itu gurih dan enak. Ada serundeng di dalamnya.", time: 45, image: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Kerak_telor_Betawi.jpg" }
   ],
   "C": [
     { id: "C", title: "Pembaca Semenjana", subtitle: "Level C", text: "Ondel-ondel menari dengan riang diiringi musik tanjidor. Mereka adalah simbol budaya Betawi yang harus kita jaga.", time: 60, image: "/images/stories/jakarta_ondel_ondel.png" },
@@ -54,7 +54,7 @@ const STORY_VARIATIONS: Record<string, any[]> = {
   ],
   "B-2": [
     {
-      id: "B-2", title: "Makan Kerak Telor", theme: "Level B-2 — Pembaca Awal", icon: "restaurant", color: "#87CEEB", colorDark: "#5AAFD1", image: "https://i.ibb.co.com/4gW3NvzP/kerak-telor.png",
+      id: "B-2", title: "Makan Kerak Telor", theme: "Level B-2 — Pembaca Awal", icon: "restaurant", color: "#87CEEB", colorDark: "#5AAFD1", image: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Kerak_telor_Betawi.jpg",
       text: "Beni makan kerak telor di taman dekat Monas. Kerak telor itu gurih dan enak. Ada serundeng dan telur bebek di dalamnya. Beni membelinya dari bapak penjual yang ramah.",
       questions: [
         { type: "mc", question: "Apa makanan khas yang dimakan Beni?", options: ["Nasi Goreng", "Kerak Telor", "Sate Padang", "Siomay"], correctAnswers: [1], barrettLevel: "literal" },
