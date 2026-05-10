@@ -171,12 +171,14 @@ export default function ReadingRoom() {
   }, [book, currentFontConfig]);
 
   const bookElementsCount = bookElements.length;
+  const tamatPageIndex = useMemo(() => bookElements.findIndex(el => el.key === "blank-end"), [bookElements]);
 
   // Real-time point awarding effect
   useEffect(() => {
      const timer = setInterval(() => {
         const duration = Date.now() - pageStartTime;
-        if (duration >= 10000 && !awardedPages.has(currentPage) && currentPage > 0 && currentPage < bookElementsCount - 1) {
+        // 10 seconds threshold, not already awarded, and must be a content page (excluding covers and "Tamat" page)
+        if (duration >= 10000 && !awardedPages.has(currentPage) && currentPage >= 2 && currentPage < tamatPageIndex) {
            setAwardedPages(prev => new Set(prev).add(currentPage));
            const now = Date.now();
            const positions = Array.from({ length: 5 }).map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
