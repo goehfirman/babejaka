@@ -1,14 +1,16 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAG1jxsuv0EPFdre7qfwu8OklgMOmb-kTQ",
+  authDomain: "babe-jaka-b8177.firebaseapp.com",
+  projectId: "babe-jaka-b8177",
+  storageBucket: "babe-jaka-b8177.firebasestorage.app",
+  messagingSenderId: "277825540257",
+  appId: "1:277825540257:web:5cc12e7c95c0bd194be0e0",
+  measurementId: "G-3TG5Q0JDDS"
 };
 
 // Initialize Firebase
@@ -16,4 +18,12 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export { db, storage };
+// Analytics is client-side only and needs a check for SSR
+let analytics;
+if (typeof window !== "undefined") {
+  isSupported().then(supported => {
+    if (supported) analytics = getAnalytics(app);
+  });
+}
+
+export { db, storage, analytics };
