@@ -16,7 +16,7 @@ import html2canvas from 'html2canvas';
 const LEVEL_VARIATIONS: Record<string, any[]> = {
   "A": [
     { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Ini roti buaya. Roti ini besar. Roti buaya enak.", time: 30, image: "/images/stories/roti_buaya_basic.png" },
-    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Ini nasi uduk. Nasi ini enak. Aku suka nasi.", time: 30, image: "/images/stories/nasi_uduk.png" }
+    { id: "A", title: "Pembaca Dini", subtitle: "Level A", text: "Ini nasi uduk. Nasi ini enak. Aku suka nasi uduk.", time: 30, image: "/images/stories/nasi_uduk.png" }
   ],
   "B": [
     { id: "B", title: "Pembaca Awal", subtitle: "Level B", text: "Pagi ini aku naik TransJakarta. Busnya bersih dan dingin. Aku pergi ke halte Bundaran HI.", time: 45, image: "/images/stories/jakarta_transjakarta.png" },
