@@ -153,46 +153,57 @@ export default function TugOfWarGame() {
       <div className="flex-1 flex flex-col items-center justify-center pt-8 px-4">
          
          {/* Characters & Rope */}
-         <div className="relative w-full max-w-4xl h-64 mb-12 flex items-center justify-center">
-            {/* Ground Line */}
-            <div className="absolute bottom-12 left-0 right-0 h-4 bg-gray-200/50 rounded-full"></div>
+         <div className="relative w-full max-w-5xl h-80 mb-12 flex items-center justify-center">
+            {/* Ground Line & Center Marker */}
+            <div className="absolute bottom-16 left-0 right-0 h-1.5 bg-gray-300 rounded-full"></div>
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-0.5 h-32 bg-gray-300/50"></div>
             
-            {/* Rope */}
-            <motion.div 
-              className="absolute bottom-[72px] h-3 bg-[#8B4513] shadow-lg rounded-full flex items-center justify-center overflow-visible"
-              animate={{ x: -ropeOffset * 4 }}
-              transition={{ type: "spring", stiffness: 50, damping: 10 }}
-              style={{ width: '150%' }}
-            >
-               {/* Center Ribbon */}
-               <div className="w-8 h-12 bg-red-600 border-2 border-white shadow-lg rounded-sm relative">
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-gray-400"></div>
-               </div>
+            {/* Rope Container */}
+            <div className="absolute bottom-[80px] w-full overflow-hidden h-20 flex items-center">
+              <motion.div 
+                className="relative h-4 bg-[#A0522D] shadow-xl rounded-full flex items-center justify-center"
+                animate={{ x: -ropeOffset * 6 }}
+                transition={{ type: "spring", stiffness: 60, damping: 12 }}
+                style={{ width: '200%', left: '-50%' }}
+              >
+                 {/* Rope Texture */}
+                 <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(45deg, #000 25%, transparent 25%, transparent 50%, #000 50%, #000 75%, transparent 75%, transparent)', backgroundSize: '20px 20px' }}></div>
+                 
+                 {/* Center Yellow Ribbon */}
+                 <div className="absolute left-1/2 -translate-x-1/2 w-8 h-12 bg-yellow-400 border-4 border-yellow-500 shadow-lg rounded-md z-30 flex items-center justify-center">
+                    <div className="w-full h-1 bg-yellow-600/30"></div>
+                 </div>
+              </motion.div>
+            </div>
 
-               {/* Texture lines */}
-               {[...Array(50)].map((_, i) => (
-                 <div key={i} className="flex-1 h-full border-r border-black/10"></div>
-               ))}
-            </motion.div>
-
-            {/* Players */}
-            <div className="absolute inset-0 flex justify-between items-end px-12 pb-14">
-               {/* Player Team (Babe Jaka Side) */}
+            {/* Teams */}
+            <div className="absolute inset-0 flex justify-between items-end px-4 md:px-20 pb-16">
+               {/* Player Team (Left Side) */}
                <motion.div 
-                 animate={{ x: -ropeOffset * 4, rotate: lead < 0 ? 10 : 0 }}
-                 className="relative w-32 h-32"
+                 animate={{ x: -ropeOffset * 6, rotate: lead < 0 ? 12 : 0 }}
+                 className="flex items-end gap-[-40px]"
                >
-                  <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" alt="Player" className="w-full h-full object-contain" />
-                  <div className="absolute -top-4 left-0 bg-primary text-white text-[10px] font-black px-2 py-0.5 rounded-md">TIM KAMU</div>
+                  <div className="relative w-28 h-28 z-20">
+                     <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" alt="Player 1" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="relative w-24 h-24 -ml-12 opacity-80 z-10">
+                     <img src="https://i.ibb.co.com/Zp0mYVKv/babe-jempol.png" alt="Player 2" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="absolute -top-12 left-0 bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full shadow-glow-red">TIM KAMU</div>
                </motion.div>
 
-               {/* Opponent Team */}
+               {/* Opponent Team (Right Side) */}
                <motion.div 
-                 animate={{ x: -ropeOffset * 4, rotate: lead > 0 ? -10 : 0 }}
-                 className="relative w-32 h-32 scale-x-[-1]"
+                 animate={{ x: -ropeOffset * 6, rotate: lead > 0 ? -12 : 0 }}
+                 className="flex items-end flex-row-reverse gap-[-40px]"
                >
-                  <img src="https://i.ibb.co.com/d4jXMJp2/babe-bingung.png" alt="Opponent" className="w-full h-full object-contain grayscale opacity-60" />
-                  <div className="absolute -top-4 left-0 bg-gray-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md scale-x-[-1]">LAWAN</div>
+                  <div className="relative w-28 h-28 z-20 scale-x-[-1]">
+                     <img src="https://i.ibb.co.com/d4jXMJp2/babe-bingung.png" alt="Opponent 1" className="w-full h-full object-contain grayscale opacity-60" />
+                  </div>
+                  <div className="relative w-24 h-24 -mr-12 opacity-50 z-10 scale-x-[-1]">
+                     <img src="https://i.ibb.co.com/hx2BYfbm/babe-keprok.png" alt="Opponent 2" className="w-full h-full object-contain grayscale" />
+                  </div>
+                  <div className="absolute -top-12 right-0 bg-gray-600 text-white text-[10px] font-black px-3 py-1 rounded-full">LAWAN</div>
                </motion.div>
             </div>
          </div>
