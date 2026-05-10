@@ -353,7 +353,7 @@ export default function SlingshotGame() {
     
     // Reverse direction for slingshot feel
     const targetX = -offset.x * power;
-    const targetY = -300; // Increased depth for better reach on mobile
+    const targetY = -offset.y * 2.5; // Dynamic depth based on pull
 
     setGameState("flying");
     setIsDragging(false);
@@ -369,11 +369,13 @@ export default function SlingshotGame() {
 
   const checkCollision = (tx: number, ty: number) => {
     // Bubble positions (relative to screen center)
+    // We'll place them at a depth that requires a decent pull to reach
+    const targetDepth = -250;
     const bubbles = [
-      { x: -180, y: -300 },
-      { x: -60, y: -300 },
-      { x: 60, y: -300 },
-      { x: 180, y: -300 }
+      { x: -180, y: targetDepth },
+      { x: -60, y: targetDepth },
+      { x: 60, y: targetDepth },
+      { x: 180, y: targetDepth }
     ];
 
     let hitIndex = 0; 
@@ -568,8 +570,8 @@ export default function SlingshotGame() {
                 const step = (i + 1) * 0.14;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
-                const dy = -300 * step;
-                const scale = 1.1 - (step * 0.2); // Less scaling down
+                const dy = -ballPos.y * 2.5 * step;
+                const scale = 1.1 - (step * 0.2); 
                 
                 return (
                   <motion.div
