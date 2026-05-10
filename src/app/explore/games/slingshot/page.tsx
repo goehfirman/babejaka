@@ -61,7 +61,7 @@ export default function SlingshotGame() {
     
     // Reverse direction for slingshot feel
     const targetX = -offset.x * power;
-    const targetY = -offset.y * power - 400; // Shoot upwards/into screen
+    const targetY = -offset.y * power - 250; // Shortened distance to match bubbles
 
     setGameState("flying");
     setIsDragging(false);
@@ -84,10 +84,10 @@ export default function SlingshotGame() {
     // Bubble positions (relative to screen center)
     // Horizontal row: left to right
     const bubbles = [
-      { x: -180, y: -400 },
-      { x: -60, y: -400 },
-      { x: 60, y: -400 },
-      { x: 180, y: -400 }
+      { x: -180, y: -250 },
+      { x: -60, y: -250 },
+      { x: 60, y: -250 },
+      { x: 180, y: -250 }
     ];
 
     let hitIndex = -1;
@@ -251,11 +251,11 @@ export default function SlingshotGame() {
           {/* Trajectory Guide (Dots) */}
           {isDragging && (
             <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center">
-              {[...Array(10)].map((_, i) => {
-                const step = (i + 1) * 0.12;
+              {[...Array(7)].map((_, i) => {
+                const step = (i + 1) * 0.14;
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
-                const dy = -ballPos.y * power * step - (400 * step);
+                const dy = -ballPos.y * power * step - (250 * step);
                 const scale = 1 - (step * 0.4);
                 
                 return (
