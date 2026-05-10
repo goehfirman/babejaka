@@ -47,17 +47,24 @@ export default function TugOfWarGame() {
   const { profile, addPoints } = useProfile();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [gameState, setGameState] = useState("playing"); // playing, result, gameOver
-  const [ropePosition, setRopePosition] = useState(0); // -100 to 100 (player vs opponent)
-  const [score, setScore] = useState(0);
+  const [playerScore, setPlayerScore] = useState(0);
+  const [opponentScore, setOpponentScore] = useState(0);
   const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
   const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [gameQuestions, setGameQuestions] = useState(QUESTIONS);
+  const [startTime, setStartTime] = useState(Date.now());
   const answerRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Calculate rope offset based on score lead
+  // Every 1 point lead = 4% movement
+  const lead = playerScore - opponentScore;
+  const ropeOffset = lead * 4;
 
   // Shuffle logic
   useEffect(() => {
     const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5);
     setGameQuestions(shuffled);
+    setStartTime(Date.now());
   }, []);
 
   const question = gameQuestions[currentLevel] || gameQuestions[0];
@@ -65,15 +72,19 @@ export default function TugOfWarGame() {
   const handleAnswer = (index: number) => {
     if (gameState !== "playing") return;
 
+    const endTime = Date.now();
+    const duration = (endTime - startTime) / 1000;
     const isCorrect = index === question.jawabanBenar;
+    
     setFeedback({ type: isCorrect ? "correct" : "wrong", index });
     setGameState("result");
 
     if (isCorrect) {
-      setScore(s => s + 5);
-      setRopePosition(prev => Math.max(prev - 20, -100)); // Pull to player side (left)
+      // Speed bonus: max 10 points if < 2s, minimum 5 points
+      const pullPower = Math.max(5, Math.floor(10 - duration));
+      setPlayerScore(s => s + pullPower);
       
-      // Star Animation from answer button
+      // Star Animation
       const btn = answerRefs.current[index];
       if (btn) {
         const rect = btn.getBoundingClientRect();
@@ -85,7 +96,7 @@ export default function TugOfWarGame() {
         setPendingStars({ count: 5, timestamp: now, positions });
       }
     } else {
-      setRopePosition(prev => Math.min(prev + 20, 100)); // Pull to opponent side (right)
+      setOpponentScore(s => s + 8); // Opponent gets fixed pull on wrong answer
     }
 
     setTimeout(() => {
@@ -93,6 +104,7 @@ export default function TugOfWarGame() {
         setCurrentLevel(prev => prev + 1);
         setGameState("playing");
         setFeedback(null);
+        setStartTime(Date.now());
       } else {
         setGameState("gameOver");
       }
@@ -101,10 +113,11 @@ export default function TugOfWarGame() {
 
   const resetGame = () => {
     setCurrentLevel(0);
-    setScore(0);
-    setRopePosition(0);
+    setPlayerScore(0);
+    setOpponentScore(0);
     setGameState("playing");
     setFeedback(null);
+    setStartTime(Date.now());
   };
 
   return (
@@ -147,9 +160,9 @@ export default function TugOfWarGame() {
             {/* Rope */}
             <motion.div 
               className="absolute bottom-[72px] h-3 bg-[#8B4513] shadow-lg rounded-full flex items-center justify-center overflow-visible"
-              animate={{ x: -ropePosition * 2 }}
+              animate={{ x: -ropeOffset * 4 }}
               transition={{ type: "spring", stiffness: 50, damping: 10 }}
-              style={{ width: '120%' }}
+              style={{ width: '150%' }}
             >
                {/* Center Ribbon */}
                <div className="w-8 h-12 bg-red-600 border-2 border-white shadow-lg rounded-sm relative">
@@ -166,7 +179,7 @@ export default function TugOfWarGame() {
             <div className="absolute inset-0 flex justify-between items-end px-12 pb-14">
                {/* Player Team (Babe Jaka Side) */}
                <motion.div 
-                 animate={{ x: -ropePosition * 2, rotate: ropePosition > 0 ? 10 : 0 }}
+                 animate={{ x: -ropeOffset * 4, rotate: lead < 0 ? 10 : 0 }}
                  className="relative w-32 h-32"
                >
                   <img src="https://i.ibb.co.com/vxhZR8wB/MASKOT-BABE.png" alt="Player" className="w-full h-full object-contain" />
@@ -175,7 +188,7 @@ export default function TugOfWarGame() {
 
                {/* Opponent Team */}
                <motion.div 
-                 animate={{ x: -ropePosition * 2, rotate: ropePosition < 0 ? -10 : 0 }}
+                 animate={{ x: -ropeOffset * 4, rotate: lead > 0 ? -10 : 0 }}
                  className="relative w-32 h-32 scale-x-[-1]"
                >
                   <img src="https://i.ibb.co.com/d4jXMJp2/babe-bingung.png" alt="Opponent" className="w-full h-full object-contain grayscale opacity-60" />
@@ -235,7 +248,7 @@ export default function TugOfWarGame() {
                 </div>
                 <h2 className="text-4xl font-black text-ink mb-2">PERMAINAN SELESAI!</h2>
                 <p className="text-ink-light font-bold mb-8">
-                   {ropePosition < 0 ? "Hebat! Kamu memenangkan Tarik Tambang!" : "Hampir saja! Ayo coba lagi agar lebih kuat!"}
+                   {lead > 0 ? "Hebat! Kamu memenangkan Tarik Tambang!" : "Hampir saja! Ayo coba lagi agar lebih kuat!"}
                 </p>
                 <div className="flex gap-4">
                   <button onClick={resetGame} className="flex-1 bg-secondary text-white font-black py-4 rounded-2xl shadow-glow-blue flex items-center justify-center gap-2 hover:-translate-y-1 transition-all">
