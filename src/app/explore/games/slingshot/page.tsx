@@ -321,11 +321,26 @@ export default function SlingshotGame() {
   const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [ballPos, setBallPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [gameQuestions, setGameQuestions] = useState(QUESTIONS);
   
   const slingRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const question = QUESTIONS[currentLevel];
+  // Shuffle logic
+  const shuffleArray = (array: any[]) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  useEffect(() => {
+    setGameQuestions(shuffleArray(QUESTIONS));
+  }, []);
+
+  const question = gameQuestions[currentLevel] || gameQuestions[0];
 
   // Handle shooting logic
   const handleRelease = (event: any, info: any) => {
@@ -397,7 +412,7 @@ export default function SlingshotGame() {
   };
 
   const nextQuestion = () => {
-    if (currentLevel < QUESTIONS.length - 1) {
+    if (currentLevel < gameQuestions.length - 1) {
       setCurrentLevel(l => l + 1);
       setGameState("playing");
       setFeedback(null);
@@ -408,6 +423,7 @@ export default function SlingshotGame() {
   };
 
   const resetGame = () => {
+    setGameQuestions(shuffleArray(QUESTIONS));
     setCurrentLevel(0);
     setScore(0);
     setGameState("playing");
