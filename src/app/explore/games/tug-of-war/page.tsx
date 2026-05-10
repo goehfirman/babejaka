@@ -156,7 +156,7 @@ export default function TugOfWarGame() {
       await updateDoc(doc(db, "rooms", roomId), updates);
       if (isCorrect) { triggerStars(index); playSound('pull'); }
       
-      // Check Win: Flag crosses Finish Line
+      // Check Win: Marker enters Finish Zone (0-15 or 85-100)
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
       const p2S = updates[`players.p2.score`] || roomData.players.p2?.score || 0;
       const currentPos = 50 + (p2S - p1S);
@@ -257,15 +257,15 @@ export default function TugOfWarGame() {
             <div className="absolute inset-0 bg-[#F0F7FF] rounded-[2rem] border-2 border-blue-100 shadow-inner"></div>
             
             {/* Striped Finish Zones (as per image) */}
-            <div className="absolute inset-0 flex justify-between items-center px-[10%] pointer-events-none">
-               {/* Finish P1 Zone */}
-               <div className="h-full w-24 bg-repeat bg-center opacity-20 border-x border-gray-300" 
+            <div className="absolute inset-0 flex justify-between items-center pointer-events-none">
+               {/* Finish P1 Zone (0-15%) */}
+               <div className="h-full w-[15%] bg-repeat bg-center opacity-20 border-r border-gray-300" 
                     style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P1</div>
                </div>
                
-               {/* Finish P2 Zone */}
-               <div className="h-full w-24 bg-repeat bg-center opacity-20 border-x border-gray-300" 
+               {/* Finish P2 Zone (85-100%) */}
+               <div className="h-full w-[15%] bg-repeat bg-center opacity-20 border-l border-gray-300" 
                     style={{ backgroundImage: 'repeating-linear-gradient(45deg, #999, #999 10px, #fff 10px, #fff 20px)' }}>
                   <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-sm text-[8px] font-black text-gray-500 border border-gray-200">FINISH P2</div>
                </div>
