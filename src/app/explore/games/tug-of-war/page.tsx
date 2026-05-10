@@ -61,9 +61,13 @@ export default function TugOfWarGame() {
   // Multi: p1 is left (score pulls to 0), p2 is right (score pulls to 100)
   const calculateMultiPos = () => {
     if (!roomData) return 50;
+    // Use the synced ropePosition from Firestore if available
+    if (roomData.gameplay?.ropePosition !== undefined) {
+      return roomData.gameplay.ropePosition;
+    }
     const p1Score = roomData.players.p1.score || 0;
     const p2Score = roomData.players.p2?.score || 0;
-    return 50 + (p2Score - p1Score); // if p2 high, pos goes to 100
+    return 50 + (p2Score - p1Score);
   };
 
   const ropePosition = gameMode === "single" ? (50 + (opponentScore - playerScore)) : calculateMultiPos();
@@ -277,9 +281,9 @@ export default function TugOfWarGame() {
             {/* Unified Rope System */}
             <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                <motion.div 
-                 animate={{ x: ropeOffset * 10 }}
+                 animate={{ x: (ropePosition - 50) + "%" }}
                  transition={{ type: "spring", stiffness: 40, damping: 15 }}
-                 className="relative w-[150%] h-40 flex items-center justify-center"
+                 className="relative w-full h-40 flex items-center justify-center"
                >
                   {/* The Rope */}
                   <div className="absolute w-full h-6 bg-[#A0522D] shadow-xl rounded-full flex items-center">
