@@ -391,6 +391,34 @@ export default function IntegratedDiagnosticPage() {
   const { addPoints } = useProfile();
   const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
   const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+     const handleFullscreenChange = () => {
+        setIsFullscreen(!!(document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement));
+     };
+     document.addEventListener('fullscreenchange', handleFullscreenChange);
+     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+     return () => {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+     };
+  }, []);
+
+  const toggleFullscreen = () => {
+     if (!document.fullscreenElement && !(document as any).webkitFullscreenElement && !(document as any).mozFullScreenElement && !(document as any).msFullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+     } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+        else if ((document as any).mozCancelFullScreen) (document as any).mozCancelFullScreen();
+        else if ((document as any).msExitFullscreen) (document as any).msExitFullscreen();
+     }
+  };
 
   const handleGeneratePreview = async () => {
     if (!certificateRef.current) return;
@@ -1105,15 +1133,25 @@ export default function IntegratedDiagnosticPage() {
 
                   {/* Integrated Header - Badge, Stars & Timer */}
                   <div className="flex justify-between items-center mb-10">
-                      {/* Left: Level Badge */}
-                      <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-full border-4 border-[#E2E8F0] shadow-sm">
-                         <div className="w-10 h-10 bg-[#5AAFD1] rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white shadow-sm">{currentLevel?.id}</div>
+                      {/* Left: Level Badge & Fullscreen */}
+                       <div className="flex items-center gap-3">
+                          <button 
+                            onClick={toggleFullscreen}
+                            className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#A0AEC0] hover:text-[#5AAFD1] border-2 border-[#E2E8F0] shadow-sm transition-all active:scale-95"
+                            title="Layar Penuh"
+                          >
+                            <span className="material-symbols-rounded text-2xl">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+                          </button>
 
-                         <div className="text-left font-black uppercase">
-                            <p className="text-[9px] text-[#A0AEC0] tracking-widest leading-none mb-0.5">Kelancaran</p>
-                            <h4 className="text-sm text-[#333333]">{currentLevel.title}</h4>
-                         </div>
-                      </div>
+                          <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-full border-4 border-[#E2E8F0] shadow-sm">
+                             <div className="w-10 h-10 bg-[#5AAFD1] rounded-full flex items-center justify-center text-white font-black text-xl border-2 border-white shadow-sm">{currentLevel?.id}</div>
+
+                             <div className="text-left font-black uppercase">
+                                <p className="text-[9px] text-[#A0AEC0] tracking-widest leading-none mb-0.5">Kelancaran</p>
+                                <h4 className="text-sm text-[#333333]">{currentLevel.title}</h4>
+                             </div>
+                          </div>
+                       </div>
 
                       {/* Center: Star Counter (Read Along style) */}
                       {isReading && (

@@ -236,8 +236,17 @@ export default function ReadingRoom() {
   return (
     <div className="flex flex-col h-screen bg-[#E5E7EB] font-body text-[#333333] relative overflow-hidden">
       <header className={`bg-white px-4 md:px-8 py-3 flex w-full items-center justify-between z-[60] shadow-[0_2px_10px_rgba(0,0,0,0.05)] border-b border-[#E2E8F0] absolute top-0 left-0 right-0 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isNavVisible ? 'translate-y-0' : '-translate-y-full'}`} onMouseEnter={() => setIsNavVisible(true)}>
-         <div className="w-12 md:w-32 flex justify-start">
-            <Link href="/explore/library" className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all"><span className="material-symbols-rounded text-2xl">arrow_back</span></Link>
+         <div className="w-12 md:w-48 flex justify-start items-center gap-2">
+            <Link href="/explore/library" className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all">
+               <span className="material-symbols-rounded text-2xl">arrow_back</span>
+            </Link>
+            <button 
+              onClick={toggleFullscreen}
+              className="w-10 h-10 flex items-center justify-center rounded-full text-[#A0AEC0] hover:text-[#FFB347] hover:bg-[#F8FAFC] transition-all"
+              title="Layar Penuh"
+            >
+              <span className="material-symbols-rounded text-2xl">{isFullscreen || isCssFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+            </button>
          </div>
          <div className="text-center animate-bounce-in flex-1">
             <h1 className="text-sm md:text-base font-bold text-[#4B5563] flex items-center justify-center gap-2">
