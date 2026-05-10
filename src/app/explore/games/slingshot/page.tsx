@@ -267,14 +267,14 @@ export default function SlingshotGame() {
                 const power = 1.5;
                 const dx = -ballPos.x * power * step;
                 const dy = -ballPos.y * power * step - (125 * step);
-                const scale = 1 - (step * 0.4);
+                const scale = 1.1 - (step * 0.2); // Less scaling down
                 
                 return (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.9 - (step * 0.3), x: dx, y: dy, scale }}
-                    className="absolute w-3.5 h-3.5 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,1)]"
+                    animate={{ opacity: 1, x: dx, y: dy, scale }}
+                    className="absolute w-4 h-4 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,1),0_0_30px_rgba(255,255,255,0.4)]"
                   />
                 );
               })}
