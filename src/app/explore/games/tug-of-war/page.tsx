@@ -71,10 +71,10 @@ export default function TugOfWarGame() {
 
   // Calculation for 2.5D Rope Position
   const calculateMultiPos = () => {
-    if (!roomData) return 50;
-    if (roomData.gameplay?.ropePosition !== undefined) return roomData.gameplay.ropePosition;
-    const p1Score = roomData.players.p1.score || 0;
+    if (!roomData || !roomData.players) return 50;
+    const p1Score = roomData.players.p1?.score || 0;
     const p2Score = roomData.players.p2?.score || 0;
+    // P1 pulls to 0 (left), P2 pulls to 100 (right)
     return 50 + (p2Score - p1Score);
   };
 
@@ -121,7 +121,7 @@ export default function TugOfWarGame() {
             p1: { name: profile.name, isReady: false, score: 0, lastAnswerStatus: null },
             p2: null
           },
-          gameplay: { ropePosition: 50, currentLevel: 0 }
+          gameplay: { currentLevel: 0 }
         };
         await setDoc(docRef, newRoom);
         setRoomId(code);
@@ -151,9 +151,9 @@ export default function TugOfWarGame() {
           }
         }
       }
-    } catch (err) {
-      console.error(err);
-      alert("Gagal terhubung ke database. Coba lagi.");
+    } catch (err: any) {
+      console.error("Database Connection Error:", err);
+      alert(`Gagal terhubung ke database: ${err.message || 'Unknown Error'}`);
     } finally {
       setIsJoining(false);
     }
