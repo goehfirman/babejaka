@@ -281,15 +281,20 @@ export default function ReadingRoom() {
       </header>
 
       <main className={`flex-1 flex w-full relative overflow-hidden transition-all duration-300 ${isCssFullscreen ? 'fixed inset-0 z-[100] bg-[#E5E7EB]' : 'z-10 pt-16'}`}>
-        <div className="absolute inset-0 z-20 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-20 overflow-hidden">
           <QuickPinchZoom 
             ref={pinchZoomRef} 
             onUpdate={onUpdate} 
             wheelScaleFactor={500} 
-            draggableUnZoomed={false}
+            draggableUnZoomed={true}
             enabled={true}
+            minScale={0.5}
+            maxScale={5}
+            containerProps={{
+              style: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }
+            }}
           >
-            <div id="zoom-target" className="flex items-center justify-center p-4 md:p-8 transition-none">
+            <div id="zoom-target" className="flex items-center justify-center p-4 md:p-8 transition-none will-change-transform">
                <div className={`w-[90vw] md:w-[75vw] max-w-[1000px] h-[60vh] md:h-[65vh] max-h-[600px] flex items-center justify-center`}>
                   <FlipBook width={550} height={750} size="stretch" minWidth={300} maxWidth={1200} minHeight={400} maxHeight={750} maxShadowOpacity={0.5} showCover={true} mobileScrollSupport={true} usePortrait={false} onFlip={onPage} className="flip-book-custom" ref={flipBookRef} useMouseEvents={true}>
                       {bookElements}
