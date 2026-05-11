@@ -291,9 +291,6 @@ export default function LandingPage() {
                     <Image src="https://i.ibb.co.com/ymtW3dCX/katapel-bg.png" alt="Katapel" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
-                       <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30">
-                          <span className="material-symbols-rounded text-white text-4xl">target</span>
-                       </div>
                        <h3 className="text-2xl font-black text-white mb-2 tracking-tight">KATAPEL BABE JAKA</h3>
                        <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Bidik Jawaban yang Benar!</p>
                     </div>
@@ -304,12 +301,9 @@ export default function LandingPage() {
                    onClick={() => router.push('/explore/games/tug-of-war')}
                    className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
                  >
-                    <Image src="https://i.ibb.co.com/FqjpWPkK/tarik-tambang-bg.png" alt="Tarik Tambang" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <Image src="https://i.ibb.co.com/PvPM5pdn/Gemini-Generated-Image-av7uskav7uskav7u.png" alt="Tarik Tambang" fill className="object-cover -scale-x-100 group-hover:scale-x-[-1.1] group-hover:scale-y-[110%] transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
-                       <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30">
-                          <span className="material-symbols-rounded text-white text-4xl">groups</span>
-                       </div>
                        <h3 className="text-2xl font-black text-white mb-2 tracking-tight">TARIK TAMBANG</h3>
                        <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Adu Cepat Jawab Soal!</p>
                     </div>
