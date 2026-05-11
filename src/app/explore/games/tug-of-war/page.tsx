@@ -519,7 +519,7 @@ export default function TugOfWarGame() {
                         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black/10 rounded-[100%] blur-xl"></div>
                         <img src="https://i.ibb.co.com/mFJ6b3Sx/narik.png" className="w-48 h-48 object-contain drop-shadow-2xl" alt="P1" />
                         <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap">
-                           {gameMode === "single" ? "KAMU" : roomData?.players.p1?.name || "PEMAIN 1"}
+                           {gameMode === "single" ? profile.name : roomData?.players.p1?.name || "PEMAIN 1"}
                         </div>
                      </div>
                   </motion.div>
@@ -537,7 +537,7 @@ export default function TugOfWarGame() {
                         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black/10 rounded-[100%] blur-xl"></div>
                         <img src="https://i.ibb.co.com/mFJ6b3Sx/narik.png" className="w-48 h-48 object-contain drop-shadow-2xl" alt="P2" />
                         <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-secondary text-white text-[10px] font-black px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap -scale-x-100">
-                           {gameMode === "single" ? "BOT" : roomData?.players.p2?.name || "LAWAN"}
+                           {gameMode === "single" ? "JAKA" : roomData?.players.p2?.name || "LAWAN"}
                         </div>
                      </div>
                   </motion.div>
