@@ -1174,30 +1174,35 @@ export default function IntegratedDiagnosticPage() {
                               <span className="hidden md:inline">Mulai Membaca</span> <span className="material-symbols-rounded text-xl">mic</span>
                             </button>
                          ) : (
-                            <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-1.5 rounded-full border-2 border-[#E2E8F0]">
-                               {/* Mic Indicator - reflects actual audio capture state */}
-                               <div className="relative w-10 h-10 flex items-center justify-center">
-                                 {isMicActive && <div className="absolute inset-0 rounded-full bg-[#5AAFD1] opacity-20 animate-ping"></div>}
-                                 <div className={`relative w-8 h-8 rounded-full border-2 shadow-sm flex items-center justify-center z-10 transition-colors ${isMicActive ? 'bg-[#5AAFD1] border-[#4691B0]' : 'bg-[#FFB347] border-[#E69A2E]'}`}>
-                                   <span className="material-symbols-rounded text-white text-base">{isMicActive ? 'mic' : 'mic_off'}</span>
-                                 </div>
-                               </div>
+                             <>
+                                {/* Mic Indicator Separated */}
+                                <div className="bg-white/50 backdrop-blur-sm p-1.5 rounded-full border-2 border-[#E2E8F0]">
+                                   <div className="relative w-10 h-10 flex items-center justify-center">
+                                     {isMicActive && <div className="absolute inset-0 rounded-full bg-[#5AAFD1] opacity-20 animate-ping"></div>}
+                                     <div className={`relative w-8 h-8 rounded-full border-2 shadow-sm flex items-center justify-center z-10 transition-colors ${isMicActive ? 'bg-[#5AAFD1] border-[#4691B0]' : 'bg-[#FFB347] border-[#E69A2E]'}`}>
+                                       <span className="material-symbols-rounded text-white text-base">{isMicActive ? 'mic' : 'mic_off'}</span>
+                                     </div>
+                                   </div>
+                                </div>
 
-                               <button 
-                                 onClick={handleRepeatReading}
-                                 className="btn-bubbly rounded-full px-4 py-3 !bg-[#FFB300] !shadow-[0_4px_0_#FF8F00] flex items-center justify-center text-white transition-transform hover:scale-105 active:scale-95"
-                                 title="Ulangi Kalimat"
-                               >
-                                 <span className="material-symbols-rounded text-xl">replay</span>
-                               </button>
+                                {/* Action Buttons */}
+                                <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-1.5 rounded-full border-2 border-[#E2E8F0]">
+                                   <button 
+                                     onClick={handleRepeatReading}
+                                     className="btn-bubbly rounded-full px-4 py-3 !bg-[#FFB300] !shadow-[0_4px_0_#FF8F00] flex items-center justify-center text-white transition-transform hover:scale-105 active:scale-95"
+                                     title="Ulangi Kalimat"
+                                   >
+                                     <span className="material-symbols-rounded text-xl">replay</span>
+                                   </button>
 
-                               <button 
-                                 onClick={stopFluencyReading} 
-                                 className="btn-bubbly rounded-full px-8 py-3 !bg-[#34D399] !shadow-[0_4px_0_#059669] flex items-center gap-2 text-base"
-                               >
-                                 Selesai <span className="material-symbols-rounded text-xl">check_circle</span>
-                               </button>
-                            </div>
+                                   <button 
+                                     onClick={stopFluencyReading} 
+                                     className="btn-bubbly rounded-full px-8 py-3 !bg-[#34D399] !shadow-[0_4px_0_#059669] flex items-center gap-2 text-base"
+                                   >
+                                     Selesai <span className="material-symbols-rounded text-xl">check_circle</span>
+                                   </button>
+                                </div>
+                             </>
                          )}
 
                          <div className={`hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-black text-2xl border-4 transition-all ${timeLeft < 10 ? 'bg-[#FF4757] border-[#D63031] text-white animate-bounce' : 'bg-white border-[#E2E8F0] text-[#5AAFD1]'}`}>
