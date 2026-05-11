@@ -15,6 +15,26 @@ export default function LandingPage() {
   const [showDevModal, setShowDevModal] = useState(false);
   const [showGamePicker, setShowGamePicker] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
+  const [expandedBtn, setExpandedBtn] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = () => setExpandedBtn(null);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const handleAction = (id: string, callback: () => void) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    if (isMobile) {
+      if (expandedBtn === id) {
+        callback();
+      } else {
+        setExpandedBtn(id);
+      }
+    } else {
+      callback();
+    }
+  };
 
   const isDefaultUser = profile.name === "Petualang Baca";
   
@@ -75,29 +95,29 @@ export default function LandingPage() {
           <div className="flex flex-row items-center gap-4 mt-8" style={{ animation: 'bounce-in 1.2s forwards' }}>
             {/* Perpustakaan */}
             <button 
-              onClick={handleMulai}
-              className="group relative flex items-center gap-3 bg-primary text-white h-16 w-16 hover:w-56 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden shadow-lg shadow-primary/20"
+              onClick={(e) => { e.stopPropagation(); handleAction('perpus', handleMulai); }}
+              className={`group relative flex items-center gap-3 bg-primary text-white h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden shadow-lg shadow-primary/20 ${expandedBtn === 'perpus' ? 'w-56' : 'w-16'} hover:w-56`}
             >
               <span className="material-symbols-rounded font-bold text-3xl shrink-0">menu_book</span>
-              <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Perpustakaan</span>
+              <span className={`font-black text-lg whitespace-nowrap transition-opacity duration-300 delay-100 ${expandedBtn === 'perpus' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}>Perpustakaan</span>
             </button>
 
             {/* Diagnosis */}
             <button 
-              onClick={handleDiagnosis}
-              className="group relative flex items-center gap-3 bg-white text-primary h-16 w-16 hover:w-52 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg"
+              onClick={(e) => { e.stopPropagation(); handleAction('diag', handleDiagnosis); }}
+              className={`group relative flex items-center gap-3 bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg ${expandedBtn === 'diag' ? 'w-52' : 'w-16'} hover:w-52`}
             >
               <span className="material-symbols-rounded font-bold text-3xl shrink-0">troubleshoot</span>
-              <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Diagnosis</span>
+              <span className={`font-black text-lg whitespace-nowrap transition-opacity duration-300 delay-100 ${expandedBtn === 'diag' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}>Diagnosis</span>
             </button>
 
             {/* Main Permainan */}
             <button 
-              onClick={() => setShowGamePicker(true)}
-              className="group relative flex items-center gap-3 bg-white text-primary h-16 w-16 hover:w-64 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg"
+              onClick={(e) => { e.stopPropagation(); handleAction('game', () => setShowGamePicker(true)); }}
+              className={`group relative flex items-center gap-3 bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg ${expandedBtn === 'game' ? 'w-64' : 'w-16'} hover:w-64`}
             >
               <span className="material-symbols-rounded font-bold text-3xl shrink-0">sports_esports</span>
-              <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Main Permainan</span>
+              <span className={`font-black text-lg whitespace-nowrap transition-opacity duration-300 delay-100 ${expandedBtn === 'game' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}>Main Permainan</span>
             </button>
           </div>
         </div>
