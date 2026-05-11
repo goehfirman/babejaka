@@ -9,7 +9,7 @@ import BrandLogo from "@/components/BrandLogo";
 import { useProfile } from "@/lib/profile-context";
 import { PointToast } from "@/components/PointToast";
 import { StarFly } from "@/components/StarFly";
-import QuickPinchZoom, { makeSelectable } from "react-quick-pinch-zoom";
+import QuickPinchZoom from "react-quick-pinch-zoom";
 
 // Dynamically import react-pageflip to avoid SSR 'window is not defined' errors
 const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false });
@@ -288,8 +288,8 @@ export default function ReadingRoom() {
             wheelScaleFactor={500} 
             draggableUnZoomed={true}
             enabled={true}
-            minScale={0.5}
-            maxScale={5}
+            minZoom={0.5}
+            maxZoom={5}
             containerProps={{
               style: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }
             }}
