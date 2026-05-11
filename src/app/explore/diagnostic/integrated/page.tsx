@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useProfile } from "@/lib/profile-context";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { gradeEssayAction } from "@/actions/grade-essay";
 import { BOOKS } from "@/lib/books-data";
 import jsPDF from 'jspdf';
@@ -1127,7 +1128,16 @@ export default function IntegratedDiagnosticPage() {
                    </div>
                  )
                )}
-               <div className="card-bubbly bg-[#FFFAF0] p-8 md:p-12 min-h-[400px] flex flex-col justify-between relative overflow-hidden">
+                <div className="card-bubbly bg-[#FFFAF0] p-8 md:p-12 min-h-[400px] flex flex-col justify-between relative overflow-hidden">
+                   {/* Mobile Countdown Line Indicator */}
+                   <div className="md:hidden absolute top-0 left-0 w-full h-1.5 bg-gray-100 z-50">
+                     <motion.div 
+                       initial={{ width: "100%" }}
+                       animate={{ width: `${(timeLeft / selectedLevels[currentLevelIdx].time) * 100}%` }}
+                       transition={{ duration: 1, ease: "linear" }}
+                       className={`h-full ${timeLeft < 10 ? 'bg-[#FF4757]' : 'bg-[#5AAFD1]'}`}
+                     />
+                   </div>
                   
                   {/* Progress Bar (Read Along style) */}
                   {isReading && (
@@ -1200,12 +1210,11 @@ export default function IntegratedDiagnosticPage() {
                             </div>
                          )}
 
-                         <div className={`flex items-center gap-2 px-6 py-3 rounded-full font-black text-2xl border-4 transition-all ${timeLeft < 10 ? 'bg-[#FF4757] border-[#D63031] text-white animate-bounce' : 'bg-white border-[#E2E8F0] text-[#5AAFD1]'}`}>
+                         <div className={`hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-black text-2xl border-4 transition-all ${timeLeft < 10 ? 'bg-[#FF4757] border-[#D63031] text-white animate-bounce' : 'bg-white border-[#E2E8F0] text-[#5AAFD1]'}`}>
                             <span className="material-symbols-rounded text-2xl">timer</span>{timeLeft}s
                          </div>
                       </div>
                    </div>
-                  
                   <div className="grid md:grid-cols-12 gap-10 items-center">
                       <div className="md:col-span-4 relative aspect-square rounded-3xl overflow-hidden border-4 border-white shadow-md bg-[#F8FAFC]">
                         {currentLevel?.image && <Image src={currentLevel.image} alt="Illust" fill className="object-cover" unoptimized />}
@@ -1607,13 +1616,13 @@ export default function IntegratedDiagnosticPage() {
                         onClick={() => window.location.reload()} 
                         className="w-full md:w-auto px-10 py-5 bg-white text-[#87CEEB] border-4 border-[#87CEEB] rounded-full font-black text-xl hover:bg-[#F0F8FF] transition-all flex items-center justify-center gap-3 shadow-[0_6px_0_#5AAFD1]"
                      >
-                        DIAGNOSIS ULANG <span className="material-symbols-rounded text-2xl">refresh</span>
+                        Diagnosis Ulang <span className="material-symbols-rounded text-2xl">refresh</span>
                      </button>
                      <Link 
                         href="/explore/library" 
                         className="w-full md:w-auto px-10 py-5 bg-[#FFB347] text-white border-4 border-[#E69A2E] rounded-full font-black text-xl hover:scale-105 hover:shadow-xl transition-all flex items-center justify-center gap-3 shadow-[0_6px_0_#CC8400]"
                      >
-                        KEMBALI KE PERPUSTAKAAN <span className="material-symbols-rounded text-2xl font-bold">celebration</span>
+                        Kembali ke Perpustakaan <span className="material-symbols-rounded text-2xl font-bold">celebration</span>
                      </Link>
                   </div>
                </div>
@@ -1652,7 +1661,7 @@ export default function IntegratedDiagnosticPage() {
             <div className="p-6 border-t-2 border-[#E2E8F0] flex justify-end gap-4 bg-white shrink-0">
               <button onClick={() => setReportPreviewData(null)} className="px-6 py-3 rounded-full font-bold text-[#666666] hover:bg-[#F1F5F9] transition-colors">Batal</button>
               <button onClick={handleDownloadPDF} className="px-8 py-3 bg-[#5AAFD1] text-white rounded-full font-black flex items-center gap-2 shadow-[0_4px_0_#4691B0] hover:-translate-y-0.5 transition-all active:translate-y-1">
-                UNDUH PDF <span className="material-symbols-rounded">download</span>
+                Unduh PDF <span className="material-symbols-rounded">download</span>
               </button>
             </div>
           </div>

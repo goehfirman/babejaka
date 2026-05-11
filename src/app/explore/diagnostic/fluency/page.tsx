@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import React, { useState, useEffect, useRef } from "react";
 import { useProfile } from "@/lib/profile-context";
 
@@ -362,10 +363,10 @@ export default function FluencyDiagnosticPage() {
                    </button>
                 )}
 
-                <div className={`flex items-center gap-2 px-6 py-2 rounded-2xl font-black text-xl border-4 shadow-sm transition-all ${timeLeft < 10 ? 'bg-[#FF4757] border-[#D63031] text-white animate-bounce' : 'bg-white border-[#E2E8F0] text-[#5AAFD1]'}`}>
-                    <span className="material-symbols-rounded text-2xl">timer</span>
-                    {timeLeft}s
-                </div>
+                 <div className={`hidden md:flex items-center gap-2 px-6 py-2 rounded-2xl font-black text-xl border-4 shadow-sm transition-all ${timeLeft < 10 ? 'bg-[#FF4757] border-[#D63031] text-white animate-bounce' : 'bg-white border-[#E2E8F0] text-[#5AAFD1]'}`}>
+                     <span className="material-symbols-rounded text-2xl">timer</span>
+                     {timeLeft}s
+                 </div>
              </div>
            </div>
          )}
@@ -426,6 +427,15 @@ export default function FluencyDiagnosticPage() {
 
 
                <div className="card-bubbly bg-[#FFFAF0] border-4 border-[#E2E8F0] p-6 md:p-10 min-h-[400px] flex flex-col justify-between relative overflow-hidden">
+                  {/* Mobile Countdown Line Indicator */}
+                  <div className="md:hidden absolute top-0 left-0 w-full h-1.5 bg-gray-100 z-50">
+                    <motion.div 
+                      initial={{ width: "100%" }}
+                      animate={{ width: `${(timeLeft / LEVELS[currentTestIndex].time) * 100}%` }}
+                      transition={{ duration: 1, ease: "linear" }}
+                      className={`h-full ${timeLeft < 10 ? 'bg-[#FF4757]' : 'bg-[#5AAFD1]'}`}
+                    />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch flex-1">
                      {/* Illustration on the left */}
                      <div className="md:col-span-5 relative w-full h-[250px] md:h-auto md:min-h-full rounded-3xl overflow-hidden border-4 border-white shadow-md bg-[#F8FAFC]">
@@ -508,10 +518,10 @@ export default function FluencyDiagnosticPage() {
 
                   <div className="mt-16 flex flex-col sm:flex-row gap-6 justify-center relative z-10">
                      <Link href="/explore/library" className="btn-bubbly rounded-full px-12 py-5 text-xl flex justify-center bg-[#FFB347] text-white border-4 border-[#E69A2E] shadow-[0_6px_0_#E69A2E] hover:scale-105 transition-transform hover:-translate-y-0">
-                        KEMBALI KE BERANDA 🏠
+                        Kembali ke Beranda 🏠
                      </Link>
                      <button onClick={() => { setStep("journey"); setMatchedIndices([]); setReadDuration(0); }} className="px-12 py-5 bg-white text-[#A0AEC0] rounded-full font-black uppercase tracking-widest text-lg hover:border-[#E2E8F0] hover:text-[#333333] transition-all border-4 border-[#E2E8F0]">
-                        ULANGI LAGI
+                        Ulangi Lagi
                      </button>
                   </div>
                </div>

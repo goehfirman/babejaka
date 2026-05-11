@@ -133,7 +133,7 @@ export default function LeaderboardPage() {
               className="group relative inline-flex items-center gap-3 bg-secondary text-white h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-10 overflow-hidden shadow-xl shadow-secondary/20 hover:scale-105 active:scale-95"
             >
               <span className="material-symbols-rounded font-bold text-2xl shrink-0 group-hover:rotate-[360deg] transition-transform duration-700">home</span>
-              <span className="font-black text-base whitespace-nowrap">KEMBALI KE BERANDA</span>
+              <span className="font-semibold text-base whitespace-nowrap">Kembali ke Beranda</span>
             </Link>
           </div>
         </div>
