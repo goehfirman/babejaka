@@ -267,7 +267,7 @@ export default function LandingPage() {
         className="fixed bottom-6 left-6 md:bottom-8 md:left-8 z-[110] bg-white text-secondary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-secondary/20 shadow-lg w-16 hover:w-56 flex items-center gap-3 group"
       >
         <span className="material-symbols-rounded font-bold text-3xl shrink-0">info</span>
-        <span className="font-black text-base whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 uppercase">
+        <span className="font-black text-base whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
           Informasi Situs
         </span>
       </button>
