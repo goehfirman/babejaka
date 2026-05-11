@@ -9,6 +9,7 @@ import BrandLogo from "@/components/BrandLogo";
 import { useProfile } from "@/lib/profile-context";
 import { PointToast } from "@/components/PointToast";
 import { StarFly } from "@/components/StarFly";
+import QuickPinchZoom, { makeSelectable } from "react-quick-pinch-zoom";
 
 // Dynamically import react-pageflip to avoid SSR 'window is not defined' errors
 const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false });
@@ -61,7 +62,6 @@ export default function ReadingRoom() {
   const [currentPage, setCurrentPage] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isCssFullscreen, setIsCssFullscreen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const [showFontMenu, setShowFontMenu] = useState(false);
   const [currentFontConfig, setCurrentFontConfig] = useState({
      family: "font-sans",
@@ -78,6 +78,14 @@ export default function ReadingRoom() {
   const [pageStartTime, setPageStartTime] = useState(Date.now());
   const hasEarnedFinishRef = useRef(false);
   const flipBookRef = useRef<any>(null);
+  const pinchZoomRef = useRef<any>(null);
+
+  const onUpdate = React.useCallback(({ x, y, scale }: any) => {
+    const el = document.getElementById("zoom-target");
+    if (el) {
+      el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+    }
+  }, []);
 
   // Hook for page timer
   useEffect(() => {
@@ -217,7 +225,11 @@ export default function ReadingRoom() {
      }
   };
 
-  const handleZoom = () => setZoomLevel((prev) => prev === 1 ? 1.25 : prev === 1.25 ? 1.5 : 1);
+  const handleZoom = () => {
+     if (pinchZoomRef.current) {
+        pinchZoomRef.current.alignCenter({ scale: 1, x: 0, y: 0, animated: true });
+     }
+  };
   const nextButtonClick = () => flipBookRef.current?.pageFlip().flipNext();
   const prevButtonClick = () => flipBookRef.current?.pageFlip().flipPrev();
   
@@ -269,12 +281,22 @@ export default function ReadingRoom() {
       </header>
 
       <main className={`flex-1 flex w-full relative overflow-hidden transition-all duration-300 ${isCssFullscreen ? 'fixed inset-0 z-[100] bg-[#E5E7EB]' : 'z-10 pt-16'}`}>
-        <div className={`absolute inset-0 flex items-center justify-center p-4 md:p-8 z-20 transition-transform duration-300 ease-in-out`} style={{ transform: `scale(${zoomLevel})` }}>
-           <div className={`w-[90vw] md:w-[75vw] max-w-[1000px] h-[60vh] md:h-[65vh] max-h-[600px] flex items-center justify-center`}>
-              <FlipBook width={550} height={750} size="stretch" minWidth={300} maxWidth={1200} minHeight={400} maxHeight={750} maxShadowOpacity={0.5} showCover={true} mobileScrollSupport={true} usePortrait={false} onFlip={onPage} className="flip-book-custom" ref={flipBookRef} useMouseEvents={true}>
-                  {bookElements}
-              </FlipBook>
-           </div>
+        <div className="absolute inset-0 z-20 flex items-center justify-center overflow-hidden">
+          <QuickPinchZoom 
+            ref={pinchZoomRef} 
+            onUpdate={onUpdate} 
+            wheelScaleFactor={500} 
+            draggableUnZoomed={false}
+            enabled={true}
+          >
+            <div id="zoom-target" className="flex items-center justify-center p-4 md:p-8 transition-none">
+               <div className={`w-[90vw] md:w-[75vw] max-w-[1000px] h-[60vh] md:h-[65vh] max-h-[600px] flex items-center justify-center`}>
+                  <FlipBook width={550} height={750} size="stretch" minWidth={300} maxWidth={1200} minHeight={400} maxHeight={750} maxShadowOpacity={0.5} showCover={true} mobileScrollSupport={true} usePortrait={false} onFlip={onPage} className="flip-book-custom" ref={flipBookRef} useMouseEvents={true}>
+                      {bookElements}
+                  </FlipBook>
+               </div>
+            </div>
+          </QuickPinchZoom>
         </div>
 
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-between px-2 md:px-8">
@@ -287,7 +309,7 @@ export default function ReadingRoom() {
               <span className="text-sm font-medium tracking-wide">{currentPage} / {bookElementsCount - 1}</span>
               <div className="h-4 w-px bg-white/20"></div>
               <Link href="/explore/library" className="hover:text-[#FFB347] transition-colors"><span className="material-symbols-rounded text-xl">home</span></Link>
-              <button onClick={handleZoom} className={`transition-colors ${zoomLevel > 1 ? 'text-[#FFB347]' : 'hover:text-[#FFB347]'}`}><span className="material-symbols-rounded text-xl">zoom_in</span></button>
+              <button onClick={handleZoom} className="hover:text-[#FFB347] transition-colors"><span className="material-symbols-rounded text-xl">zoom_in</span></button>
               <button onClick={toggleFullscreen} className="hover:text-[#FFB347] transition-colors"><span className="material-symbols-rounded text-xl">{isFullscreen || isCssFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span></button>
            </div>
         </div>
