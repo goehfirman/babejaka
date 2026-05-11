@@ -68,7 +68,7 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
                 type="text" 
                 value={inputName}
                 onChange={(e) => setInputName(e.target.value)}
-                placeholder="Namamu di sini"
+                placeholder="Tuliskan nama lengkapmu"
                 autoFocus
                 className="w-full bg-white/80 border border-gray-100 rounded-2xl px-8 py-4 text-lg font-bold text-ink placeholder:text-gray-300 outline-none focus:border-primary focus:bg-white transition-all shadow-sm text-center focus:scale-[1.01]"
               />
