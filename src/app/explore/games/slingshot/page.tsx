@@ -364,8 +364,9 @@ export default function SlingshotGame() {
       oy *= ratio;
     }
 
-    const powerX = 4.5;
-    const powerY = 4.5;
+    const isMobile = window.innerWidth < 768;
+    const powerX = isMobile ? 1.5 : 4.5;
+    const powerY = isMobile ? 1.5 : 4.5;
     
     // Reverse direction for slingshot feel
     const targetX = -ox * powerX;
@@ -384,21 +385,18 @@ export default function SlingshotGame() {
   };
 
   const checkCollision = (tx: number, ty: number) => {
-    // Bubble positions (relative to screen center)
-    // We'll place them at a depth that requires a decent pull to reach
-    const targetDepth = -450;
-    const bubbles = [
-      { x: -360, y: targetDepth },
-      { x: -120, y: targetDepth },
-      { x: 120, y: targetDepth },
-      { x: 360, y: targetDepth }
-    ];
+    // Dynamic bubble centers relative to screen center
+    const dynamicBubbles = bubbleRefs.current.map((el) => {
+      if (!el) return 0;
+      const rect = el.getBoundingClientRect();
+      return (rect.left + rect.width / 2) - (window.innerWidth / 2);
+    });
 
-    let hitIndex = 0; 
+    let hitIndex = -1; 
     let minDist = Infinity;
 
-    bubbles.forEach((b, i) => {
-      const d = Math.sqrt(Math.pow(tx - b.x, 2) + Math.pow(ty - b.y, 2));
+    dynamicBubbles.forEach((bx, i) => {
+      const d = Math.abs(tx - bx);
       if (d < minDist) {
         minDist = d;
         hitIndex = i;
@@ -614,9 +612,10 @@ export default function SlingshotGame() {
           {isDragging && (
             <div className="absolute bottom-[152px] pointer-events-none overflow-visible w-0 h-0 flex justify-center items-center z-30">
               {[...Array(7)].map((_, i) => {
-                const step = (i + 1) / 7; // Last dot at exactly 1.0
-                const powerX = 4.5;
-                const powerY = 4.5;
+                const step = (i + 1) / 7;
+                const isMobile = window.innerWidth < 768;
+                const powerX = isMobile ? 1.5 : 4.5;
+                const powerY = isMobile ? 1.5 : 4.5;
                 const dx = -ballPos.x * powerX * step;
                 const dy = -ballPos.y * powerY * step;
                 const scale = 1.3 - (step * 0.8); // More dramatic perspective
