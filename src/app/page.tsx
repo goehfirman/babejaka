@@ -261,15 +261,12 @@ export default function LandingPage() {
       {/* TENTANG PENGEMBANG BUTTON (BOTTOM RIGHT) */}
       <button 
         onClick={() => setShowDevModal(true)}
-        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[110] bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 p-2 md:px-6 md:py-4 rounded-2xl font-black text-xs text-primary tracking-widest hover:scale-105 hover:bg-white hover:shadow-2xl transition-all flex items-center gap-3 group"
+        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[110] bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg w-16 hover:w-72 flex items-center gap-3 group"
       >
-        <span className="relative hidden md:block">
-          TENTANG PENGEMBANG
-          <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+        <span className="material-symbols-rounded font-bold text-3xl shrink-0">person</span>
+        <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 uppercase">
+          Tentang Pengembang
         </span>
-        <div className="w-12 h-12 md:w-8 md:h-8 rounded-xl md:rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-          <span className="material-symbols-rounded text-2xl md:text-lg">person</span>
-        </div>
       </button>
 
       {/* GAME PICKER MODAL */}
