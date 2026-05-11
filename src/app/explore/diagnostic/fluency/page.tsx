@@ -351,7 +351,7 @@ export default function FluencyDiagnosticPage() {
                      onClick={startReading} 
                      className="btn-bubbly rounded-full px-8 py-2 bg-[#5AAFD1] flex items-center gap-2 shadow-[0_4px_0_#4691B0] text-base"
                    >
-                     Mulai Membaca <span className="material-symbols-rounded text-xl">mic</span>
+                     <span className="hidden md:inline">Mulai Membaca</span> <span className="material-symbols-rounded text-xl">mic</span>
                    </button>
                 ) : (
                    <button 

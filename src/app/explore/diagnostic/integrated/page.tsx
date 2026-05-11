@@ -1171,7 +1171,7 @@ export default function IntegratedDiagnosticPage() {
                               onClick={startFluencyReading} 
                               className="btn-bubbly rounded-full px-8 py-3 bg-[#5AAFD1] flex items-center gap-2 shadow-[0_4px_0_#4691B0] text-base"
                             >
-                              Mulai Membaca <span className="material-symbols-rounded text-xl">mic</span>
+                              <span className="hidden md:inline">Mulai Membaca</span> <span className="material-symbols-rounded text-xl">mic</span>
                             </button>
                          ) : (
                             <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-1.5 rounded-full border-2 border-[#E2E8F0]">
