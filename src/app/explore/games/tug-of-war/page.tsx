@@ -399,9 +399,13 @@ export default function TugOfWarGame() {
         <button onClick={() => setGameMode("select")} className="p-2 hover:bg-white/50 rounded-full transition-all text-ink"><ArrowLeft size={24} /></button>
         <div className="flex items-center gap-4">
            <Volume2 className="text-ink-light opacity-30" />
-           <div className="bg-ink text-white px-5 py-2 rounded-2xl flex items-center gap-2">
-              <Star className="text-yellow-400 fill-yellow-400" size={16} />
-              <span className="font-black">{profile.points}</span>
+           <div className="bg-ink text-white px-5 py-2 rounded-2xl flex items-center gap-3">
+              <span className="text-[10px] font-black opacity-60 uppercase tracking-widest">{profile.name}</span>
+              <div className="w-px h-3 bg-white/20" />
+              <div className="flex items-center gap-2">
+                 <Star className="text-yellow-400 fill-yellow-400" size={16} />
+                 <span className="font-black">{profile.points}</span>
+              </div>
            </div>
         </div>
       </div>

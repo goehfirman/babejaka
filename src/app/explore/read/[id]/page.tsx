@@ -224,13 +224,7 @@ export default function ReadingRoom() {
   const onPage = (e: any) => {
      const newPage = e.data;
      setCurrentPage(newPage);
-     if (newPage >= bookElementsCount - 1 && !hasEarnedFinishRef.current) {
-        addPoints(50);
-        hasEarnedFinishRef.current = true;
-        const now = Date.now();
-        const positions = Array.from({ length: 10 }).map(() => ({ x: window.innerWidth / 2, y: window.innerHeight / 2 }));
-        setPendingStars({ count: 10, timestamp: now, positions });
-     }
+     // Automatic points on last page removed per request
   };
 
   return (
