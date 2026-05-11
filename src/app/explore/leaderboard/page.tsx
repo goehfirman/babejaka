@@ -44,6 +44,15 @@ export default function LeaderboardPage() {
         <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
         
+        {/* Back Button */}
+        <Link 
+          href="/explore/dashboard" 
+          className="absolute top-8 left-8 z-[100] flex items-center gap-2 bg-white/20 hover:bg-white/40 backdrop-blur-md px-5 py-2.5 rounded-full text-white font-black text-xs border border-white/30 transition-all hover:scale-105 active:scale-95 group"
+        >
+          <span className="material-symbols-rounded text-lg transition-transform group-hover:-translate-x-1">home</span>
+          BERANDA
+        </Link>
+        
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-white text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
             <span className="material-symbols-rounded text-base">emoji_events</span>
@@ -116,12 +125,13 @@ export default function LeaderboardPage() {
             })}
           </div>
 
-          <div className="mt-10 pt-8 border-t-2 border-slate-50 text-center">
+          <div className="mt-12 pt-10 border-t-2 border-slate-50 text-center">
             <Link 
               href="/explore/dashboard" 
-              className="btn-bubbly rounded-full px-10 py-4 inline-flex items-center gap-2 text-sm"
+              className="group relative inline-flex items-center gap-3 bg-secondary text-white h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-10 overflow-hidden shadow-xl shadow-secondary/20 hover:scale-105 active:scale-95"
             >
-              KEMBALI KE BERANDA <span className="material-symbols-rounded">home</span>
+              <span className="material-symbols-rounded font-bold text-2xl shrink-0 group-hover:rotate-[360deg] transition-transform duration-700">home</span>
+              <span className="font-black text-base whitespace-nowrap">KEMBALI KE BERANDA</span>
             </Link>
           </div>
         </div>
