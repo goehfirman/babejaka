@@ -37,7 +37,18 @@ export default function LeaderboardPage() {
   const sortedLeaderboard = leaderboard;
 
   return (
-    <div className="min-h-screen bg-[#F0F8FF] font-body text-[#333333] pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] font-body text-[#333333] pb-20 relative overflow-hidden">
+      {/* Heritage Watermark Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.04] bg-batik-subtle animate-drift"></div>
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 opacity-[0.05]"
+        style={{ 
+          backgroundImage: 'url("https://i.ibb.co.com/hzkP529/Gemini-Generated-Image-1ce1or1ce1or1ce1.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-primary to-secondary pt-32 pb-20 px-6 relative overflow-hidden">
         {/* Animated Background Elements */}
