@@ -261,10 +261,10 @@ export default function LandingPage() {
       {/* TENTANG PENGEMBANG BUTTON (BOTTOM RIGHT) */}
       <button 
         onClick={() => setShowDevModal(true)}
-        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[110] bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg w-16 hover:w-72 flex items-center gap-3 group"
+        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[110] bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg w-16 hover:w-64 flex items-center gap-3 group"
       >
         <span className="material-symbols-rounded font-bold text-3xl shrink-0">person</span>
-        <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 uppercase">
+        <span className="font-black text-base whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
           Tentang Pengembang
         </span>
       </button>
