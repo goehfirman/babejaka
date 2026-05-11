@@ -126,7 +126,9 @@ export default function LandingPage() {
         <div className="lg:w-1/2 flex items-center justify-center relative mt-20 md:mt-28">
           <div className="relative w-full max-w-[510px] aspect-square animate-float-subtle">
             {/* Interactive Speech Bubble */}
-            <BabeSpeechBubble />
+            <div className="hidden md:block">
+               <BabeSpeechBubble />
+            </div>
             
             {/* Holographic Ring Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl opacity-30 animate-pulse"></div>
@@ -143,7 +145,7 @@ export default function LandingPage() {
             </div>
 
             {/* Jakarta Global City Badge - Breathing & Enlarged */}
-            <div className="absolute top-[10%] -right-28 w-80 h-80 z-20 animate-float-breathing">
+            <div className="hidden md:block absolute top-[10%] -right-28 w-80 h-80 z-20 animate-float-breathing">
                 <Image 
                   src="https://i.ibb.co.com/jn3fgc0/jakarta-global-city.png" 
                   alt="Jakarta Global City" 
