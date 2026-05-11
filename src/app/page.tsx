@@ -111,13 +111,13 @@ export default function LandingPage() {
               <span className={`font-black text-lg whitespace-nowrap transition-opacity duration-300 delay-100 ${expandedBtn === 'diag' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}>Diagnosis</span>
             </button>
 
-            {/* Main Permainan */}
+            {/* Permainan */}
             <button 
               onClick={(e) => { e.stopPropagation(); handleAction('game', () => setShowGamePicker(true)); }}
-              className={`group relative flex items-center gap-3 bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg ${expandedBtn === 'game' ? 'w-64' : 'w-16'} hover:w-64`}
+              className={`group relative flex items-center gap-3 bg-white text-primary h-16 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg ${expandedBtn === 'game' ? 'w-56' : 'w-16'} hover:w-56`}
             >
               <span className="material-symbols-rounded font-bold text-3xl shrink-0">sports_esports</span>
-              <span className={`font-black text-lg whitespace-nowrap transition-opacity duration-300 delay-100 ${expandedBtn === 'game' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}>Main Permainan</span>
+              <span className={`font-black text-lg whitespace-nowrap transition-opacity duration-300 delay-100 ${expandedBtn === 'game' ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}>Permainan</span>
             </button>
           </div>
         </div>
