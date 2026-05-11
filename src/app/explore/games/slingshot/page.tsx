@@ -491,9 +491,13 @@ export default function SlingshotGame() {
         </div>
 
         <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-sm">
+          <div className="flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur-md rounded-2xl border border-white shadow-sm">
+             <div className="flex flex-col items-end border-r border-gray-100 pr-3">
+                <span className="text-[9px] font-black text-ink-light tracking-widest uppercase opacity-40">PEMAIN</span>
+                <span className="text-xs font-black text-ink-light">{profile.name}</span>
+             </div>
              <div className="flex flex-col items-end">
-               <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">POIN BINTANG</span>
+                <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">POIN BINTANG</span>
                <div className="flex items-center gap-1.5">
                   <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 animate-pulse" />
                   <span className="text-xl font-black text-ink">{profile.points || 0}</span>
