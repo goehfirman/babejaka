@@ -288,7 +288,7 @@ export default function LandingPage() {
                    onClick={() => router.push('/explore/games/slingshot')}
                    className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
                  >
-                    <Image src="https://i.ibb.co.com/Y4FKRjTv/bg.png" alt="Katapel" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <Image src="https://i.ibb.co.com/9m6sMc0N/katapel-bg.png" alt="Katapel" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30">
@@ -304,7 +304,7 @@ export default function LandingPage() {
                    onClick={() => router.push('/explore/games/tug-of-war')}
                    className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
                  >
-                    <Image src="https://i.ibb.co.com/jn3fgc0/jakarta-global-city.png" alt="Tarik Tambang" fill className="object-contain p-12 bg-secondary/10 group-hover:scale-110 transition-transform duration-700" />
+                    <Image src="https://i.ibb.co.com/mFMpBxrG/tarik-tambang-bg.png" alt="Tarik Tambang" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
                        <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30">
