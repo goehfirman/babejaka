@@ -24,8 +24,8 @@ export default function LandingPage() {
   }, []);
 
   const handleAction = (id: string, callback: () => void) => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-    if (isMobile) {
+    const isTouchDevice = typeof window !== 'undefined' && window.innerWidth < 1280;
+    if (isTouchDevice) {
       if (expandedBtn === id) {
         callback();
       } else {
