@@ -1162,16 +1162,6 @@ export default function IntegratedDiagnosticPage() {
                       </div>
 
 
-                      {/* Center: Star Counter (Read Along style) */}
-                      {isReading && (
-                        <div className="flex items-center gap-2 bg-gradient-to-r from-[#FFF8E1] to-[#FFFDE7] px-5 py-2 rounded-full border-2 border-[#FFD54F] shadow-sm">
-                          <span className="material-symbols-rounded text-[#FFB300] text-2xl" style={{
-                            animation: matchedIndices.length > 0 ? 'pulse 0.3s ease-in-out' : 'none'
-                          }}>star</span>
-                          <span className="font-black text-xl text-[#F57F17]">{matchedIndices.length}</span>
-                          <span className="text-xs text-[#A0AEC0] font-bold">/ {currentLevel?.text?.split(" ").length || 0}</span>
-                        </div>
-                      )}
 
                       {/* Right: Actions & Timer Group */}
                       <div className="flex items-center gap-4">
