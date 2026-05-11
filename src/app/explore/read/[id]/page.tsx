@@ -288,11 +288,14 @@ export default function ReadingRoom() {
             wheelScaleFactor={500} 
             draggableUnZoomed={true}
             enabled={true}
-            minZoom={0.5}
-            maxZoom={5}
+            minZoom={0.1}
+            maxZoom={10}
             enforceBoundsDuringZoom={false}
             centerContained={false}
             inertia={false}
+            zoomOutFactor={1}
+            tapZoomFactor={0}
+            doubleTapToggleZoom={false}
             containerProps={{
               style: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }
             }}
