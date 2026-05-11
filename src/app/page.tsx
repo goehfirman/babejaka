@@ -72,18 +72,32 @@ export default function LandingPage() {
             Siap keliling Jakarta lewat cerita? Bersama Babe Jaka, kamu bisa asah kemampuan membacamu jadi makin jago sambil mengenal kerennya budaya Betawi. Yuk, mulai baca sekarang!
           </p>
 
-          <div className="flex flex-wrap justify-center lg:justify-start gap-4" style={{ animation: 'bounce-in 1.2s forwards' }}>
-            <button onClick={handleMulai} className="btn-heritage flex items-center gap-3">
-              PERPUSTAKAAN <span className="material-symbols-rounded font-bold text-2xl">menu_book</span>
+          <div className="flex flex-row items-center gap-4 mt-8" style={{ animation: 'bounce-in 1.2s forwards' }}>
+            {/* Perpustakaan */}
+            <button 
+              onClick={handleMulai}
+              className="group relative flex items-center gap-3 bg-primary text-white h-16 w-16 hover:w-56 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden shadow-lg shadow-primary/20"
+            >
+              <span className="material-symbols-rounded font-bold text-3xl shrink-0">menu_book</span>
+              <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Perpustakaan</span>
             </button>
-            <button onClick={handleDiagnosis} className="btn-heritage-outline">
-              DIAGNOSIS <span className="material-symbols-rounded font-bold text-2xl">troubleshoot</span>
+
+            {/* Diagnosis */}
+            <button 
+              onClick={handleDiagnosis}
+              className="group relative flex items-center gap-3 bg-white text-primary h-16 w-16 hover:w-52 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg"
+            >
+              <span className="material-symbols-rounded font-bold text-3xl shrink-0">troubleshoot</span>
+              <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Diagnosis</span>
             </button>
+
+            {/* Main Permainan */}
             <button 
               onClick={() => setShowGamePicker(true)}
-              className="btn-heritage-outline !text-secondary !border-secondary/20 hover:!bg-secondary/5 flex items-center gap-3"
+              className="group relative flex items-center gap-3 bg-white text-primary h-16 w-16 hover:w-64 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] rounded-full px-5 overflow-hidden border-4 border-primary/20 shadow-lg"
             >
-              MAIN PERMAINAN <span className="material-symbols-rounded font-bold text-2xl">sports_esports</span>
+              <span className="material-symbols-rounded font-bold text-3xl shrink-0">sports_esports</span>
+              <span className="font-black text-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Main Permainan</span>
             </button>
           </div>
         </div>
