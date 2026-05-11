@@ -292,6 +292,7 @@ export default function ReadingRoom() {
             maxZoom={5}
             enforceBoundsDuringZoom={false}
             centerContained={false}
+            inertia={false}
             containerProps={{
               style: { width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }
             }}
