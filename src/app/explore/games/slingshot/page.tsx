@@ -465,8 +465,12 @@ export default function SlingshotGame() {
   return (
     <div className="fixed inset-0 bg-[#F0F4F8] overflow-hidden flex flex-col font-sans select-none">
       {/* Background Decor */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#5AAFD1_1px,transparent_1px)] [background-size:20px_20px]"></div>
+      <div className="absolute inset-0 opacity-50 pointer-events-none">
+        <img 
+          src="https://i.ibb.co.com/K1Y0sBy/Gemini-Generated-Image-mk00bamk00bamk00.png" 
+          alt="Background" 
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Header */}
