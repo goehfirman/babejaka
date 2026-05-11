@@ -102,14 +102,15 @@ export default function NamePromptModal({ onClose, onSuccess, isCompulsory = fal
             </button>
           </form>
 
-          {!isCompulsory && (
-            <button 
-              onClick={onClose}
-              className="mt-8 w-full text-center text-ink-light font-bold text-sm hover:text-primary transition-all opacity-40 hover:opacity-100"
-            >
-              Lewati untuk sekarang
-            </button>
-          )}
+          <button 
+            onClick={() => {
+              if (onClose) onClose();
+              window.location.href = "/";
+            }}
+            className="mt-8 w-full text-center text-ink-light font-bold text-sm hover:text-primary transition-all opacity-40 hover:opacity-100"
+          >
+            Lewati untuk sekarang
+          </button>
         </div>
       </div>
     </div>
