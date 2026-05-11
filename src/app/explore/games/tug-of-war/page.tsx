@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, RefreshCw, Trophy, Users, Star, Swords, Volume2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trophy, Users, Star, Swords, Volume2, Maximize, Minimize } from "lucide-react";
 import { useProfile } from "@/lib/profile-context";
 import { StarFly } from "@/components/StarFly";
 import { db } from "@/lib/firebase";
@@ -104,6 +104,34 @@ const QUESTIONS = [
 export default function TugOfWarGame() {
   const router = useRouter();
   const { profile, addPoints } = useProfile();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+     const handleFullscreenChange = () => {
+        setIsFullscreen(!!(document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement));
+     };
+     document.addEventListener('fullscreenchange', handleFullscreenChange);
+     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+     return () => {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+     };
+  }, []);
+
+  const toggleFullscreen = () => {
+     if (!document.fullscreenElement && !(document as any).webkitFullscreenElement && !(document as any).mozFullScreenElement && !(document as any).msFullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+     } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+        else if ((document as any).mozCancelFullScreen) (document as any).mozCancelFullScreen();
+        else if ((document as any).msExitFullscreen) (document as any).msExitFullscreen();
+     }
+  };
   
   const [gameMode, setGameMode] = useState<"select" | "single" | "multi-lobby" | "multi-playing">("select");
   const [roomId, setRoomId] = useState("");
@@ -396,7 +424,12 @@ export default function TugOfWarGame() {
         }}
       />
       <div className="relative z-50 p-6 flex items-center justify-between">
-        <button onClick={() => setGameMode("select")} className="p-2 hover:bg-white/50 rounded-full transition-all text-ink"><ArrowLeft size={24} /></button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setGameMode("select")} className="p-2 hover:bg-white/50 rounded-full transition-all text-ink"><ArrowLeft size={24} /></button>
+          <button onClick={toggleFullscreen} className="p-2 hover:bg-white/50 rounded-full transition-all text-ink hidden md:flex">
+            {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+          </button>
+        </div>
         <div className="flex items-center gap-4">
            <Volume2 className="text-ink-light opacity-30" />
            <div className="bg-ink text-white px-5 py-2 rounded-2xl flex items-center gap-3">

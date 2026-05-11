@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, RefreshCw, Trophy, Target, Star } from "lucide-react";
+import { ArrowLeft, RefreshCw, Trophy, Target, Star, Maximize, Minimize } from "lucide-react";
 import { useProfile } from "@/lib/profile-context";
 import { StarFly } from "@/components/StarFly";
 
@@ -320,6 +320,34 @@ const MAX_QUESTIONS = 5;
 export default function SlingshotGame() {
   const router = useRouter();
   const { profile, addPoints } = useProfile();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+     const handleFullscreenChange = () => {
+        setIsFullscreen(!!(document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement));
+     };
+     document.addEventListener('fullscreenchange', handleFullscreenChange);
+     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+     return () => {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+     };
+  }, []);
+
+  const toggleFullscreen = () => {
+     if (!document.fullscreenElement && !(document as any).webkitFullscreenElement && !(document as any).mozFullScreenElement && !(document as any).msFullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+     } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+        else if ((document as any).mozCancelFullScreen) (document as any).mozCancelFullScreen();
+        else if ((document as any).msExitFullscreen) (document as any).msExitFullscreen();
+     }
+  };
   const [currentLevel, setCurrentLevel] = useState(0);
   const [score, setScore] = useState(0);
   const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
@@ -473,9 +501,14 @@ export default function SlingshotGame() {
 
       {/* Header */}
       <div className="relative z-[100] p-4 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600">
-          <ArrowLeft size={24} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600">
+            <ArrowLeft size={24} />
+          </button>
+          <button onClick={toggleFullscreen} className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600 hidden md:flex">
+            {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+          </button>
+        </div>
         
         <div className="flex-1 max-w-md mx-8 flex flex-col items-center gap-1">
           <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
