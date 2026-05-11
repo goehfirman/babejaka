@@ -55,15 +55,6 @@ export default function LeaderboardPage() {
         <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
         
-        {/* Back Button */}
-        <Link 
-          href="/explore/dashboard" 
-          className="absolute top-8 left-8 z-[100] flex items-center gap-2 bg-white/20 hover:bg-white/40 backdrop-blur-md px-5 py-2.5 rounded-full text-white font-black text-xs border border-white/30 transition-all hover:scale-105 active:scale-95 group"
-        >
-          <span className="material-symbols-rounded text-lg transition-transform group-hover:-translate-x-1">home</span>
-          BERANDA
-        </Link>
-        
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-white text-xs font-black uppercase tracking-widest mb-6 border border-white/30">
             <span className="material-symbols-rounded text-base">emoji_events</span>
