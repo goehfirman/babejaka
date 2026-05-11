@@ -1103,7 +1103,7 @@ export default function IntegratedDiagnosticPage() {
                         <img 
                           src="https://i.ibb.co.com/1GKyHbCJ/kepala-babe.png" 
                           alt="Babe Jaka" 
-                          className="h-16 w-auto object-contain animate-bounce" 
+                          className="h-16 w-auto object-contain" 
                         />
                          <div>
                            <h3 className="text-lg font-black text-[#5AAFD1]">Luar Biasa!</h3>
@@ -1119,7 +1119,7 @@ export default function IntegratedDiagnosticPage() {
                         <img 
                           src="https://i.ibb.co.com/1GKyHbCJ/kepala-babe.png" 
                           alt="Babe Jaka" 
-                          className="h-32 w-auto mx-auto mb-6 object-contain animate-bounce" 
+                          className="h-32 w-auto mx-auto mb-6 object-contain" 
                         />
                        <h3 className="text-2xl font-black text-[#5AAFD1] mb-2">Luar Biasa!</h3>
                        <p className="text-[#666666] font-bold">Semua kata berhasil kamu baca dengan sempurna!</p>

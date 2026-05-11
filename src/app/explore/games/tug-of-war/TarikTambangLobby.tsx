@@ -1,20 +1,29 @@
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, LogIn, Swords, Users, Star, RefreshCw } from "lucide-react";
+import { Plus, LogIn, Swords, Users, Star, RefreshCw, ArrowLeft } from "lucide-react";
 
 interface LobbyProps {
   onCreate: () => void;
   onJoin: (code: string) => void;
   onSingle: () => void;
+  onBack: () => void;
   isJoining?: boolean;
 }
 
-export default function TarikTambangLobby({ onCreate, onJoin, onSingle, isJoining }: LobbyProps) {
+export default function TarikTambangLobby({ onCreate, onJoin, onSingle, onBack, isJoining }: LobbyProps) {
   const [joinCode, setJoinCode] = useState("");
 
   return (
-    <div className="min-h-screen bg-batik-subtle flex items-center justify-center p-6">
+    <div className="min-h-screen bg-batik-subtle flex flex-col items-center justify-center p-6 relative">
+      {/* Back Button */}
+      <button 
+        onClick={onBack}
+        className="absolute top-8 left-8 p-4 bg-white rounded-full shadow-premium text-ink hover:bg-primary hover:text-white transition-all group"
+      >
+        <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+      </button>
+
       <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Single Player Option */}

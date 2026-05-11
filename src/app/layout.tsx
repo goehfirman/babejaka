@@ -4,6 +4,7 @@ import "./globals.css";
 import { ProfileProvider } from "@/lib/profile-context";
 import NameGuard from "@/components/NameGuard";
 import Navbar from "@/components/Navbar";
+import GlobalBackground from "@/components/GlobalBackground";
 
 export const metadata: Metadata = {
   title: "BABE JAKA - Jakarta Kota Global",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className="bg-[#F8FAFC] font-body text-[#1A1A1A] antialiased overflow-x-hidden min-h-screen bg-batik-subtle">
         <ProfileProvider>
           <NameGuard>
+            <GlobalBackground />
             <Navbar />
             {children}
           </NameGuard>

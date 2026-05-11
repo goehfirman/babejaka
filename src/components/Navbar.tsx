@@ -55,13 +55,6 @@ export default function Navbar() {
 
 
 
-            {/* Hamburger Button (Mobile Only) */}
-            <button 
-              onClick={() => setIsMenuOpen(true)}
-              className="flex md:hidden w-10 h-10 items-center justify-center rounded-xl bg-gray-50 text-primary border border-gray-200 hover:bg-white transition-all active:scale-95"
-            >
-              <span className="material-symbols-rounded text-2xl font-bold">menu</span>
-            </button>
 
             {/* Profile & Logout / Login Button */}
             {isDefaultUser ? (
@@ -106,20 +99,30 @@ export default function Navbar() {
             >
               <span className="material-symbols-rounded text-2xl">fullscreen</span>
             </button>
+
+            {/* Hamburger Button (Mobile Only) - Moved to far right */}
+            <button 
+              onClick={() => setIsMenuOpen(true)}
+              className="flex md:hidden w-10 h-10 items-center justify-center rounded-xl bg-gray-50 text-primary border border-gray-200 hover:bg-white transition-all active:scale-95"
+            >
+              <span className="material-symbols-rounded text-2xl font-bold">menu</span>
+            </button>
           </div>
         </div>
 
-        {/* Traditional Gigi Balang Ornament - Seamless Repeat */}
-        <div 
-          className="absolute left-0 right-0 top-full pointer-events-none h-[90px] md:h-[110px] overflow-hidden"
-          style={{ 
-            backgroundImage: 'url("https://i.ibb.co.com/XrnHrbqS/BABE-JAKA-3.png")',
-            backgroundRepeat: 'repeat-x',
-            backgroundPosition: 'top center',
-            backgroundSize: 'auto 100%',
-            opacity: 0.95
-          }}
-        />
+        {/* Traditional Gigi Balang Ornament - Show only on homepage as requested */}
+        {pathname === "/" && (
+          <div 
+            className="absolute left-0 right-0 top-full pointer-events-none h-[90px] md:h-[110px] overflow-hidden"
+            style={{ 
+              backgroundImage: 'url("https://i.ibb.co.com/XrnHrbqS/BABE-JAKA-3.png")',
+              backgroundRepeat: 'repeat-x',
+              backgroundPosition: 'top center',
+              backgroundSize: 'auto 100%',
+              opacity: 0.95
+            }}
+          />
+        )}
       </nav>
 
       {showNameModal && (

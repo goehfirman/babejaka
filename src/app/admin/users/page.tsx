@@ -1,18 +1,47 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { db } from "@/lib/firebase";
+import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 
-const USERS = [
-  { id: 1, name: "Teguh Pratama", class: "Admin", accuracy: 98, status: "Aktif", lastActive: "2 menit yang lalu" },
-  { id: 2, name: "Budi Santoso", class: "User", accuracy: 85, status: "Aktif", lastActive: "5 menit yang lalu" },
-  { id: 3, name: "Siti Aminah", class: "User", accuracy: 78, status: "Santai", lastActive: "1 jam yang lalu" },
-  { id: 4, name: "Ani Wijaya", class: "User", accuracy: 95, status: "Aktif", lastActive: "Sekarang" },
-  { id: 5, name: "Raka Putra", class: "User", accuracy: 64, status: "Bantuan", lastActive: "3 jam yang lalu" },
-];
+interface UserData {
+  id: string;
+  name: string;
+  schoolName: string;
+  className: string;
+  points: number;
+  lastUpdated?: string;
+  accuracy?: number;
+  status?: string;
+}
 
 export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, "users"), orderBy("lastUpdated", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const usersData: UserData[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as UserData[];
+      setUsers(usersData);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching users:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const filteredUsers = users.filter(user => 
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.schoolName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-[#F0F8FF] font-body text-[#333333] flex">
@@ -79,7 +108,7 @@ export default function AdminUsers() {
                  <span className="material-symbols-rounded absolute left-5 top-1/2 -translate-y-1/2 text-[#A0AEC0] text-2xl group-focus-within:text-[#FFB347] transition-colors">search</span>
                  <input 
                    type="text" 
-                   placeholder="Cari pengguna dengan nama atau ID..." 
+                   placeholder="Cari pengguna dengan nama atau sekolah..." 
                    className="w-full pl-14 pr-6 py-4 bg-white border-4 border-[#E2E8F0] shadow-sm rounded-2xl text-base font-bold text-[#333333] placeholder:text-[#A0AEC0] focus:outline-none focus:border-[#FFB347] transition-all"
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
@@ -98,74 +127,88 @@ export default function AdminUsers() {
                  <thead>
                     <tr className="border-b-4 border-[#E2E8F0] bg-[#F8FAFC]">
                        <th className="px-8 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Profil Pengguna</th>
-                       <th className="px-6 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Kelas</th>
-                       <th className="px-6 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Kemampuan</th>
+                       <th className="px-6 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Sekolah / Kelas</th>
+                       <th className="px-6 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Poin</th>
                        <th className="px-6 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Status</th>
                        <th className="px-6 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em]">Log Terakhir</th>
                        <th className="px-8 py-5 text-[10px] font-black text-[#A0AEC0] uppercase tracking-[0.2em] text-right">Tindakan</th>
                     </tr>
                  </thead>
                  <tbody className="divide-y-2 divide-[#E2E8F0]">
-                    {USERS.map((student) => (
-                       <tr key={student.id} className="hover:bg-[#F0F8FF] transition-colors group">
-                          <td className="px-8 py-6">
-                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white border-2 border-[#E2E8F0] shadow-sm p-1 group-hover:border-[#FFB347] transition-all overflow-hidden flex items-center justify-center">
-                                   <Image src={`https://api.dicebear.com/9.x/fun-emoji/svg?seed=${student.name}`} alt="Avatar" width={38} height={38} unoptimized />
-                                </div>
-                                <div>
-                                   <p className="text-base font-black text-[#333333] leading-none uppercase group-hover:text-[#FFB347] transition-colors mb-1">{student.name}</p>
-                                   <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest leading-none">ID-2024-{student.id}</p>
-                                </div>
-                             </div>
-                          </td>
-                          <td className="px-6 py-6">
-                             <span className="text-sm font-black text-[#666666] bg-[#F8FAFC] px-3 py-2 rounded-xl border-2 border-[#E2E8F0]">{student.class}</span>
-                          </td>
-                          <td className="px-6 py-6">
-                             <div className="flex items-center gap-3">
-                                <div className="flex-1 h-3 w-16 bg-[#F0F8FF] rounded-full border-2 border-[#E2E8F0] overflow-hidden">
-                                   <div className={`h-full ${student.accuracy > 80 ? 'bg-[#34D399]' : student.accuracy > 70 ? 'bg-[#5AAFD1]' : 'bg-[#FF4757]'}`} style={{ width: `${student.accuracy}%` }}></div>
-                                </div>
-                                <span className={`text-sm font-black ${student.accuracy > 80 ? 'text-[#34D399]' : student.accuracy > 70 ? 'text-[#5AAFD1]' : 'text-[#FF4757]'}`}>{student.accuracy}%</span>
-                             </div>
-                          </td>
-                          <td className="px-6 py-6">
-                             <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 ${
-                                student.status === 'Aktif' ? 'bg-[#D1FAE5] text-[#059669] border-[#34D399]' : 
-                                student.status === 'Santai' ? 'bg-[#E0F2FE] text-[#0284C7] border-[#38BDF8]' : 
-                                'bg-[#FFE2E5] text-[#E11D48] border-[#FF4757]'
-                             }`}>
-                                {student.status}
-                             </span>
-                          </td>
-                          <td className="px-6 py-6 text-[11px] font-bold text-[#A0AEC0] uppercase tracking-wider">
-                             {student.lastActive}
-                          </td>
-                          <td className="px-8 py-6 text-right">
-                             <div className="flex justify-end gap-2">
-                                <button className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#E2E8F0] hover:bg-[#F0F8FF] hover:border-[#87CEEB] hover:text-[#87CEEB] rounded-2xl text-[#A0AEC0] transition-all shadow-sm">
-                                   <span className="material-symbols-rounded text-xl">visibility</span>
-                                </button>
-                                <button className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#E2E8F0] hover:bg-[#FFE2E5] hover:border-[#FF4757] hover:text-[#FF4757] rounded-2xl text-[#A0AEC0] transition-all shadow-sm">
-                                   <span className="material-symbols-rounded text-xl">edit</span>
-                                </button>
-                             </div>
-                          </td>
-                       </tr>
-                    ))}
+                    {loading ? (
+                      <tr>
+                        <td colSpan={6} className="px-8 py-20 text-center">
+                          <div className="flex flex-col items-center gap-4">
+                            <span className="material-symbols-rounded animate-spin text-4xl text-[#FFB347]">progress_activity</span>
+                            <p className="text-[#A0AEC0] font-black uppercase tracking-widest text-xs">Memuat Data Pengguna...</p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-8 py-20 text-center text-[#A0AEC0] font-bold">
+                          {searchTerm ? "Tidak ada pengguna yang cocok dengan pencarian." : "Belum ada pengguna yang terdaftar."}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredUsers.map((student) => (
+                        <tr key={student.id} className="hover:bg-[#F0F8FF] transition-colors group">
+                           <td className="px-8 py-6">
+                              <div className="flex items-center gap-4">
+                                 <div className="w-12 h-12 rounded-full bg-white border-2 border-[#E2E8F0] shadow-sm p-1 group-hover:border-[#FFB347] transition-all overflow-hidden flex items-center justify-center">
+                                    <Image src={`https://api.dicebear.com/9.x/fun-emoji/svg?seed=${student.name}`} alt="Avatar" width={38} height={38} unoptimized />
+                                 </div>
+                                 <div>
+                                    <p className="text-base font-black text-[#333333] leading-none uppercase group-hover:text-[#FFB347] transition-colors mb-1">{student.name}</p>
+                                    <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest leading-none">{student.id}</p>
+                                 </div>
+                              </div>
+                           </td>
+                           <td className="px-6 py-6">
+                              <div>
+                                <p className="text-sm font-black text-[#666666] mb-1">{student.schoolName || "Tidak Diketahui"}</p>
+                                <span className="text-[10px] font-black text-[#A0AEC0] bg-[#F8FAFC] px-2 py-1 rounded-lg border-2 border-[#E2E8F0] uppercase tracking-wider">{student.className}</span>
+                              </div>
+                           </td>
+                           <td className="px-6 py-6">
+                              <div className="flex items-center gap-2">
+                                 <span className="material-symbols-rounded text-[#FFB347]">stars</span>
+                                 <span className="text-base font-black text-[#FFB347]">{student.points || 0}</span>
+                              </div>
+                           </td>
+                           <td className="px-6 py-6">
+                              <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 ${
+                                 (student.points || 0) > 100 ? 'bg-[#D1FAE5] text-[#059669] border-[#34D399]' : 
+                                 'bg-[#E0F2FE] text-[#0284C7] border-[#38BDF8]'
+                              }`}>
+                                 { (student.points || 0) > 100 ? 'Aktif' : 'Baru' }
+                              </span>
+                           </td>
+                           <td className="px-6 py-6 text-[11px] font-bold text-[#A0AEC0] uppercase tracking-wider">
+                              {student.lastUpdated ? new Date(student.lastUpdated).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : "-"}
+                           </td>
+                           <td className="px-8 py-6 text-right">
+                              <div className="flex justify-end gap-2">
+                                 <button className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#E2E8F0] hover:bg-[#F0F8FF] hover:border-[#87CEEB] hover:text-[#87CEEB] rounded-2xl text-[#A0AEC0] transition-all shadow-sm">
+                                    <span className="material-symbols-rounded text-xl">visibility</span>
+                                 </button>
+                                 <button className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#E2E8F0] hover:bg-[#FFE2E5] hover:border-[#FF4757] hover:text-[#FF4757] rounded-2xl text-[#A0AEC0] transition-all shadow-sm">
+                                    <span className="material-symbols-rounded text-xl">edit</span>
+                                 </button>
+                              </div>
+                           </td>
+                        </tr>
+                      ))
+                    )}
                  </tbody>
               </table>
            </div>
 
            {/* Bulk Actions Placeholder */}
            <div className="mt-8 flex justify-between items-center px-4">
-              <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest">Menampilkan 5 dari 120 Pengguna</p>
-              <div className="flex gap-2">
-                 <button className="w-10 h-10 rounded-xl bg-white border-2 border-[#E2E8F0] flex items-center justify-center text-sm font-black text-[#A0AEC0] hover:text-[#333333] hover:border-[#cbd5e1] transition-all shadow-sm">1</button>
-                 <button className="w-10 h-10 rounded-xl bg-[#FFB347] border-2 border-[#E69A2E] text-white flex items-center justify-center text-sm font-black shadow-[0_4px_0_#E69A2E] -translate-y-1">2</button>
-                 <button className="w-10 h-10 rounded-xl bg-white border-2 border-[#E2E8F0] flex items-center justify-center text-sm font-black text-[#A0AEC0] hover:text-[#333333] hover:border-[#cbd5e1] transition-all shadow-sm">3</button>
-              </div>
+              <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest">
+                Menampilkan {filteredUsers.length} dari {users.length} Pengguna
+              </p>
            </div>
 
         </div>

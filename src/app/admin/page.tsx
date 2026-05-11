@@ -1,22 +1,45 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-
-const STATS = [
-  { label: 'Total Pengguna', value: '32', icon: 'groups', color: 'text-blue-500', bg: 'bg-blue-100', border: 'border-blue-200' },
-  { label: 'Rata-rata Akurasi', value: '88%', icon: 'verified', color: 'text-[#FFB347]', bg: 'bg-[#FFF3E0]', border: 'border-[#FFE0B2]' },
-  { label: 'Buku Selesai', value: '124', icon: 'auto_stories', color: 'text-[#9b59b6]', bg: 'bg-[#f4ebf7]', border: 'border-[#e0cbe7]' },
-  { label: 'Misi Jaga Bumi', value: '12/17', icon: 'public', color: 'text-emerald-500', bg: 'bg-emerald-100', border: 'border-emerald-200' },
-];
-
-const RECENT_ACTIVITY = [
-  { user: 'Teguh Pratama', action: 'Selesai membaca "Air Kehidupan"', time: '2 menit yang lalu', status: 'Lancar' },
-  { user: 'Budi Santoso', action: 'Memulai kuis "Si Kancil"', time: '5 menit yang lalu', status: 'Progres' },
-  { user: 'Siti Aminah', action: 'Mendapat lencana "Climate Hero"', time: '12 menit yang lalu', status: 'Baru' },
-];
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export default function AdminDashboard() {
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+
+  useEffect(() => {
+    const q = collection(db, "users");
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setTotalUsers(snapshot.size);
+      
+      const activities = snapshot.docs
+        .map(doc => ({
+          user: doc.data().name,
+          action: `Terdaftar dari ${doc.data().schoolName || 'Sekolah'}`,
+          time: doc.data().lastUpdated ? new Date(doc.data().lastUpdated).toLocaleString() : 'Baru saja',
+          status: (doc.data().points || 0) > 10 ? 'Aktif' : 'Baru'
+        }))
+        .slice(0, 5);
+      setRecentActivity(activities);
+      
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching stats:", error);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const STATS = [
+    { label: 'Total Pengguna', value: loading ? '...' : totalUsers.toString(), icon: 'groups', color: 'text-blue-500', bg: 'bg-blue-100', border: 'border-blue-200' },
+    { label: 'Rata-rata Akurasi', value: '88%', icon: 'verified', color: 'text-[#FFB347]', bg: 'bg-[#FFF3E0]', border: 'border-[#FFE0B2]' },
+    { label: 'Buku Selesai', value: '124', icon: 'auto_stories', color: 'text-[#9b59b6]', bg: 'bg-[#f4ebf7]', border: 'border-[#e0cbe7]' },
+    { label: 'Misi Jaga Bumi', value: '12/17', icon: 'public', color: 'text-emerald-500', bg: 'bg-emerald-100', border: 'border-emerald-200' },
+  ];
   return (
     <div className="min-h-screen bg-[#F0F8FF] font-body text-[#333333] flex">
       
@@ -131,21 +154,27 @@ export default function AdminDashboard() {
                     <h3 className="text-xl font-black uppercase tracking-tight text-[#333333]">Aktivitas Pengguna</h3>
                     <button className="px-6 py-2.5 bg-[#5AAFD1] text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-[0_4px_0_#4691B0] transition-all hover:-translate-y-1 active:translate-y-0">Lihat Semua</button>
                  </div>
-                 <div className="space-y-4">
-                    {RECENT_ACTIVITY.map((act) => (
-                       <div key={act.user} className="flex items-center gap-4 p-4 bg-[#F8FAFC] rounded-2xl border-2 border-transparent hover:border-[#E2E8F0] transition-all">
-                          <Image src={`https://api.dicebear.com/9.x/fun-emoji/svg?seed=${act.user}`} alt="Avatar" width={48} height={48} className="rounded-full bg-white border-2 border-[#E2E8F0]" unoptimized />
-                          <div className="flex-1">
-                             <div className="flex justify-between items-center mb-1">
-                                <p className="text-base font-black text-[#333333] leading-none">{act.user}</p>
-                                <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full border-2 ${act.status === 'Lancar' ? 'bg-[#D1FAE5] text-[#059669] border-[#34D399]' : 'bg-[#E0F2FE] text-[#5AAFD1] border-[#BEE3F8]'}`}>{act.status}</span>
-                             </div>
-                             <p className="text-sm font-bold text-[#666666] mb-1">{act.action}</p>
-                             <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest">{act.time}</p>
-                          </div>
-                       </div>
-                    ))}
-                 </div>
+                  <div className="space-y-4">
+                    {loading ? (
+                      <p className="text-center py-4 text-[#A0AEC0]">Memuat aktivitas...</p>
+                    ) : recentActivity.length === 0 ? (
+                      <p className="text-center py-4 text-[#A0AEC0]">Belum ada aktivitas.</p>
+                    ) : (
+                      recentActivity.map((act, idx) => (
+                        <div key={idx} className="flex items-center gap-4 p-4 bg-[#F8FAFC] rounded-2xl border-2 border-transparent hover:border-[#E2E8F0] transition-all">
+                           <Image src={`https://api.dicebear.com/9.x/fun-emoji/svg?seed=${act.user}`} alt="Avatar" width={48} height={48} className="rounded-full bg-white border-2 border-[#E2E8F0]" unoptimized />
+                           <div className="flex-1">
+                              <div className="flex justify-between items-center mb-1">
+                                 <p className="text-base font-black text-[#333333] leading-none">{act.user}</p>
+                                 <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full border-2 ${act.status === 'Aktif' ? 'bg-[#D1FAE5] text-[#059669] border-[#34D399]' : 'bg-[#E0F2FE] text-[#5AAFD1] border-[#BEE3F8]'}`}>{act.status}</span>
+                              </div>
+                              <p className="text-sm font-bold text-[#666666] mb-1">{act.action}</p>
+                              <p className="text-[10px] font-black text-[#A0AEC0] uppercase tracking-widest">{act.time}</p>
+                           </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
               </div>
 
               <div className="lg:col-span-1 flex flex-col gap-6">
