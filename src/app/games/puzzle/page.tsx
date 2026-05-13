@@ -350,7 +350,7 @@ export default function PuzzlePage() {
                 <div 
                   ref={containerRef}
                   className={`relative bg-white/10 rounded-[40px] backdrop-blur-sm border border-white/30 shadow-2xl overflow-visible select-none transition-all duration-500 ${isShuffling ? 'brightness-90 scale-95' : 'cursor-grab active:cursor-grabbing'}`}
-                  style={{ width: BOARD_SIZE + 300, height: BOARD_SIZE + 300, display: 'flex', alignItems: 'center', justifyCenter: 'center' }}
+                  style={{ width: BOARD_SIZE + 300, height: BOARD_SIZE + 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <svg width="0" height="0" className="absolute">
                     <defs>
