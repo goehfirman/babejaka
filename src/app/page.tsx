@@ -334,7 +334,7 @@ export default function LandingPage() {
                    onClick={() => router.push('/games/puzzle')}
                    className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
                  >
-                    <Image src="/games/puzzle-default.png" alt="Puzzle" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <Image src="https://i.ibb.co.com/Df7HFSF8/Gemini-Generated-Image-pcx6hopcx6hopcx6.png" alt="Puzzle" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#F97316]/90 via-[#F97316]/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
                        <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase">PUZZLE LITERASI</h3>

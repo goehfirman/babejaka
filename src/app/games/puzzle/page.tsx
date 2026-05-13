@@ -28,7 +28,7 @@ interface Piece {
 }
 
 const PUZZLE_IMAGES = [
-  { id: 0, url: "/games/puzzle-default.png", label: "Teka-Teki Jakarta" },
+  { id: 0, url: "https://i.ibb.co.com/Df7HFSF8/Gemini-Generated-Image-pcx6hopcx6hopcx6.png", label: "Teka-Teki Jakarta" },
   { id: 1, url: "/games/puzzle-1.png", label: "Ondel-ondel & Monas" },
   { id: 2, url: "/games/puzzle-2.png", label: "Kota Tua Jakarta" },
   { id: 3, url: "/games/puzzle-3.png", label: "Bajaj Modern" },
