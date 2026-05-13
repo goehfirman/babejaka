@@ -302,7 +302,7 @@ export default function LandingPage() {
               </div>
 
               {/* Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 md:p-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 md:p-12">
                  {/* Slingshot */}
                  <div 
                    onClick={() => router.push('/explore/games/slingshot')}
@@ -311,8 +311,8 @@ export default function LandingPage() {
                     <Image src="https://i.ibb.co.com/ymtW3dCX/katapel-bg.png" alt="Katapel" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
-                       <h3 className="text-2xl font-black text-white mb-2 tracking-tight">KATAPEL BABE JAKA</h3>
-                       <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Bidik Jawaban yang Benar!</p>
+                       <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase">KATAPEL BABE JAKA</h3>
+                       <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Bidik Jawaban!</p>
                     </div>
                  </div>
 
@@ -324,8 +324,21 @@ export default function LandingPage() {
                     <Image src="https://i.ibb.co.com/PvPM5pdn/Gemini-Generated-Image-av7uskav7uskav7u.png" alt="Tarik Tambang" fill className="object-cover -scale-x-100 group-hover:scale-x-[-1.1] group-hover:scale-y-[110%] transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-secondary/40 to-transparent"></div>
                     <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
-                       <h3 className="text-2xl font-black text-white mb-2 tracking-tight">TARIK TAMBANG</h3>
-                       <p className="text-white/80 text-xs font-bold uppercase tracking-widest">Adu Cepat Jawab Soal!</p>
+                       <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase">TARIK TAMBANG</h3>
+                       <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Adu Cepat!</p>
+                    </div>
+                 </div>
+
+                 {/* Puzzle Game */}
+                 <div 
+                   onClick={() => router.push('/games/puzzle')}
+                   className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
+                 >
+                    <Image src="/games/puzzle-default.png" alt="Puzzle" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F97316]/90 via-[#F97316]/40 to-transparent"></div>
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end items-center text-center">
+                       <h3 className="text-xl font-black text-white mb-2 tracking-tight uppercase">PUZZLE LITERASI</h3>
+                       <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Susun Gambarnya!</p>
                     </div>
                  </div>
               </div>
