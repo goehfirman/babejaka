@@ -28,7 +28,7 @@ interface Piece {
 }
 
 const PUZZLE_IMAGES = [
-  { id: 0, url: "/games/puzzle-default.png", label: "Perpustakaan Masa Depan" },
+  { id: 0, url: "/games/puzzle-default.png", label: "Teka-Teki Jakarta" },
   { id: 1, url: "/games/puzzle-1.png", label: "Ondel-ondel & Monas" },
   { id: 2, url: "/games/puzzle-2.png", label: "Kota Tua Jakarta" },
   { id: 3, url: "/games/puzzle-3.png", label: "Bajaj Modern" },
@@ -39,7 +39,12 @@ const PUZZLE_IMAGES = [
   { id: 8, url: "/games/puzzle-8.png", label: "Soto Betawi Lezat" },
   { id: 9, url: "/games/puzzle-9.png", label: "Pantai Ancol & Dufan" },
   { id: 10, url: "/games/puzzle-10.png", label: "Pasar Tanah Abang" },
-  { id: 11, url: "https://i.ibb.co.com/p6x2SRQb/4.jpg", label: "JakLingko & Literasi" }
+  { id: 11, url: "https://i.ibb.co.com/p6x2SRQb/4.jpg", label: "JakLingko & Literasi" },
+  { id: 12, url: "/games/puzzle-12.png", label: "Permainan Galasin" },
+  { id: 13, url: "/games/puzzle-13.png", label: "Kerak Telor Betawi" },
+  { id: 14, url: "/games/puzzle-14.png", label: "MRT Jakarta Modern" },
+  { id: 15, url: "/games/puzzle-15.png", label: "Kota Tua 2D Style" },
+  { id: 16, url: "/games/puzzle-16.png", label: "Taman Mini (TMII)" }
 ];
 
 export default function PuzzlePage() {
