@@ -211,7 +211,7 @@ export default function PuzzlePage() {
   if (!isClient) return null;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 flex flex-col items-center max-w-[1440px] mx-auto font-body overflow-x-hidden bg-batik-subtle">
+    <div className="fixed inset-0 h-screen overflow-y-auto pt-24 pb-12 px-4 flex flex-col items-center max-w-[1440px] mx-auto font-body bg-batik-subtle">
       
       <AnimatePresence mode="wait">
         {gameState === "selection" ? (
@@ -240,7 +240,7 @@ export default function PuzzlePage() {
                      <h3 className="text-2xl font-black text-ink font-changa">Pilih Gambar</h3>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto p-2 scrollbar-hide">
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 lg:max-h-[600px] lg:overflow-y-auto p-2 scrollbar-hide">
                      {PUZZLE_IMAGES.map((img) => (
                        <motion.div 
                          key={img.id}
