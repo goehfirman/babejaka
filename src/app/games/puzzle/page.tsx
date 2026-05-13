@@ -148,6 +148,13 @@ export default function PuzzlePage() {
         }, 500);
       }
     }, 400);
+
+    // Auto-scroll to board on mobile
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
   }, [difficulty, selectedImage]);
 
   const handleDragEnd = (id: number, info: any) => {
