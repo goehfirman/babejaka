@@ -275,7 +275,7 @@ export default function PuzzlePage() {
   if (!isClient) return null;
 
   return (
-    <div className="fixed inset-0 h-screen overflow-y-auto pt-24 pb-12 px-4 flex flex-col items-center max-w-[1440px] mx-auto font-body bg-batik-subtle">
+    <div className="min-h-screen w-full pt-32 pb-20 px-4 flex flex-col items-center max-w-7xl mx-auto font-body">
       
       {/* Game Navbar */}
       <div className="fixed top-0 left-0 right-0 z-[200] bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
