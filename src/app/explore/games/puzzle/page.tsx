@@ -317,8 +317,10 @@ export default function PuzzlePage() {
           </div>
         </div>
       </div>
-
-      <AnimatePresence mode="wait">
+      
+      {/* Scalable Game Content Wrapper */}
+      <div className={`w-full flex-1 flex flex-col items-center transition-all duration-500 origin-top ${isFullscreen ? 'md:scale-100 scale-[0.7]' : 'scale-100'}`}>
+        <AnimatePresence mode="wait">
         {gameState === "selection" ? (
           <motion.div 
             key="selection"
@@ -568,6 +570,7 @@ export default function PuzzlePage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       <style jsx>{`
         .bg-batik-subtle {
