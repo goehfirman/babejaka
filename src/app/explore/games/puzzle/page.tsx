@@ -318,8 +318,8 @@ export default function PuzzlePage() {
         </div>
       </div>
       
-      {/* Scalable Game Content Wrapper - Permanent 0.7 scale on mobile */}
-      <div className="w-full flex-1 flex flex-col items-center transition-all duration-500 origin-top scale-[0.7] md:scale-100">
+      {/* Game Content Wrapper */}
+      <div className="w-full flex-1 flex flex-col items-center">
         <AnimatePresence mode="wait">
         {gameState === "selection" ? (
           <motion.div 
