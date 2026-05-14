@@ -292,9 +292,9 @@ export default function LandingPage() {
 
       {/* GAME PICKER MODAL */}
       {showGamePicker && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
-           <div className="absolute inset-0" onClick={() => setShowGamePicker(false)}></div>
-           <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[300] overflow-y-auto flex items-start md:items-center justify-center p-4 md:p-6 bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
+           <div className="fixed inset-0" onClick={() => setShowGamePicker(false)}></div>
+           <div className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-4xl my-auto overflow-hidden animate-in zoom-in duration-300">
               {/* Header */}
               <div className="bg-batik-subtle p-8 md:p-12 text-center border-b border-gray-100">
                  <h2 className="text-3xl md:text-5xl font-black text-ink mb-4 italic">Pilih <span className="text-primary">Permainan</span> Seru!</h2>
