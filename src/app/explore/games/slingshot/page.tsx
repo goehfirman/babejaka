@@ -531,7 +531,7 @@ export default function SlingshotGame() {
              </div>
              <div className="flex flex-col items-end">
                 <span className="text-[10px] font-black text-ink-light tracking-widest uppercase opacity-60">POIN BINTANG</span>
-               <div className="flex items-center gap-1.5">
+               <div id="navbar-points" className="flex items-center gap-1.5">
                   <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 animate-pulse" />
                   <span className="text-xl font-black text-ink">{profile.points || 0}</span>
                </div>

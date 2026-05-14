@@ -2,10 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Timer, Hash, RefreshCcw, Trophy, ChevronLeft, Eye, EyeOff, LayoutGrid, Play, Image as ImageIcon, Settings2, Sparkles } from "lucide-react";
+import { Timer, Hash, RefreshCcw, Trophy, ChevronLeft, Eye, EyeOff, LayoutGrid, Play, Image as ImageIcon, Settings2, Sparkles, Star, Home, Maximize, Minimize, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import confetti from "canvas-confetti";
+import { useProfile } from "@/lib/profile-context";
+import { PointToast } from "@/components/PointToast";
+import { StarFly } from "@/components/StarFly";
 
 type Difficulty = 3 | 4 | 5;
 type SideType = 0 | 1 | -1;
@@ -48,6 +52,7 @@ const PUZZLE_IMAGES = [
 ];
 
 export default function PuzzlePage() {
+  const router = useRouter();
   // Game Flow State
   const [gameState, setGameState] = useState<"selection" | "playing">("selection");
   const [isShuffling, setIsShuffling] = useState(false);
@@ -64,6 +69,40 @@ export default function PuzzlePage() {
   const [isWon, setIsWon] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!(document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement && !(document as any).webkitFullscreenElement && !(document as any).mozFullScreenElement && !(document as any).msFullscreenElement) {
+       document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+       if (document.exitFullscreen) document.exitFullscreen();
+       else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+       else if ((document as any).mozCancelFullScreen) (document as any).mozCancelFullScreen();
+       else if ((document as any).msExitFullscreen) (document as any).msExitFullscreen();
+    }
+  };
+
+  // Points State
+  const { addPoints, profile } = useProfile();
+  const [earnedPoints, setEarnedPoints] = useState<number | null>(null);
+  const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
   
   const containerRef = useRef<HTMLDivElement>(null);
   const BOARD_SIZE = 500; 
@@ -179,6 +218,19 @@ export default function PuzzlePage() {
       if (newPieces.every(p => p.isLocked)) {
         setIsWon(true);
         confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+        
+        // Award Points
+        const pointsAwarded = (difficulty - 2) * 5;
+        // Points will be added one-by-one via StarFly onStarHit
+        setEarnedPoints(pointsAwarded);
+        
+        // Trigger Star Animation
+        const now = Date.now();
+        const positions = Array.from({ length: pointsAwarded }).map(() => ({ 
+          x: window.innerWidth / 2, 
+          y: window.innerHeight / 2 
+        }));
+        setPendingStars({ count: pointsAwarded, timestamp: now, positions });
       }
     } else {
       setPieces(pieces.map(p => p.id === id ? { ...p, currentX: currentX, currentY: currentY } : p));
@@ -225,6 +277,47 @@ export default function PuzzlePage() {
   return (
     <div className="fixed inset-0 h-screen overflow-y-auto pt-24 pb-12 px-4 flex flex-col items-center max-w-[1440px] mx-auto font-body bg-batik-subtle">
       
+      {/* Game Navbar */}
+      <div className="fixed top-0 left-0 right-0 z-[200] bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => router.push("/")}
+              className="p-2.5 bg-gray-50 text-primary rounded-xl hover:bg-primary/10 transition-all border border-gray-100"
+              title="Beranda"
+            >
+              <Home size={20} />
+            </button>
+            <div className="w-px h-6 bg-gray-200 mx-2" />
+            <button 
+              onClick={toggleFullscreen}
+              className="p-2.5 bg-gray-50 text-gray-500 rounded-xl hover:bg-gray-100 transition-all border border-gray-100"
+              title="Layar Penuh"
+            >
+              {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+            </button>
+          </div>
+
+          <div className="hidden md:flex flex-col items-center">
+            <span className="text-[10px] font-black text-primary tracking-[0.2em] uppercase opacity-60">Permainan</span>
+            <h2 className="text-xl font-black text-ink italic font-changa">Jigsaw <span className="text-primary">Literasi</span></h2>
+          </div>
+
+          <div className="flex items-center gap-4">
+             <div className="bg-white px-4 py-2 rounded-2xl flex items-center gap-4 border border-gray-100 shadow-sm">
+                <div className="flex flex-col items-end border-r border-gray-100 pr-4">
+                   <span className="text-[9px] font-black text-primary tracking-widest uppercase opacity-60">Pemain</span>
+                   <span className="text-xs font-black text-ink leading-none">{profile.name}</span>
+                </div>
+                <div id="navbar-points" className="flex items-center gap-1.5">
+                   <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 animate-pulse" />
+                   <span className="text-xl font-black text-ink">{profile.points || 0}</span>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
       <AnimatePresence mode="wait">
         {gameState === "selection" ? (
           <motion.div 
@@ -484,6 +577,12 @@ export default function PuzzlePage() {
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
+
+      {/* Point Visuals */}
+      {earnedPoints !== null && (
+        <PointToast amount={earnedPoints} onClose={() => setEarnedPoints(null)} />
+      )}
+      <StarFly burst={pendingStars} onStarHit={() => addPoints(1)} />
     </div>
   );
 }

@@ -435,7 +435,7 @@ export default function TugOfWarGame() {
            <div className="bg-ink text-white px-5 py-2 rounded-2xl flex items-center gap-3">
               <span className="text-[10px] font-black opacity-60 uppercase tracking-widest">{profile.name}</span>
               <div className="w-px h-3 bg-white/20" />
-              <div className="flex items-center gap-2">
+              <div id="navbar-points" className="flex items-center gap-2">
                  <Star className="text-yellow-400 fill-yellow-400" size={16} />
                  <span className="font-black">{profile.points}</span>
               </div>

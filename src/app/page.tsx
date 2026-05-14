@@ -331,7 +331,7 @@ export default function LandingPage() {
 
                  {/* Puzzle Game */}
                  <div 
-                   onClick={() => router.push('/games/puzzle')}
+                   onClick={() => router.push('/explore/games/puzzle')}
                    className="group relative h-72 rounded-[32px] overflow-hidden cursor-pointer shadow-xl transform transition-all hover:-translate-y-2 hover:shadow-2xl"
                  >
                     <Image src="https://i.ibb.co.com/Df7HFSF8/Gemini-Generated-Image-pcx6hopcx6hopcx6.png" alt="Puzzle" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
