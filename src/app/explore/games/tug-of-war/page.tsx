@@ -174,6 +174,7 @@ export default function TugOfWarGame() {
   const [playerScore, setPlayerScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
   const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
+  const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [startTime, setStartTime] = useState(Date.now());
   const [toast, setToast] = useState<string | null>(null);
   const prevScores = useRef({ p1: 0, p2: 0 });
