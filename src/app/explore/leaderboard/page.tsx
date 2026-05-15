@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useProfile } from "@/lib/profile-context";
 import { StarFly } from "@/components/StarFly";
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 
 export default function LeaderboardPage() {
   const { profile } = useProfile();
@@ -14,8 +14,7 @@ export default function LeaderboardPage() {
   useEffect(() => {
     const q = query(
       collection(db, "users"),
-      orderBy("points", "desc"),
-      limit(20)
+      orderBy("points", "desc")
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
