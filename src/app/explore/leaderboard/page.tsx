@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
             <div className="animate-spin inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
             <p className="font-black text-ink-light">Memuat Jawara...</p>
           </div>
-        ) : sortedLeaderboard.length === 0 ? (
+        ) : leaderboard.length === 0 ? (
           <div className="bg-white rounded-[40px] p-20 text-center shadow-xl">
             <p className="font-black text-ink-light">Belum ada jawara terdaftar.</p>
           </div>

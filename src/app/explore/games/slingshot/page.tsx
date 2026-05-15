@@ -317,6 +317,21 @@ const QUESTIONS = [
 
 const MAX_QUESTIONS = 5;
 
+// --- SFX Helper ---
+const playSound = (type: 'pull' | 'throw' | 'hit' | 'correct' | 'wrong' | 'celebration') => {
+  const sounds: Record<string, string> = {
+    pull: "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3", // Reuse pull sound
+    throw: "https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3", // Snap sound
+    hit: "https://assets.mixkit.co/active_storage/sfx/1344/1344-preview.mp3", // Impact sound
+    correct: "https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3", // Chime
+    wrong: "https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3", // Buzzer
+    celebration: "https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3" // Clapping
+  };
+  const audio = new Audio(sounds[type]);
+  audio.volume = 0.4;
+  audio.play().catch(() => {});
+};
+
 export default function SlingshotGame() {
   const router = useRouter();
   const { profile, addPoints } = useProfile();
@@ -402,6 +417,7 @@ export default function SlingshotGame() {
 
     setGameState("flying");
     setIsDragging(false);
+    playSound('throw');
 
     // Animate ball
     setBallPos({ x: targetX, y: targetY });
@@ -434,6 +450,8 @@ export default function SlingshotGame() {
     if (hitIndex !== -1) {
       if (hitIndex === question.jawabanBenar) {
         setScore(s => s + 5);
+        playSound('hit');
+        setTimeout(() => playSound('correct'), 300);
         
         // Trigger Star Burst from the hit bubble's screen position
         const now = Date.now();
@@ -455,6 +473,8 @@ export default function SlingshotGame() {
 
         setFeedback({ type: "correct", index: hitIndex });
       } else {
+        playSound('hit');
+        setTimeout(() => playSound('wrong'), 300);
         setFeedback({ type: "wrong", index: hitIndex });
       }
     } else {
@@ -476,6 +496,7 @@ export default function SlingshotGame() {
       setBallPos({ x: 0, y: 0 });
     } else {
       setGameState("gameOver");
+      playSound('celebration');
     }
   };
 
@@ -705,7 +726,10 @@ export default function SlingshotGame() {
               drag={gameState === "playing"}
               dragConstraints={{ top: 0, bottom: 150, left: -100, right: 100 }}
               dragElastic={0.1}
-              onDragStart={() => setIsDragging(true)}
+              onDragStart={() => {
+                setIsDragging(true);
+                playSound('pull');
+              }}
               onDrag={(e, info) => setBallPos({ x: info.offset.x, y: info.offset.y })}
               onDragEnd={handleRelease}
               initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
