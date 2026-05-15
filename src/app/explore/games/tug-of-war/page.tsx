@@ -378,12 +378,19 @@ export default function TugOfWarGame() {
         const freshSnap = await getDoc(doc(db, "rooms", roomId));
         if (freshSnap.exists()) {
            const freshData = freshSnap.data();
-           const nextLevel = (freshData.gameplay.currentLevel + 1) % gameQuestions.length;
-           await updateDoc(doc(db, "rooms", roomId), { 
-             "gameplay.currentLevel": nextLevel,
-             // Clear status to allow next toast
-             [`players.${playerRole}.lastAnswerStatus`]: null
-           });
+           // Only increment if the level hasn't been moved by the other player yet
+           if (freshData.gameplay.currentLevel === roomData.gameplay.currentLevel) {
+              const nextLevel = (freshData.gameplay.currentLevel + 1) % gameQuestions.length;
+              await updateDoc(doc(db, "rooms", roomId), { 
+                "gameplay.currentLevel": nextLevel,
+                [`players.${playerRole}.lastAnswerStatus`]: null
+              });
+           } else {
+              // Someone already moved the level, just clear local answer status
+              await updateDoc(doc(db, "rooms", roomId), { 
+                [`players.${playerRole}.lastAnswerStatus`]: null
+              });
+           }
         }
       }, 2000);
 
