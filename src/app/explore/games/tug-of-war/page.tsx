@@ -351,12 +351,10 @@ export default function TugOfWarGame() {
       const otherRole = playerRole === "p1" ? "p2" : "p1";
       
       const currentScore = (roomData.players as any)[playerRole].score || 0;
-      const nextLevel = (roomData.gameplay.currentLevel + 1) % gameQuestions.length;
       
       const updates: any = {
         [`players.${playerRole}.score`]: currentScore + power,
         [`players.${playerRole}.lastAnswerStatus`]: isCorrect ? "correct" : "wrong",
-        "gameplay.currentLevel": nextLevel // Sync next level for both
       };
  
       if (!isCorrect) {
@@ -375,6 +373,20 @@ export default function TugOfWarGame() {
       }
       setTimeout(() => setToast(null), 2000);
       
+      // Update Level in Firestore after 2 seconds delay
+      setTimeout(async () => {
+        const freshSnap = await getDoc(doc(db, "rooms", roomId));
+        if (freshSnap.exists()) {
+           const freshData = freshSnap.data();
+           const nextLevel = (freshData.gameplay.currentLevel + 1) % gameQuestions.length;
+           await updateDoc(doc(db, "rooms", roomId), { 
+             "gameplay.currentLevel": nextLevel,
+             // Clear status to allow next toast
+             [`players.${playerRole}.lastAnswerStatus`]: null
+           });
+        }
+      }, 2000);
+
       // Check Win: Marker enters Finish Zone (40 or 60)
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
       const p2S = updates[`players.p2.score`] || roomData.players.p2?.score || 0;
