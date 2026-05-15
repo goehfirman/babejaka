@@ -178,9 +178,9 @@ export default function TugOfWarGame() {
   const [startTime, setStartTime] = useState(Date.now());
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("success");
-  const prevData = useRef<{ p1: { score: number, status: string | null }, p2: { score: number, status: string | null } }>({ 
-    p1: { score: 0, status: null }, 
-    p2: { score: 0, status: null } 
+  const prevData = useRef<{ p1: { score: number, status: string | null, level: number }, p2: { score: number, status: string | null, level: number } }>({ 
+    p1: { score: 0, status: null, level: 0 }, 
+    p2: { score: 0, status: null, level: 0 } 
   });
   const answerRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -209,9 +209,13 @@ export default function TugOfWarGame() {
           setCurrentLevel(data.gameplay.currentLevel);
         }
 
+
         if (data.metadata.status === "finished") {
-          setGameState("gameOver");
-          if (data.metadata.winner === playerRole) playWinCelebration();
+          // Add delay before showing gameOver screen so final toast can be seen
+          setTimeout(() => {
+            setGameState("gameOver");
+            if (data.metadata.winner === playerRole) playWinCelebration();
+          }, 2000);
         }
       }
     });
@@ -227,9 +231,13 @@ export default function TugOfWarGame() {
     const otherRole = playerRole === "p1" ? "p2" : "p1";
     const otherPlayer = roomData.players[otherRole];
     const selfPlayer = roomData.players[playerRole];
+    const currentLevelSync = roomData.gameplay.currentLevel;
 
-    // Monitor Opponent
-    if (otherPlayer && otherPlayer.lastAnswerStatus !== prevData.current[otherRole].status) {
+    // Monitor Opponent - Trigger if status changed OR if it's a new level with a status
+    const hasStatusChanged = otherPlayer?.lastAnswerStatus !== prevData.current[otherRole].status;
+    const hasLevelChanged = currentLevelSync !== prevData.current[otherRole].level;
+
+    if (otherPlayer && otherPlayer.lastAnswerStatus && (hasStatusChanged || hasLevelChanged)) {
        if (otherPlayer.lastAnswerStatus === "correct") {
           setToastType("success");
           setToast(`${otherPlayer.name} Berhasil menjawab dengan benar!`);
@@ -240,10 +248,10 @@ export default function TugOfWarGame() {
        setTimeout(() => setToast(null), 2000);
     }
 
-    // Monitor Self (for sync across devices if needed, but mainly for local logic consistency)
+    // Update Previous Data
     prevData.current = { 
-      p1: { score: p1?.score || 0, status: p1?.lastAnswerStatus || null }, 
-      p2: { score: p2?.score || 0, status: p2?.lastAnswerStatus || null } 
+      p1: { score: p1?.score || 0, status: p1?.lastAnswerStatus || null, level: currentLevelSync }, 
+      p2: { score: p2?.score || 0, status: p2?.lastAnswerStatus || null, level: currentLevelSync } 
     };
   }, [roomData, playerRole]);
 
