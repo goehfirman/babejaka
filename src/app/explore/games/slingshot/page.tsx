@@ -784,7 +784,9 @@ export default function SlingshotGame() {
               </motion.div>
               <h1 className="text-5xl font-black mb-2 tracking-tighter italic">SELESAI!</h1>
               <p className="text-xl font-bold mb-10 opacity-80 px-10">
-                Hebat! Kamu dapet skor <span className="text-primary font-black underline">{score}</span> poin.
+                {score === 0 
+                  ? "Ayo semangat! Jangan menyerah, coba lagi yuk!" 
+                  : `Hebat! Kamu dapet skor ${score} poin.`}
               </p>
               
               <div className="flex flex-col gap-4 max-w-xs mx-auto">

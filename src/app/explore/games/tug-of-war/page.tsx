@@ -174,8 +174,9 @@ export default function TugOfWarGame() {
   const [playerScore, setPlayerScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
   const [pendingStars, setPendingStars] = useState<{ count: number; timestamp: number; positions: { x: number; y: number }[] }>({ count: 0, timestamp: 0, positions: [] });
-  const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [startTime, setStartTime] = useState(Date.now());
+  const [toast, setToast] = useState<string | null>(null);
+  const prevScores = useRef({ p1: 0, p2: 0 });
   const answerRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Calculation for 2.5D Rope Position
@@ -211,6 +212,23 @@ export default function TugOfWarGame() {
     });
     return () => unsub();
   }, [roomId, playerRole]);
+
+  // Toast Monitor for Multiplayer
+  useEffect(() => {
+    if (!roomData || !playerRole) return;
+    const p1 = roomData.players.p1;
+    const p2 = roomData.players.p2;
+    
+    const otherRole = playerRole === "p1" ? "p2" : "p1";
+    const otherPlayer = roomData.players[otherRole];
+
+    if (otherPlayer && otherPlayer.score > prevScores.current[otherRole]) {
+       setToast(`${otherPlayer.name} Berhasil menjawab dengan benar!`);
+       setTimeout(() => setToast(null), 2000);
+    }
+
+    prevScores.current = { p1: p1?.score || 0, p2: p2?.score || 0 };
+  }, [roomData, playerRole]);
 
   const [isJoining, setIsJoining] = useState(false);
 
@@ -283,6 +301,8 @@ export default function TugOfWarGame() {
         const power = duration < 2 ? 4 : (duration < 5 ? 2 : 1);
         pS += power;
         setPlayerScore(pS);
+        setToast(`${profile.name} Berhasil menjawab dengan benar!`);
+        setTimeout(() => setToast(null), 2000);
         triggerStars(index);
         playSound('pull');
       } else {
@@ -316,7 +336,12 @@ export default function TugOfWarGame() {
       }
  
       await updateDoc(doc(db, "rooms", roomId), updates);
-      if (isCorrect) { triggerStars(index); playSound('pull'); }
+      if (isCorrect) { 
+        setToast(`${profile.name} Berhasil menjawab dengan benar!`);
+        setTimeout(() => setToast(null), 2000);
+        triggerStars(index); 
+        playSound('pull'); 
+      }
       
       // Check Win: Marker enters Finish Zone (40 or 60)
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
@@ -414,6 +439,24 @@ export default function TugOfWarGame() {
 
   return (
     <div className="min-h-screen bg-[#F0F4F8] relative overflow-hidden flex flex-col">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ y: -100, opacity: 0, scale: 0.5 }}
+            animate={{ y: 100, opacity: 1, scale: 1 }}
+            exit={{ y: -100, opacity: 0, scale: 0.5 }}
+            className="fixed top-0 left-0 right-0 z-[1000] flex justify-center pointer-events-none"
+          >
+            <div className="bg-success text-white px-8 py-4 rounded-full font-black text-xl shadow-2xl border-4 border-white flex items-center gap-3">
+              <Star className="fill-white animate-spin-slow" />
+              {toast}
+              <Star className="fill-white animate-spin-slow" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Game Background */}
       <div 
         className="absolute inset-0 pointer-events-none z-0 opacity-50"
@@ -589,6 +632,15 @@ export default function TugOfWarGame() {
          </div>
       </div>
       <StarFly burst={pendingStars} onStarHit={() => addPoints(1)} />
+      <style jsx global>{`
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
