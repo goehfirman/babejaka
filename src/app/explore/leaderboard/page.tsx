@@ -10,6 +10,7 @@ export default function LeaderboardPage() {
   const { profile } = useProfile();
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const q = query(
@@ -18,9 +19,10 @@ export default function LeaderboardPage() {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({
+      const data = snapshot.docs.map((doc, idx) => ({
         ...doc.data(),
         id: doc.id,
+        rank: idx + 1,
         isUser: doc.id === `${profile.name}_${profile.schoolName}` || doc.data().name === profile.name
       }));
       setLeaderboard(data);
@@ -33,7 +35,10 @@ export default function LeaderboardPage() {
     return () => unsubscribe();
   }, [profile.name, profile.schoolName]);
 
-  const sortedLeaderboard = leaderboard;
+  const filteredLeaderboard = leaderboard.filter(user => 
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.schoolName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-body text-[#333333] pb-20 relative overflow-hidden">
@@ -83,13 +88,40 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <>
+        
+        {/* Search Bar */}
+        <div className="bg-white/80 backdrop-blur-md rounded-[32px] p-4 shadow-lg mb-8 border-4 border-white flex items-center gap-4 group focus-within:ring-4 focus-within:ring-primary/20 transition-all">
+          <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-focus-within:bg-primary group-focus-within:text-white transition-all">
+            <span className="material-symbols-rounded">search</span>
+          </div>
+          <input 
+            type="text"
+            placeholder="Cari nama Jawara atau sekolah..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="flex-1 bg-transparent border-none outline-none font-black text-ink placeholder:text-slate-300"
+          />
+          {searchTerm && (
+            <button 
+              onClick={() => setSearchTerm("")}
+              className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 transition-all"
+            >
+              <span className="material-symbols-rounded text-base">close</span>
+            </button>
+          )}
+        </div>
 
         {/* List of Rank 4+ */}
         <div className="bg-white rounded-[40px] shadow-2xl border-4 border-white overflow-hidden p-6 md:p-10">
           <div className="space-y-4">
-            {sortedLeaderboard.map((user, idx) => {
-              const rank = idx + 1;
-              const isUser = user.isUser;
+            {filteredLeaderboard.length === 0 ? (
+              <div className="py-10 text-center">
+                <p className="font-black text-slate-400 italic">Jawara yang kamu cari tidak ditemukan...</p>
+              </div>
+            ) : (
+              filteredLeaderboard.map((user, idx) => {
+                const rank = user.rank;
+                const isUser = user.isUser;
 
               return (
                 <div 
@@ -123,7 +155,8 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
               );
-            })}
+            })
+           )}
           </div>
 
           <div className="mt-12 pt-10 border-t-2 border-slate-50 text-center">
