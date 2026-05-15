@@ -177,7 +177,11 @@ export default function TugOfWarGame() {
   const [feedback, setFeedback] = useState<null | { type: "correct" | "wrong"; index: number }>(null);
   const [startTime, setStartTime] = useState(Date.now());
   const [toast, setToast] = useState<string | null>(null);
-  const prevScores = useRef({ p1: 0, p2: 0 });
+  const [toastType, setToastType] = useState<"success" | "error">("success");
+  const prevData = useRef<{ p1: { score: number, status: string | null }, p2: { score: number, status: string | null } }>({ 
+    p1: { score: 0, status: null }, 
+    p2: { score: 0, status: null } 
+  });
   const answerRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Calculation for 2.5D Rope Position
@@ -222,13 +226,25 @@ export default function TugOfWarGame() {
     
     const otherRole = playerRole === "p1" ? "p2" : "p1";
     const otherPlayer = roomData.players[otherRole];
+    const selfPlayer = roomData.players[playerRole];
 
-    if (otherPlayer && otherPlayer.score > prevScores.current[otherRole]) {
-       setToast(`${otherPlayer.name} Berhasil menjawab dengan benar!`);
+    // Monitor Opponent
+    if (otherPlayer && otherPlayer.lastAnswerStatus !== prevData.current[otherRole].status) {
+       if (otherPlayer.lastAnswerStatus === "correct") {
+          setToastType("success");
+          setToast(`${otherPlayer.name} Berhasil menjawab dengan benar!`);
+       } else if (otherPlayer.lastAnswerStatus === "wrong") {
+          setToastType("error");
+          setToast(`${otherPlayer.name} Salah menjawab!`);
+       }
        setTimeout(() => setToast(null), 2000);
     }
 
-    prevScores.current = { p1: p1?.score || 0, p2: p2?.score || 0 };
+    // Monitor Self (for sync across devices if needed, but mainly for local logic consistency)
+    prevData.current = { 
+      p1: { score: p1?.score || 0, status: p1?.lastAnswerStatus || null }, 
+      p2: { score: p2?.score || 0, status: p2?.lastAnswerStatus || null } 
+    };
   }, [roomData, playerRole]);
 
   const [isJoining, setIsJoining] = useState(false);
@@ -302,20 +318,23 @@ export default function TugOfWarGame() {
         const power = duration < 2 ? 4 : (duration < 5 ? 2 : 1);
         pS += power;
         setPlayerScore(pS);
+        setToastType("success");
         setToast(`${profile.name} Berhasil menjawab dengan benar!`);
-        setTimeout(() => setToast(null), 2000);
         triggerStars(index);
         playSound('pull');
       } else {
         oS += 2;
         setOpponentScore(oS);
+        setToastType("error");
+        setToast(`${profile.name} Salah menjawab!`);
       }
+      setTimeout(() => setToast(null), 2000);
       checkWin(pS, oS);
       setTimeout(() => { 
         setCurrentLevel(p => (p + 1) % gameQuestions.length); 
         setFeedback(null); 
         setStartTime(Date.now()); 
-      }, 1500);
+      }, 2000);
     } else {
       // Multiplayer
       if (!roomId || !playerRole || !roomData) return;
@@ -338,11 +357,15 @@ export default function TugOfWarGame() {
  
       await updateDoc(doc(db, "rooms", roomId), updates);
       if (isCorrect) { 
+        setToastType("success");
         setToast(`${profile.name} Berhasil menjawab dengan benar!`);
-        setTimeout(() => setToast(null), 2000);
         triggerStars(index); 
         playSound('pull'); 
+      } else {
+        setToastType("error");
+        setToast(`${profile.name} Salah menjawab!`);
       }
+      setTimeout(() => setToast(null), 2000);
       
       // Check Win: Marker enters Finish Zone (40 or 60)
       const p1S = updates[`players.p1.score`] || roomData.players.p1.score;
@@ -359,7 +382,7 @@ export default function TugOfWarGame() {
       setTimeout(() => { 
         setFeedback(null); 
         setStartTime(Date.now()); 
-      }, 1500);
+      }, 2000);
     }
   };
  
@@ -449,7 +472,7 @@ export default function TugOfWarGame() {
             exit={{ y: -100, opacity: 0, scale: 0.5 }}
             className="fixed top-0 left-0 right-0 z-[1000] flex justify-center pointer-events-none"
           >
-            <div className="bg-success text-white px-8 py-4 rounded-full font-black text-xl shadow-2xl border-4 border-white flex items-center gap-3">
+            <div className={`${toastType === 'success' ? 'bg-success' : 'bg-primary'} text-white px-8 py-4 rounded-full font-black text-xl shadow-2xl border-4 border-white flex items-center gap-3`}>
               <Star className="fill-white animate-spin-slow" />
               {toast}
               <Star className="fill-white animate-spin-slow" />
